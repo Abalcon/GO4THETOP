@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+  /*text-align: center;*/
 }
 
 .App-header {
@@ -7,7 +7,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
@@ -34,6 +34,7 @@
   margin:0px auto;
   padding: 20px 0px 20px 0px;
 }
+
 .jumbotron {
   padding:70px 30px 70px 30px;
   margin:0px auto;
@@ -41,14 +42,10 @@
   color:floralwhite;
 }
 
-address{
+address {
   font-size:80%;
   margin:0px;
   color:#0f0f0f;
-}
-
-.navbar-dark {
-  background-color: #7FFFD4;
 }
 
 ul {

@@ -20,30 +20,38 @@ class Header extends Component {
     render () {
         return (
             <div>
-                <Navbar dark expand="md">
+                <Navbar light expand="md">
                     <div className="container">
-                        <NavbarToggler onClick={this.toggleNav} />
                         <NavbarBrand className="mr-auto" href="/">Go for the Top!</NavbarBrand>
+                        <NavbarToggler onClick={this.toggleNav} />
                         <Collapse isOpen={this.state.isNavOpen} navbar>
-                            <Nav navbar>
+                            <Nav className="ml-2 mr-2" navbar>
                                 <NavItem>
-                                    <NavLink className="nav-link" to='/credits'>
-                                        <span className="fa fa-home fa-lg">Home</span>
+                                    <NavLink className="nav-link" to='/home'>
+                                        <span className="fa fa-home fa-lg">
+
+                                        </span>Home
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink className="nav-link" to='/credits'>
-                                        <span className="fa fa-info fa-lg">Credits</span>
+                                        <span className="fa fa-info fa-lg">
+
+                                        </span>Credits
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink className="nav-link" to='/preliminary'>
-                                        <span className="fa fa-list fa-lg">Preliminary</span>
+                                        <span className="fa fa-list fa-lg">
+
+                                        </span>Preliminary
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
                                     <NavLink className="nav-link" to='/maindraw'>
-                                        <span className="fa fa-address-card fa-lg">Main Draw</span>
+                                        <span className="fa fa-address-card fa-lg">
+
+                                        </span>Main Draw
                                     </NavLink>
                                 </NavItem>
                             </Nav>
