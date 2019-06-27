@@ -3,7 +3,7 @@ import Entry from './EntryComponent';
 import RecordSubmit from './RecordSubmitComponent';
 import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
 
-function Preliminary(props) {
+function Preliminary() {
     return (
         <div className="container">
             <Tabs>
