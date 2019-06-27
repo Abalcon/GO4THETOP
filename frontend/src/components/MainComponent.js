@@ -6,11 +6,13 @@ import Preliminary from './PreliminaryComponent';
 import { STAFFS } from '../shared/staffs';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import { Switch, Route, Redirect } from 'react-router-dom';
+import { NOTICES } from "../shared/notices";
 
 class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            notices: NOTICES,
             staffs: STAFFS
         };
     }
@@ -18,7 +20,7 @@ class Main extends Component {
     render () {
         const HomePage = () => {
             return (
-                <Home />
+                <Home notices={this.state.notices}/>
             );
         };
 
