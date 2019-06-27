@@ -3,6 +3,7 @@ import Header from './HeaderComponent';
 import Home from './HomeComponent';
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
+import { STAFFS } from '../shared/staffs';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import { Switch, Route, Redirect } from 'react-router-dom';
 
@@ -10,7 +11,7 @@ class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            staffs: STAFFS
         };
     }
 
@@ -23,7 +24,7 @@ class Main extends Component {
 
         const CreditsPage = () => {
             return (
-                <Credits />
+                <Credits staffs={this.state.staffs}/>
             );
         };
 
