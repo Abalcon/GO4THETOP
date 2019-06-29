@@ -3,8 +3,8 @@ export const STAFFS =
         {
             id: 0,
             name:'Ruse',
-            image: 'assets/images/default.jpg',
-            description:'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+            image: 'assets/images/Staff_RUSE.jpg',
+            description:'주최팀장 RUSE입니다. 여러가지 일을 하고 있습니다.\n세번째도 잘 부탁드립니다. 하반기의 열기를 모두와 함께! 도전을 기다립니다.'
         },
         {
             id: 1,
@@ -24,6 +24,41 @@ export const STAFFS =
             id: 3,
             name:'Stult_i',
             image: 'assets/images/Staff_Stulti.jpg',
-            description:'Tournament Management Automation Developer!'
+            description:'웹사이트 개발자 Stult_i입니다. 게임 관련 컨텐츠의 개발이 중요하겠다 생각하여 이번에 본격적으로 참여하게 되었습니다. Contents never die!'
+        },
+        {
+            id: 4,
+            name:'GR3K',
+            image: 'assets/images/Staff_GR3K.png',
+            description:'니헤헤...'
+        },
+        {
+            id: 5,
+            name:'Sizzz',
+            image: 'assets/images/Staff_Sizzz.jpg',
+            description:'Go4TheTop에 3회째 참여하고 있는 방송/해설 담당 Sizzz 입니다.\n' +
+                '\n' +
+                '지난 번 대회보다 더 깔끔한 해설을 들려드리기 위해 준비 중입니다. 이번에도 재미있게 들어주셨으면 좋겠습니다!'
+        },
+        {
+            id: 6,
+            name:'Kalt',
+            image: 'assets/images/Staff_Kalt.png',
+            description:'처음 밟은 그 한 걸음, 미래를 여는 화살표! (はじめて踏んだその一歩、未来を拓く矢印！) - TAG, <#OurMemories>'
+        },
+        {
+            id: 7,
+            name:'Juno',
+            image: 'assets/images/Staff_Juno.jpg',
+            description:'1, 2차때 여러 보조업무를 담당했던 Juno입니다.\n' +
+                '이번 고포더탑 3차 대회 역시 스태프로 참가하게되었습니다.\n' +
+                '고포더탑 3차 대회도 잘 부탁드리고 기대 많이해주세요.\n' +
+                '감사합니다.'
+        },
+        {
+            id: 8,
+            name:'AART',
+            image: 'assets/images/Staff_HJH.jpg',
+            description:'스태프로 참가는 처음이지만 잘 부탁드립니다.'
         }
     ];

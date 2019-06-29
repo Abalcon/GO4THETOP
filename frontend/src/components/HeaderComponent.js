@@ -48,10 +48,10 @@ class Header extends Component {
                                     </NavLink>
                                 </NavItem>
                                 <NavItem>
-                                    <NavLink className="nav-link" to='/maindraw'>
+                                    <NavLink className="nav-link" to='/mainevent'>
                                         <span className="fa fa-address-card fa-lg">
 
-                                        </span>Main Draw
+                                        </span>Main Event
                                     </NavLink>
                                 </NavItem>
                             </Nav>

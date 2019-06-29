@@ -3,6 +3,7 @@ import Header from './HeaderComponent';
 import Home from './HomeComponent';
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
+import MainEvent from './MainEventComponent';
 import { STAFFS } from '../shared/staffs';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import { Switch, Route, Redirect } from 'react-router-dom';
@@ -36,6 +37,12 @@ class Main extends Component {
             );
         };
 
+        const MainEventPage = () => {
+            return (
+                <MainEvent />
+            )
+        };
+
         return (
             <div>
                 <Header />
@@ -44,7 +51,7 @@ class Main extends Component {
                         <Route path="/home" component={HomePage} />
                         <Route path="/credits" component={CreditsPage} />
                         <Route path="/preliminary" component={PreliminaryPage} />
-                        <Route path="/maindraw" component={() => <h4>본선 진행</h4>} />
+                        <Route path="/mainevent" component={MainEventPage} />
                         <Redirect to="/home" />
                     </Switch>
 
