@@ -20,7 +20,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "aws s3 sync ./build s3://go4thetop-react --profile=GO4THETOP"
+    "deploy": "aws s3 sync ./build s3://go4thetop-react --profile=GO4THETOP",
+    "invalidate": "aws cloudfront create-invalidation --profile=GO4THETOP --distribution-id E26N3EFP8M5V9L --paths / /index.html /service-worker.js /asset-manifest.json /manifest.json /favicon.ico /assets/* /static/*"
   },
   "eslintConfig": {
     "extends": "react-app"

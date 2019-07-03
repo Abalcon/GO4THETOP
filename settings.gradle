@@ -4,4 +4,4 @@ pluginManagement {
     }
 }
 rootProject.name = 'go4thetop'
-include 'frontend'
+//include 'frontend'

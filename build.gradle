@@ -15,21 +15,29 @@ sourceCompatibility = '8'
 war {
     enabled = true
     archivesBaseName = 'go4thetop-aws'
-    version = '0.3-together'
+    version = '0.5'
 
-    from('frontend/build') {
-        into 'static'
-    }
+//    from('frontend/build') {
+//        into('/')
+//    }
+//    
+//    from('frontend/build/index.html') {
+//        into('WEB-INF/classes/templates')
+//    }
+    
+//    from('.ebextensions') {
+//        into('.ebextensions')
+//    }
 }
-war.dependsOn(':frontend:assemble')
+//war.dependsOn(':frontend:assemble')
 
 jar {
     enabled = true
-    from('frontend/build') {
-        into 'static'
-    }
+//    from('frontend/build') {
+//        into 'static'
+//    }
 }
-jar.dependsOn(':frontend:assemble')
+//jar.dependsOn(':frontend:assemble')
 
 configurations {
     developmentOnly

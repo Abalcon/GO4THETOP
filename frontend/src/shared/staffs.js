@@ -14,7 +14,7 @@ export const STAFFS =
         },
         {
             id: 2,
-            name:'SoftK',
+            name:'SOFTK',
             image: 'assets/images/Staff_SoftK.jpg',
             description:'소프트케이 입니다. 벌써 Go4TheTop 3회차가 왔습니다.\n' +
                 '최근 리듬게임 대회가 많이 생겨나고, 방송 또한 많은 공을 들이고 있다고 전해 들었습니다.\n' +
@@ -28,7 +28,7 @@ export const STAFFS =
         },
         {
             id: 4,
-            name:'GR3K',
+            name:'GR3K_',
             image: 'assets/images/Staff_GR3K.png',
             description:'니헤헤...'
         },
