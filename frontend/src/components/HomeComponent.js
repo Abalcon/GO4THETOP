@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Card, CardBody, CardText, CardTitle, CardSubtitle} from "reactstrap";
+import {Card, CardBody, CardHeader, CardText, CardTitle} from "reactstrap";
 
 class Home extends Component {
 
@@ -9,9 +9,10 @@ class Home extends Component {
             return (
                 <div key={notice.id} className="col-12 m-1">
                     <Card>
+                        <CardHeader tag="h3">{notice.date}</CardHeader>
                         <CardBody>
-                            <CardTitle>{notice.date}</CardTitle>
-                            <CardSubtitle>{notice.subject}</CardSubtitle>
+                            <CardTitle tag="h5">{notice.subject}</CardTitle>
+                            {/*<CardSubtitle>{notice.subject}</CardSubtitle>*/}
                             <CardText>{newText}</CardText>
                         </CardBody>
                     </Card>

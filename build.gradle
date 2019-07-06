@@ -15,7 +15,7 @@ sourceCompatibility = '8'
 war {
     enabled = true
     archivesBaseName = 'go4thetop-aws'
-    version = '0.5'
+    version = '0.5-https-2'
 
 //    from('frontend/build') {
 //        into('/')
@@ -25,9 +25,9 @@ war {
 //        into('WEB-INF/classes/templates')
 //    }
     
-//    from('.ebextensions') {
-//        into('.ebextensions')
-//    }
+    from('.ebextensions') {
+        into('.ebextensions')
+    }
 }
 //war.dependsOn(':frontend:assemble')
 

@@ -3,16 +3,18 @@ export const NOTICES =
         {
             id: 0,
             date: '2019-06-28',
-            subject: '공지사항 테스트',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vel urna eget dui suscipit tincidunt. Etiam a risus vitae erat feugiat pharetra vitae sit amet elit. Nulla vitae erat quis ante semper mollis nec ultricies diam. Etiam elit erat, interdum quis enim vel, sodales volutpat tortor. Phasellus porta velit felis, ac eleifend lectus sodales eu. Maecenas magna dui, consectetur id risus nec, luctus varius eros. Proin ac vulputate velit. Vivamus lacus odio, luctus pellentesque urna ut, ultricies feugiat velit. Proin eget lobortis nisi, quis hendrerit ante. Curabitur non metus sollicitudin, pellentesque augue sit amet, convallis tortor. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut dictum nulla a scelerisque commodo. Vivamus pretium mauris non congue rhoncus. In commodo sem sit amet luctus venenatis. Proin condimentum diam sit amet mi laoreet aliquam. Ut porttitor enim sit amet turpis pharetra gravida.\n' +
-                '\n' +
-                'Cras fermentum massa et nibh aliquet, et pretium felis aliquam. Vestibulum ac felis finibus justo bibendum tempor vel sit amet mi. Cras at tempor ligula, sit amet lobortis ligula. Sed mattis accumsan sagittis. Vivamus quis mattis lorem. Nulla ac augue quis eros auctor imperdiet molestie eget ante. Nam ac blandit lorem, et mollis nisl. Nunc sed imperdiet lectus, et bibendum velit. Integer egestas porta tellus fermentum maximus. Proin consectetur a velit sed placerat. Praesent commodo eleifend ante. Suspendisse potenti. Fusce suscipit erat arcu, a convallis ex ultrices eget. Etiam luctus sapien at sapien blandit tempus.\n' +
-                '\n' +
-                'Donec a lorem maximus, ultrices leo nec, tincidunt elit. Maecenas viverra leo nec tristique ornare. Sed aliquam consequat facilisis. Fusce facilisis nisl sed orci lacinia pulvinar. Aenean rutrum, nulla sed rutrum pretium, mauris nunc efficitur purus, ac tempor arcu justo vel ipsum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus auctor tincidunt fringilla. Donec vestibulum, neque a ultricies venenatis, lectus dui lacinia elit, quis eleifend felis nisi sed nibh. Maecenas eu semper neque. Etiam imperdiet felis sed purus aliquam, a lacinia sem condimentum.\n' +
-                '\n' +
-                'Fusce magna erat, feugiat vitae eleifend ut, commodo sed mauris. Nunc quis metus eget turpis molestie sagittis. Nulla facilisis, quam eu imperdiet cursus, mauris neque aliquam ipsum, id sagittis massa dolor sed eros. Suspendisse vulputate justo eu lectus lacinia, eu dapibus diam iaculis. Suspendisse mollis mattis justo, at dictum eros maximus sed. In nec faucibus nibh. Pellentesque in lacus sit amet velit finibus convallis. Praesent ultricies molestie dolor, sed lobortis ante scelerisque non. Nullam et venenatis mi, sed venenatis mauris. Maecenas fermentum nibh neque. Vivamus eu rutrum metus. Nam vitae viverra nibh. Nunc pulvinar, nisi ut laoreet sodales, lacus nunc mattis nunc, sit amet porta dolor enim ut enim. Morbi interdum quis turpis sit amet ultrices.\n' +
-                '\n' +
-                'Phasellus vel dolor imperdiet, pellentesque lacus quis, tincidunt augue. Donec id pulvinar mauris. Quisque sit amet lectus malesuada, porta neque vitae, interdum mi. Integer non dui pellentesque, placerat risus vel, sodales orci. Proin cursus, nulla quis lacinia posuere, quam ipsum volutpat massa, at euismod nulla turpis ac justo. Sed iaculis augue sit amet aliquam dignissim. Nullam laoreet ante euismod, sollicitudin ante at, congue nunc. Vestibulum neque risus, vehicula ac urna quis, convallis lobortis nunc. Praesent et viverra lectus. Cras fringilla euismod neque nec aliquam. Vestibulum maximus magna sapien, eu blandit odio gravida in. Duis molestie libero id leo venenatis cursus. Proin euismod felis aliquam luctus pretium. Vivamus sit amet volutpat ex, id ornare urna. Mauris lacus risus, pharetra a laoreet at, consequat non risus.'
+            subject: 'GO4THETOP 3회 개최 인사말',
+            content: '세번째 대회 입니다.\n매번 대회를 준비하기 시작할때 부터 항상 불안함 반, 기대 반이 되는 것 같습니다.\n'
+                + '앞선 두번의 대회동안 아쉬운 점을 점점 보완하면서도 새로운 아쉬운 점이 생겼고, 하얗게 불태우듯이 한 대회에 에너지를 소진하고 다시금 새로 만드는 경험을 하였습니다. 부족한듯 조금씩 채워나간 두 번의 대회였습니다.\n\n'
+                + '하지만 세번째 대회 입니다.\n저를 포함한 주최팀은 어느덧 노련함이라는 무기가 생겼고, 선수들은 점점 정교함과 높은 실력을, 관객들과 대회에 관심이 있는 모든 분들은 기대치가 올랐습니다.\n\n'
+                + '새로운 버전이 현재 일본에 공개되어 있고, 한번의 국제 대회가 지나간 상황에서 새로운 즐거움을 만들 필요성이 생겼습니다.\n'
+                + '그와 동시에 상반기의 여러 대회들은 저로 하여금 다시 두근거림을 느끼게 되었습니다. 그리고, 다시한번 대회를 준비합니다.\n\n'
+                + 'New Era, 새로운 국면을 맞이하여 수많은 강자와 상승하는 댄서들이 늘어난 댄스 댄스 레볼루션.\n\n'
+                + 'New Aces. 이번 대회를 통해 기존 에이스들의 단단함과 새로운 에이스들의 날카로움을 만나보고 싶습니다.\n\n'
+                + '한 해가 지난 만큼 조금 더 즐겁고 멋진 대회를 위해 열심히 준비하겠습니다. 한국의 댄서, 해외의 댄서 모두를 기다립니다. 10월에 만나뵙겠습니다.\n\n'
+                + 'GO4THETOP. New Era, New Aces.\n'
+                + 'Next Champion is You.\n\n'
+                + '주최 Ruse'
         },
         {
             id: 1,
