@@ -19,7 +19,6 @@ public interface PreliminaryEntryApi {
 
     @POST(Entry_API_PATH)
     public Call<Contender> addContender(@Body Contender ctd);
-    //FIXME: 여기도 잘못 쓴듯?
 
     @GET(Entry_API_PATH + "/{id}")
     public Contender getContenderById(@Path("id") long id);
@@ -28,5 +27,11 @@ public interface PreliminaryEntryApi {
     public Contender getContenderByMail(@Path("mail") String mail);
 
     @GET(Entry_API_PATH + "/search/findByMail")
-    public Collection<Contender> findByMail(@Query("mail") String mail);
+    public Call<Collection<Contender>> findByMail(@Query("mail") String mail);
+
+    /*
+    https://jongmin92.github.io/2018/01/29/Programming/android-retrofit2-okhttp3/
+    Retrofit2는 보통 Client 측의 개발을 할때 주로 사용한다
+    Server 측에서는 REST API Test용으로 가상의 Client를 만드는 역할을 하게 된다
+    */
 }

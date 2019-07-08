@@ -2,9 +2,10 @@ package com.stulti.go4thetop;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
-import okhttp3.logging.HttpLoggingInterceptor.*;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import retrofit2.Retrofit;
@@ -20,8 +21,11 @@ import static org.junit.Assert.assertTrue;
 public class Go4thetopApplicationTests {
 
     //    @Autowired
-//    private MailSender mailSender;
+//    private JavaMailSender mailSender;
+    //FIXME: Autowired가 되도록 Bean 설정 필요
     private DummyMailSender mailSender = new DummyMailSender();
+    @Autowired
+    private MailService testMailService;
 
     private final String TEST_URL = "http://localhost:9000";
     // HTTP 통신 확인용
@@ -35,6 +39,8 @@ public class Go4thetopApplicationTests {
             .client(client).build().create(PreliminaryEntryApi.class);
     private Contender testContender = new Contender("extinbase@gmail.com",
             "DJ 스툴티", "Stult_i", false, true, "AutomationCreator");
+    private Contender testContender2 = new Contender("extinbase@naver.com",
+            "DJ 아발컨", "Abalcon", true, false, "FutariUltraCS");
 
     @Test
     public void contextLoads() {
@@ -62,14 +68,23 @@ public class Go4thetopApplicationTests {
 
     @Test
     public void registrationConfirmMailTest() {
-        MailService testMailService = new MailService();
-        testMailService.setMailSender(mailSender);
+        //MailServiceImpl testMailService = new MailServiceImpl();
+        //testMailService.setMailSender(mailSender);
         testMailService.sendRegistConfirmMail(testContender);
     }
 
-    @Test
-    public void entryExistenceCheckTest() {
+//    @Test
+//    public void registrationConfirmRealMailTest() {
+//        MailServiceImpl testMailService = new MailServiceImpl();
+//        //testMailService.setMailSender(realMailSender);
+//        testMailService.sendRegistConfirmMail(testContender);
+//    }
 
+    @Test
+    public void entryExistenceCheckTest() throws IOException {
+        Contender existingContender = entryService.addContender(testContender2).execute().body();
+        Collection<Contender> checkDuplicate = entryService.findByMail("extinbase@naver.com").execute().body();
+        assertTrue(checkDuplicate.contains(existingContender));
     }
 
     /*

@@ -3,7 +3,6 @@ package com.stulti.go4thetop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.List;
 
@@ -12,11 +11,12 @@ import java.util.List;
 public class HomeController {
 
     private ContenderRepository ctdRepo;
-    private static HttpServerErrorException exception;
+    private MailService mailService;
 
     @Autowired
-    public HomeController(ContenderRepository repository) {
+    public HomeController(ContenderRepository repository, MailService mailService) {
         this.ctdRepo = repository;
+        this.mailService = mailService;
     }
 
     @RequestMapping(value = "/")
@@ -41,10 +41,18 @@ public class HomeController {
     Contender addContender(@RequestBody Contender ctd) {
         /*
         https://stackoverflow.com/questions/33796218/content-type-application-x-www-form-urlencodedcharset-utf-8-not-supported-for
-        Form을 이용한 제출을 사용하면 @RequestBody로 인식하지 못한다고 한다
+        Form을 이용한 제출(x-www-form-urlencoded)을 사용하면 @RequestBody로 인식하지 못한다고 한다
         @RequestBody를 제대로 적용하려면, Body를 Application/json 형태로 보내야 한다
         */
-        ctdRepo.save(ctd);
+        Contender newContender = ctdRepo.save(ctd);
+        mailService.sendRegistConfirmMail(newContender);
         return ctd;
     }
+
+    @RequestMapping(value = "/entry/search/findByMail")
+    public @ResponseBody
+    List<Contender> findByMail(String mail) {
+        return ctdRepo.findByMail(mail);
+    }
+
 }
