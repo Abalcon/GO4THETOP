@@ -5,29 +5,6 @@ build/
 !**/src/main/**
 !**/src/test/**
 
-## React Front-end
-# dependencies
-**/src/main/showtime/node_modules
-**/src/main/showtime/.pnp
-**/src/main/showtime/.pnp.js
-
-# testing
-**/src/main/showtime/coverage
-
-# production
-**/src/main/showtime/build
-
-# misc
-**/src/main/showtime/.DS_Store
-**/src/main/showtime/.env.local
-**/src/main/showtime/.env.development.local
-**/src/main/showtime/.env.test.local
-**/src/main/showtime/.env.production.local
-
-**/src/main/showtime/npm-debug.log*
-**/src/main/showtime/yarn-debug.log*
-**/src/main/showtime/yarn-error.log*
-
 ### STS ###
 .apt_generated
 .classpath
@@ -53,3 +30,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Bean Setting ###
+.properties
