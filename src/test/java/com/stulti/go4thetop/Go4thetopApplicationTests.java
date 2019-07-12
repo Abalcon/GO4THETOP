@@ -27,7 +27,7 @@ public class Go4thetopApplicationTests {
     @Autowired
     private MailService testMailService;
 
-    private final String TEST_URL = "http://localhost:9000";
+    private final String TEST_URL = "http://localhost:5000";
     // HTTP 통신 확인용
     Level level = Level.BODY;
     HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(level);
