@@ -18,6 +18,10 @@ class Header extends Component {
     }
 
     render () {
+        const jumbotronStyle = {
+            backgroundImage: 'url(assets/images/background_example.jpeg)'
+        };
+
         return (
             <div>
                 <Navbar light expand="md">
@@ -58,11 +62,15 @@ class Header extends Component {
                         </Collapse>
                     </div>
                 </Navbar>
-                <Jumbotron>
+                <Jumbotron style={jumbotronStyle}>
                     <div className="container">
                         <div className="row row-header">
                             <div className="col-12 col-sm-6">
                                 <h1>GO4THETOP</h1>
+                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
+                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
+                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
+                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
                                 <p>The 3rd International DanceDanceRevolution Tournament!</p>
                             </div>
                         </div>

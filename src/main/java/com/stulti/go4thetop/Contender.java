@@ -2,10 +2,7 @@ package com.stulti.go4thetop;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -19,10 +16,18 @@ public class Contender {
     private String cardName;
     private Boolean upper;
     private Boolean lower;
-    private Integer upperTrack1;
-    private Integer upperTrack2;
-    private Integer lowerTrack1;
-    private Integer lowerTrack2;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer upperTrack1 = 0;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer upperTrack2 = 0;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer upperTotal = 0;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer lowerTrack1 = 0;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer lowerTrack2 = 0;
+    @Column(nullable = false, columnDefinition = "number(5) default 0")
+    private Integer lowerTotal = 0;
     private String sns;
 
     private Contender() {}

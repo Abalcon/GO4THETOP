@@ -44,6 +44,7 @@ public class Go4thetopApplicationTests {
 
     @Test
     public void contextLoads() {
+
     }
 
     /* 테스트 내용

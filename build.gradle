@@ -15,21 +15,12 @@ sourceCompatibility = '8'
 war {
     enabled = true
     archivesBaseName = 'go4thetop-aws'
-    version = '0.5-https-2'
-
-//    from('frontend/build') {
-//        into('/')
-//    }
-//    
-//    from('frontend/build/index.html') {
-//        into('WEB-INF/classes/templates')
-//    }
+    version = '0.7-rds'
     
-    from('.ebextensions') {
-        into('.ebextensions')
-    }
+//    from('.ebextensions') {
+//        into('.ebextensions')
+//    }
 }
-//war.dependsOn(':frontend:assemble')
 
 jar {
     enabled = true
@@ -71,7 +62,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.14.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.4.0'
-    implementation 'com.h2database:h2'
+    testImplementation 'com.h2database:h2'
+    implementation 'mysql:mysql-connector-java'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
