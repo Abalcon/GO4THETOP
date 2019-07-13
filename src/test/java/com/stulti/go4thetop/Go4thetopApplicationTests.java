@@ -1,24 +1,31 @@
 package com.stulti.go4thetop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okhttp3.logging.HttpLoggingInterceptor.Level;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.IOException;
-import java.util.Collection;
-
-import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
 public class Go4thetopApplicationTests {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     //    @Autowired
 //    private JavaMailSender mailSender;
@@ -27,7 +34,7 @@ public class Go4thetopApplicationTests {
     @Autowired
     private MailService testMailService;
 
-    private final String TEST_URL = "http://localhost:5000";
+    private final String TEST_URL = "http://localhost:9000";
     // HTTP 통신 확인용
     Level level = Level.BODY;
     HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(level);
@@ -37,6 +44,7 @@ public class Go4thetopApplicationTests {
             .addConverterFactory(GsonConverterFactory.create())
             //.addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(client).build().create(PreliminaryEntryApi.class);
+
     private Contender testContender = new Contender("extinbase@gmail.com",
             "DJ 스툴티", "Stult_i", false, true, "AutomationCreator");
     private Contender testContender2 = new Contender("extinbase@naver.com",
@@ -58,35 +66,47 @@ public class Go4thetopApplicationTests {
     */
 
     @Test
-    public void registrationTest() throws IOException {
-        Contender addedContender = entryService.addContender(testContender).execute().body();
-        Collection<Contender> stored = entryService.getContenderList().execute().body();
-        System.out.println("Test: " + stored.size() + " - " + stored.toArray()[0]);
-        System.out.println(testContender);
-        System.out.println(addedContender);
-        assertTrue(stored.contains(addedContender));
+    public void registrationTest() throws Exception {
+        mockMvc.perform(post("/entry").content(asJsonString(testContender)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.mail").value(testContender.getMail()));
+        //content().json(asJsonString(testContender))
+        //jsonPath("$.person.name").value("Jason")
+
+//        mockMvc.perform(get("/entry/search/findByMail").requestAttr("mail", testContender.getMail()))
+//                .andExpect(status().isOk()).andExpect(jsonPath("$.mail").value(testContender.getMail()));
+        mockMvc.perform(get("/entry/search/findByMail").param("mail", testContender.getMail()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].mail").value(testContender.getMail()));
     }
 
-    @Test
-    public void registrationConfirmMailTest() {
-        //MailServiceImpl testMailService = new MailServiceImpl();
-        //testMailService.setMailSender(mailSender);
-        testMailService.sendRegistConfirmMail(testContender);
+    private static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    @Test
-//    public void registrationConfirmRealMailTest() {
-//        MailServiceImpl testMailService = new MailServiceImpl();
-//        //testMailService.setMailSender(realMailSender);
+//    public void registrationConfirmMailTest() {
+//        //MailServiceImpl testMailService = new MailServiceImpl();
+//        //testMailService.setMailSender(mailSender);
 //        testMailService.sendRegistConfirmMail(testContender);
 //    }
 
-    @Test
-    public void entryExistenceCheckTest() throws IOException {
-        Contender existingContender = entryService.addContender(testContender2).execute().body();
-        Collection<Contender> checkDuplicate = entryService.findByMail("extinbase@naver.com").execute().body();
-        assertTrue(checkDuplicate.contains(existingContender));
-    }
+//    @Test
+//    public void entryExistenceCheckTest() throws Exception {
+//        String expectValue = "[" + asJsonString(testContender2) + "]";
+//
+//        mockMvc.perform(post("/entry").content(asJsonString(testContender2)).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk()).andExpect(content().json(asJsonString(testContender2)));
+//
+//        mockMvc.perform(get("/entry/search/findByMail").requestAttr("mail", testContender2.getMail()))
+//                .andExpect(status().isOk()).andExpect(content().json(expectValue));
+//
+////        Contender existingContender = entryService.addContender(testContender2).execute().body();
+////        Collection<Contender> checkDuplicate = entryService.findByMail("extinbase@naver.com").execute().body();
+////        assertTrue(checkDuplicate.contains(existingContender));
+//    }
 
     /*
     [예선 참가 신청 작업 완료 후 진행]

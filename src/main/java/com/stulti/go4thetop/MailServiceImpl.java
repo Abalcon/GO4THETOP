@@ -14,6 +14,7 @@ public class MailServiceImpl implements MailService {
 //    public void setMailSender(JavaMailSender mailSender) {
 //        this.mailSender = mailSender;
 //    }
+
     @Autowired
     public JavaMailSender mailSender;
 
