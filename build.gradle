@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
 group = 'com.stulti'
-version = '0.0.1-SNAPSHOT'
+version = '0.1-ec2-running'
 sourceCompatibility = '8'
 
 war {
@@ -24,11 +24,7 @@ war {
 
 jar {
     enabled = true
-//    from('frontend/build') {
-//        into 'static'
-//    }
 }
-//jar.dependsOn(':frontend:assemble')
 
 configurations {
     developmentOnly
