@@ -9,22 +9,18 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
 group = 'com.stulti'
-version = '0.1-ec2-running'
+version = '0.2-ec2-running'
 sourceCompatibility = '8'
 
-war {
-    enabled = true
-    archivesBaseName = 'go4thetop-aws'
-    version = '0.7-rds'
-    
-//    from('.ebextensions') {
-//        into('.ebextensions')
-//    }
-}
-
-jar {
-    enabled = true
-}
+//war {
+//    enabled = true
+//    archivesBaseName = 'go4thetop-aws'
+//    version = '0.7-rds'
+//    
+////    from('.ebextensions') {
+////        into('.ebextensions')
+////    }
+//}
 
 configurations {
     developmentOnly
