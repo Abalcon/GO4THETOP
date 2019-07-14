@@ -26,7 +26,7 @@ class Header extends Component {
             <div>
                 <Navbar light expand="md">
                     <div className="container">
-                        <NavbarBrand className="mr-auto" href="/">Go for the Top!</NavbarBrand>
+                        <NavbarBrand className="mr-auto" href="/">GO4THETOP</NavbarBrand>
                         <NavbarToggler onClick={this.toggleNav} />
                         <Collapse isOpen={this.state.isNavOpen} navbar>
                             <Nav className="ml-2 mr-2" navbar>
@@ -67,11 +67,9 @@ class Header extends Component {
                         <div className="row row-header">
                             <div className="col-12 col-sm-6">
                                 <h1>GO4THETOP</h1>
-                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
-                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
-                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
-                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
-                                <p>The 3rd International DanceDanceRevolution Tournament!</p>
+                                <p>New Era, New Aces.</p>
+                                <p>2019. 10. 12.</p>
+                                <p>at Bucheon Attack</p>
                             </div>
                         </div>
                     </div>
