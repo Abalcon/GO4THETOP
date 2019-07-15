@@ -4,30 +4,32 @@ import Home from './HomeComponent';
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
 import MainEvent from './MainEventComponent';
-import { STAFFS } from '../shared/staffs';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
-import { Switch, Route, Redirect } from 'react-router-dom';
-import { NOTICES } from "../shared/notices";
+import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        notices: state.notices,
+        staffs: state.staffs
+    }
+};
 
 class Main extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            notices: NOTICES,
-            staffs: STAFFS
-        };
-    }
+    // constructor(props) {
+    //     super(props);
+    // }
 
     render () {
         const HomePage = () => {
             return (
-                <Home notices={this.state.notices}/>
+                <Home notices={this.props.notices}/>
             );
         };
 
         const CreditsPage = () => {
             return (
-                <Credits staffs={this.state.staffs}/>
+                <Credits staffs={this.props.staffs}/>
             );
         };
 
@@ -61,4 +63,4 @@ class Main extends Component {
     }
 }
 
-export default Main;
+export default withRouter(connect(mapStateToProps)(Main));
