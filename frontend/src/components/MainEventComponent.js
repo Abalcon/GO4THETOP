@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Card, CardBody, CardText, CardTitle, CardSubtitle} from "reactstrap";
-import { awsURL } from '../shared/urlList';
+import {awsApiURL} from '../shared/urlList';
 
 class MainEvent extends Component {
 
@@ -13,7 +13,7 @@ class MainEvent extends Component {
     }
 
     componentDidMount() {
-        fetch(awsURL + 'contenders', {method: 'GET', credentials: 'same-origin'})
+        fetch(awsApiURL + 'contenders', {method: 'GET', credentials: 'same-origin'})
             .then(response => {
                 if (response.ok) { return response; }
                 else { var error = new Error('Error ' + response.status + ': ' + response.statusText)
@@ -40,9 +40,9 @@ class MainEvent extends Component {
                 <div key={contender.id} className="col-12 m-1">
                     <Card>
                         <CardBody>
-                            <CardTitle>{contender.firstName}</CardTitle>
-                            <CardSubtitle>{contender.lastName}</CardSubtitle>
-                            <CardText>{contender.description}</CardText>
+                            <CardTitle>{contender.fullName}</CardTitle>
+                            <CardSubtitle>{contender.cardName}</CardSubtitle>
+                            <CardText>{contender.email}</CardText>
                         </CardBody>
                     </Card>
                 </div>

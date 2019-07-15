@@ -7,13 +7,20 @@ import MainEvent from './MainEventComponent';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
+import {addContender} from "../redux/actionCreators";
 
 const mapStateToProps = state => {
     return {
         notices: state.notices,
-        staffs: state.staffs
+        staffs: state.staffs,
+        contenders: state.contenders
     }
 };
+
+const mapDispatchToProps = (dispatch) => ({
+    addContender: (ctdID, email, fullname, cardname, lower, upper, watch, snstype, snsid, comments) =>
+        dispatch(addContender(ctdID, email, fullname, cardname, lower, upper, watch, snstype, snsid, comments))
+});
 
 class Main extends Component {
     // constructor(props) {
@@ -35,7 +42,8 @@ class Main extends Component {
 
         const PreliminaryPage = () => {
             return (
-                <Preliminary />
+                <Preliminary contenders={this.props.contenders}
+                             addContender={this.props.addContender}/>
             );
         };
 
@@ -63,4 +71,4 @@ class Main extends Component {
     }
 }
 
-export default withRouter(connect(mapStateToProps)(Main));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));

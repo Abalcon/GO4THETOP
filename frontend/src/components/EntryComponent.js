@@ -17,6 +17,9 @@ class Entry extends Component {
     handleSubmit(values) {
         console.log('Current State is: ' + JSON.stringify(values));
         alert('참가 신청 기간은 아직 시작되지 않았습니다!\nCurrent State is: ' + JSON.stringify(values));
+
+        this.props.addContender(this.props.ctdID, values.email, values.fullname, values.cardname,
+            values.lower, values.upper, values.watch, values.snstype, values.snsid, values.comment);
     }
 
     render() {
@@ -129,15 +132,14 @@ class Entry extends Component {
                         </Col>
                     </Row>
                     <Row className="form-group">
-                        <Col>
+                        <Field model=".agree[]" validators={{required}}>
                             <div className="form-check">
-                                <Control.checkbox model=".agree" name="agree" className="form-check-input"
-                                                  validators={{required}}/> {' '}
+                                <input type="checkbox" id=".agree.media" name="agree" value="agree"/> {' '}
                                 <strong>* 대회중 촬영되는 비디오 및 사진에 대하여 리소스로 사용을 동의합니다. *</strong>
-                                <Errors className="text-danger" model=".agree" show="touched"
-                                        messages={{required: '리소스 사용에 동의해야 참가할 수 있습니다.'}}/>
                             </div>
-                        </Col>
+                        </Field>
+                        <Errors className="text-danger" model=".agree" show="touched"
+                                messages={{required: '리소스 사용에 동의해야 참가할 수 있습니다.'}}/>
                     </Row>
                     <Row className="form-group">
                         <Col md={{size: 10, offset: 2}}>
