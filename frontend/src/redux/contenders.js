@@ -1,13 +1,17 @@
-import {CONTENDERS} from "../shared/contenders";
 import * as actionTypes from './actionTypes';
 
-export const Contenders = (state = CONTENDERS, action) => {
+export const Contenders = (state = {isLoading: true, errMsg: null, contenders: []}, action) => {
     switch (action.type) {
+        case actionTypes.SHOW_CONTENDERS:
+            return {...state, isLoading: false, errMsg: null, contenders: action.payload};
+        case actionTypes.CONTENDERS_LOADING:
+            return {...state, isLoading: true, errMsg: null, contenders: []};
+        case actionTypes.CONTENDERS_FAILED:
+            return {...state, isLoading: false, errMsg: action.payload, contenders: []};
         case actionTypes.ADD_CONTENDER:
             var contender = action.payload;
-            contender.id = state.length + 1; //FIXME: DB에서 다루는 부분
-            contender.date = new Date().toISOString(); //FIXME: DB에서 다루는 부분
-            return state.concat(contender);
+            //console.log("Here comes a new contender: " + contender);
+            return {...state, contenders: state.contenders.concat(contender)};
         default:
             return state;
     }

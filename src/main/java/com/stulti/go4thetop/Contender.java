@@ -13,6 +13,7 @@ public class Contender {
     Long id;
     private String mail;
     private String fullName;
+    private String howtoRead;
     private String cardName;
     private Boolean upper;
     private Boolean lower;
@@ -29,17 +30,25 @@ public class Contender {
     @Column(nullable = false, columnDefinition = "number(5) default 0")
     private Integer lowerTotal = 0;
     private String sns;
+    // 2019.07.16: 신청 시작 직전 형식 확정
+    private Boolean watching;
+    @Column(length = 1024)
+    private String comments;
 
     private Contender() {}
 
-    public Contender(String mail, String fullName, String cardName, Boolean isUpper, Boolean isLower, String sns) {
+    public Contender(String mail, String fullName, String howtoRead, String cardName, String sns,
+                     Boolean isUpper, Boolean isLower, Boolean isWatching, String comments) {
         super();
         this.mail = mail;
         this.fullName = fullName;
+        this.howtoRead = howtoRead;
         this.cardName = cardName;
         this.upper = isUpper;
         this.lower = isLower;
         this.sns = sns;
+        this.watching = isWatching;
+        this.comments = comments;
     }
 
     /*

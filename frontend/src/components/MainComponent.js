@@ -7,7 +7,7 @@ import MainEvent from './MainEventComponent';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {addContender} from "../redux/actionCreators";
+import {postContender, fetchContenders} from "../redux/actionCreators";
 
 const mapStateToProps = state => {
     return {
@@ -18,14 +18,21 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-    addContender: (ctdID, email, fullname, cardname, lower, upper, watch, snstype, snsid, comments) =>
-        dispatch(addContender(ctdID, email, fullname, cardname, lower, upper, watch, snstype, snsid, comments))
+    postContender: (ctdID, email, fullname, nameread, cardname, lower, upper, watch, snstype, snsid, comments) =>
+        dispatch(postContender(ctdID, email, fullname, nameread, cardname, lower, upper, watch, snstype, snsid, comments)),
+    fetchContenders: () => {
+        dispatch(fetchContenders())
+    }
 });
 
 class Main extends Component {
     // constructor(props) {
     //     super(props);
     // }
+
+    componentDidMount() {
+        this.props.fetchContenders();
+    }
 
     render () {
         const HomePage = () => {
@@ -42,8 +49,10 @@ class Main extends Component {
 
         const PreliminaryPage = () => {
             return (
-                <Preliminary contenders={this.props.contenders}
-                             addContender={this.props.addContender}/>
+                <Preliminary contenders={this.props.contenders.contenders}
+                             contendersLoading={this.props.contenders.isLoading}
+                             contendersErrMsg={this.props.contenders.errMsg}
+                             postContender={this.props.postContender}/>
             );
         };
 

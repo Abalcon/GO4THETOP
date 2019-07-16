@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(properties = "classpath:application-test.properties")
 @AutoConfigureMockMvc
 public class Go4thetopApplicationTests {
 
@@ -46,9 +46,11 @@ public class Go4thetopApplicationTests {
             .client(client).build().create(PreliminaryEntryApi.class);
 
     private Contender testContender = new Contender("extinbase@gmail.com",
-            "DJ 스툴티", "Stult_i", false, true, "AutomationCreator");
+            "DJ 스툴티", "디제이스툴티", "Stult-i", "None",
+            false, true, true, "AutomationCreator");
     private Contender testContender2 = new Contender("extinbase@naver.com",
-            "DJ 아발컨", "Abalcon", true, false, "FutariUltraCS");
+            "DJ 아발컨", "디제이아발컨", "Abalcon", "Twitter: abalcon",
+            false, false, true, "CannotReachOverflow");
 
     @Test
     public void contextLoads() {

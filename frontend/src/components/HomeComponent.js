@@ -5,7 +5,8 @@ class Home extends Component {
 
     render () {
         const notices = this.props.notices.map((notice) => {
-            let newText = notice.content.split ('\n').map ((item, i) => <p key={i}>{item}</p>);
+            let newText = notice.content.split('\n').map((item, i) => <span key={i}>{item}<br/></span>);
+
             return (
                 <div key={notice.id} className="col-12 m-1">
                     <Card>

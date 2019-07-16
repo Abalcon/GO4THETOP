@@ -65,11 +65,11 @@ class Header extends Component {
                 <Jumbotron style={jumbotronStyle}>
                     <div className="container">
                         <div className="row row-header">
-                            <div className="col-12 col-sm-6">
+                            <div className="col-12" style={{textAlign: "right"}}>
                                 <h1>GO4THETOP</h1>
-                                <p>New Era, New Aces.</p>
-                                <p>2019. 10. 12.</p>
-                                <p>at Bucheon Attack</p>
+                                <h4>New Era, New Aces.</h4>
+                                <span>2019. 10. 12.<br/></span>
+                                <span>Bucheon Attack</span>
                             </div>
                         </div>
                     </div>
