@@ -26,7 +26,10 @@ class Header extends Component {
             <div>
                 <Navbar light expand="md">
                     <div className="container">
-                        <NavbarBrand className="mr-auto" href="/">GO4THETOP</NavbarBrand>
+                        <NavbarBrand className="mr-auto" href="/">
+                            <img src='assets/images/G4TT_Logo.jpeg' height="40" width="40" alt='GO4THETOP'/>
+                            GO4THETOP
+                        </NavbarBrand>
                         <NavbarToggler onClick={this.toggleNav} />
                         <Collapse isOpen={this.state.isNavOpen} navbar>
                             <Nav className="ml-2 mr-2" navbar>
