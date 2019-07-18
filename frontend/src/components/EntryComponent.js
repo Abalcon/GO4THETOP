@@ -40,7 +40,7 @@ class Entry extends Component {
 
     render() {
         let caution = "참가 신청 기간은 2019.07.17~2019.08.12 입니다.\n" +
-            "참가 비용은 부문 별 5000원입니다(2부문 참여시 10000원).\n" +
+            "본선 진출시 참가 비용은 부문 별 5000원입니다(2부문 참여시 10000원).\n" +
             "참가 신청 기간중 정보 변경이 필요하시면 989990gfc@gmail.com 로 문의 부탁드립니다.\n" +
             "참가 신청에 사용된 개인정보는 대회 종료후 파기 됩니다.\n" +
             "댄서 네임과 인게임 닉네임이 같은 경우 동일 체크를, 다른경우 아래 인게임 란에 별도 기입해주세요.\n" +
@@ -48,12 +48,26 @@ class Entry extends Component {
             "뒤풀이는 인원과 장소를 논의중이며 신청이 아닌 희망자 체크임을 유의 바랍니다.\n" +
             "예선 참가시 본선 진출 여부와 관계없이 관람 신청됩니다.\n" +
             "그 외 문의사항은 대회 이메일과 트위터 공식 계정으로 문의 부탁드립니다.\n";
-
+        let cautionJP = "参加申し込み期間は2019年7月17日~8月12日です。\n" +
+            "参加費用は各部門5000ウォンです(2部門参加:10000ウォン)。\n" +
+            "参加申請期間中、情報の変更は989990gfc@gmail.comでお問い合わせください。\n" +
+            "参加申請に使われたプライバシー情報は大会終了後、直ちに破棄されます。\n" +
+            "ダンサーネームと自分のニックネームが一致する場合は'同一'にチェックしてください。 一致しない場合は下にニックネームを記入してください。\n" +
+            "予選期間中ダンサーネームを変更すると、ツールによる自動認識ができなくなります。予選終了までネームの維持をお願いいたします。\n" +
+            "打ち上げの人数と場所に関しては現在論議中です。今のは申し込みではなく,希望者調査となりますのでご了承ください。\n" +
+            "予選に参加すると本選進出,脱落とは関係なく自動で観覧申請されます。\n" +
+            "他のことは大会のEメールとツイッターの公式アカウントまでお問い合わせください。\n";
         return (
             <div>
                 <h4>참가 신청</h4>
                 {
                     caution.split('\n').map(line => {
+                        return (<span>{line}<br/></span>)
+                    })
+                }
+                <h4>参加申し込み案内</h4>
+                {
+                    cautionJP.split('\n').map(line => {
                         return (<span>{line}<br/></span>)
                     })
                 }
@@ -77,10 +91,10 @@ class Entry extends Component {
                         </Col>
                     </Row>
                     <Row className="form-group">
-                        <Label htmlFor="fullname" md={6}>참가자 이름(Dancer Name) *</Label>
+                        <Label htmlFor="fullname" md={6}>참가자 이름(Name) *</Label>
                         <Col md={9}>
                             <Control.text model=".fullname" id="fullname" name="fullname"
-                                          placeholder="Enter your real name" className="form-control"
+                                          placeholder="Enter your name" className="form-control"
                                           validators={{required}}/>
                             <Errors className="text-danger" model=".fullname" show="touched"
                                     messages={{
@@ -92,7 +106,7 @@ class Entry extends Component {
                         <Label htmlFor="fullname" md={6}>참가자 이름 읽는법(How to read your name) *</Label>
                         <Col md={9}>
                             <Control.text model=".nameread" id="nameread" name="nameread"
-                                          placeholder="Enter How to read your real name" className="form-control"
+                                          placeholder="Enter How to read your name" className="form-control"
                                           validators={{required}}/>
                             <Errors className="text-danger" model=".nameread" show="touched"
                                     messages={{
@@ -101,10 +115,10 @@ class Entry extends Component {
                         </Col>
                     </Row>
                     <Row className="form-group">
-                        <Label htmlFor="cardname" md={6}>인게임 이름(Card Name) *</Label>
+                        <Label htmlFor="cardname" md={6}>게임 내 표기 이름(Dancer/Card Name) *</Label>
                         <Col md={9}>
                             <Control.text model=".cardname" id="cardname" name="cardname"
-                                          placeholder="Enter your card name" className="form-control"
+                                          placeholder="Enter your dancer/card name" className="form-control"
                                           validators={{required, validCardName, maxLength: maxLength(8)}}/>
                             <Errors className="text-danger" model=".cardname" show="touched"
                                     messages={{

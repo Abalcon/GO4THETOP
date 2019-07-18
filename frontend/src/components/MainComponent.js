@@ -8,12 +8,16 @@ import MainEvent from './MainEventComponent';
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import {postContender, fetchContenders} from "../redux/actionCreators";
+import {renderToStaticMarkup} from "react-dom/server";
+import {withLocalize} from "react-localize-redux";
+//import globalTranslations from "./translations/global.json";
 
 const mapStateToProps = state => {
     return {
         notices: state.notices,
         staffs: state.staffs,
-        contenders: state.contenders
+        contenders: state.contenders,
+        localize: state.localize
     }
 };
 
@@ -26,9 +30,19 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 class Main extends Component {
-    // constructor(props) {
-    //     super(props);
-    // }
+    constructor(props) {
+        super(props);
+
+        this.props.initialize({
+            languages: [
+                {name: "Korean", code: "kr"},
+                {name: "English", code: "en"},
+                {name: "Japanese", code: "jp"}
+            ],
+            options: {renderToStaticMarkup}
+            // translation: globalTranslations
+        });
+    }
 
     componentDidMount() {
         this.props.fetchContenders();
@@ -80,4 +94,4 @@ class Main extends Component {
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));
+export default withLocalize(withRouter(connect(mapStateToProps, mapDispatchToProps)(Main)));
