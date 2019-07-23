@@ -10,7 +10,7 @@ import {connect} from 'react-redux';
 import {postContender, fetchContenders} from "../redux/actionCreators";
 import {renderToStaticMarkup} from "react-dom/server";
 import {withLocalize} from "react-localize-redux";
-//import globalTranslations from "./translations/global.json";
+import globalTranslations from "../translations/global.json";
 
 const mapStateToProps = state => {
     return {
@@ -35,12 +35,12 @@ class Main extends Component {
 
         this.props.initialize({
             languages: [
-                {name: "Korean", code: "kr"},
+                {name: "한국어", code: "kr"},
                 {name: "English", code: "en"},
-                {name: "Japanese", code: "jp"}
+                {name: "日本語", code: "jp"}
             ],
-            options: {renderToStaticMarkup}
-            // translation: globalTranslations
+            options: {renderToStaticMarkup},
+            translation: globalTranslations
         });
     }
 

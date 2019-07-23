@@ -1,0 +1,44 @@
+{
+  "rule": {
+    "title": [
+      "본선 규칙",
+      "Main Event Rule",
+      "本選規則"
+    ],
+    "lang": [
+      "언어 선택 : ",
+      "Select Language : ",
+      "言語を選択 : "
+    ],
+    "round1": [
+      "16강",
+      "Round of 16",
+      "16強"
+    ],
+    "round2": [
+      "더블 엘리미네이션",
+      "Double Elimination",
+      "ダブル・エリミネーション"
+    ],
+    "final": [
+      "결승 리그",
+      "Final League",
+      "ファイナルリーグ"
+    ],
+    "image1": [
+      "assets/images/MainEvent_kr1.jpg",
+      "assets/images/Preparing_en.jpeg",
+      "assets/images/MainEvent_jp1.jpg"
+    ],
+    "image2": [
+      "assets/images/MainEvent_kr2.jpg",
+      "assets/images/Preparing_en.jpeg",
+      "assets/images/MainEvent_jp2.jpg"
+    ],
+    "image3": [
+      "assets/images/MainEvent_kr3.jpg",
+      "assets/images/Preparing_en.jpeg",
+      "assets/images/MainEvent_jp3.jpg"
+    ]
+  }
+}

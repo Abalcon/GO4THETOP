@@ -11,7 +11,7 @@ const store = ConfigureStore();
 function App() {
   return (
       <Provider store={store}>
-          <LocalizeProvider store={store}>
+          <LocalizeProvider>
               <BrowserRouter>
                   <div className="App">
                       <Main/>

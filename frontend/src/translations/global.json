@@ -1,0 +1,12 @@
+{
+  "title": [
+    "My Article title",
+    "My Article title EN",
+    "My Article title JP"
+  ],
+  "greeting": [
+    "안녕하세요",
+    "Welcome",
+    "こんにちは"
+  ]
+}

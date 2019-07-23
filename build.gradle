@@ -12,16 +12,6 @@ group = 'com.stulti'
 version = '0.9-preliminary-entry'
 sourceCompatibility = '8'
 
-//war {
-//    enabled = true
-//    archivesBaseName = 'go4thetop-aws'
-//    version = '0.7-rds'
-//    
-////    from('.ebextensions') {
-////        into('.ebextensions')
-////    }
-//}
-
 configurations {
     developmentOnly
     runtimeClasspath {
@@ -61,6 +51,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     //testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.bytedeco:tesseract-platform:4.1.0-1.5.1'
 }
 
 dependencyManagement {
