@@ -43,7 +43,7 @@ class Entry extends Component {
             <div className="container">
                 <div className="row col-md-10">
                     <Card>
-                        <CardImg top src="assets/images/EntryInstructions_krjp.jpeg" alt="EntryInst"/>
+                        <CardImg top src="assets/images/EntryInstructions_krjp_190815.jpeg" alt="EntryInst"/>
                     </Card>
                 </div>
                 <h5>* : 필수 항목입니다.</h5>

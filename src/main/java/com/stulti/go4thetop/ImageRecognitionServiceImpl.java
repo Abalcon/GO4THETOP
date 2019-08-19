@@ -1,8 +1,19 @@
 package com.stulti.go4thetop;
 
 import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.Loader;
 import org.bytedeco.leptonica.PIX;
+import org.bytedeco.opencv.opencv_java;
 import org.bytedeco.tesseract.TessBaseAPI;
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.*;
+import org.opencv.dnn.Dnn;
+import org.opencv.dnn.Net;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.Features2d;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.xfeatures2d.SURF;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -13,6 +24,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.bytedeco.leptonica.global.lept.pixDestroy;
 import static org.bytedeco.leptonica.global.lept.pixRead;
@@ -32,6 +45,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     }
 
     private TessBaseAPI tessAPI = new TessBaseAPI();
+    private Net txtDetectNet;
 
     public static ImageRecognitionServiceImpl get() throws IOException {
         return new ImageRecognitionServiceImpl();
@@ -43,16 +57,439 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         }
 
         tessAPI.Init(targetDir.toString(), "eng+jpn+kor");
+        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
+        Loader.load(opencv_java.class);
+        txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
     }
 
 
     public String recognizeImageData(String imgPath, InputStream imageData) throws IOException {
         assert (imageData != null);
-
+        // save the input image
         Path target = getImagePath(imgPath);
         Files.copy(imageData, target, StandardCopyOption.REPLACE_EXISTING);
 
-        return processingImageData(target);
+        //TODO: Score Template 불러오기
+        String scoreTmpFileName = targetDir + "/ScoreTemplate.jpg";
+        Mat ScoreTemplate = Imgcodecs.imread(scoreTmpFileName);
+        Mat CannyTemplate = new Mat();
+        Imgproc.cvtColor(ScoreTemplate, ScoreTemplate, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.Canny(ScoreTemplate, CannyTemplate, 70.0, 175.0);
+
+        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식
+        float scoreThresh = 0.5f;
+        float nmsThresh = 0.4f;
+
+        String fileName = target.getFileName().toString();
+        String fileFullName = targetDir + "/" + fileName;
+
+        // Template Matching
+        Mat frame = Imgcodecs.imread(fileFullName);
+        Mat grayFrame = grayScalingImageData(fileFullName);
+        Mat resizedFrame = new Mat();
+        Mat mtResult = new Mat();
+        double bestMatchRate = -1.0;
+        Point bestMatchLocation = new Point();
+        double bestMatchScale = -1.0;
+        for (double imgScale = 1.0; imgScale >= 0.1; imgScale -= 0.05) {
+            Size resize = new Size(grayFrame.width() * imgScale, grayFrame.height() * imgScale);
+            Imgproc.resize(grayFrame, resizedFrame, resize);
+
+            if (resizedFrame.width() < CannyTemplate.width() || resizedFrame.height() < CannyTemplate.height())
+                break;
+
+            Imgproc.Canny(resizedFrame, resizedFrame, 70.0, 175.0);
+            Imgproc.matchTemplate(resizedFrame, CannyTemplate, mtResult, Imgproc.TM_CCOEFF);
+            Core.MinMaxLocResult res = Core.minMaxLoc(mtResult);
+            //Imgproc.rectangle(resizedFrame, res.maxLoc,
+            //        new Point(res.maxLoc.x + CannyTemplate.width(), res.maxLoc.y + CannyTemplate.height()), new Scalar(0, 0, 255), 1);
+            //String fileResizeName = targetDir + "/resize" + (int)(imgScale * 100) + "_" + fileName;
+            //Imgcodecs.imwrite(fileResizeName, resizedFrame);
+
+            if (res.maxVal > bestMatchRate) {
+                bestMatchRate = res.maxVal;
+                bestMatchLocation = res.maxLoc;
+                bestMatchScale = imgScale;
+            }
+        }
+        Point resultLoc1 = new Point(bestMatchLocation.x / bestMatchScale, bestMatchLocation.y / bestMatchScale);
+        Point resultLoc2 = new Point((bestMatchLocation.x + CannyTemplate.width()) / bestMatchScale, (bestMatchLocation.y + CannyTemplate.height()) / bestMatchScale);
+        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 0, 255, 255), 2);
+        String fileMatchName = targetDir + "/matching_" + fileName;
+        Imgcodecs.imwrite(fileMatchName, frame);
+
+        // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
+        double hessianThreshold = 400;
+        int nOctaves = 4, nOctaveLayers = 3;
+        boolean extended = false, upright = false;
+        SURF detector = SURF.create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
+        MatOfKeyPoint keypointsObject = new MatOfKeyPoint(), keypointsScene = new MatOfKeyPoint();
+        Mat descriptorsObject = new Mat(), descriptorsScene = new Mat();
+        detector.detectAndCompute(ScoreTemplate, new Mat(), keypointsObject, descriptorsObject);
+        detector.detectAndCompute(grayFrame, new Mat(), keypointsScene, descriptorsScene);
+
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+        List<MatOfDMatch> knnMatches = new ArrayList<>();
+        matcher.knnMatch(descriptorsObject, descriptorsScene, knnMatches, 2);
+
+        double ratioThresh = 0.75;
+        List<DMatch> listOfGoodMatches = new ArrayList<>();
+        for (MatOfDMatch knnMatch : knnMatches) {
+            if (knnMatch.rows() > 1) {
+                DMatch[] matches = knnMatch.toArray();
+                if (matches[0].distance < ratioThresh * matches[1].distance) {
+                    listOfGoodMatches.add(matches[0]);
+                }
+            }
+        }
+        MatOfDMatch goodMatches = new MatOfDMatch();
+        goodMatches.fromList(listOfGoodMatches);
+
+        //-- Draw matches
+        Mat imgMatches = new Mat();
+        Features2d.drawMatches(ScoreTemplate, keypointsObject, grayFrame, keypointsScene, goodMatches, imgMatches, Scalar.all(-1),
+                Scalar.all(-1), new MatOfByte(), Features2d.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS);
+        //-- Localize the object
+        List<Point> obj = new ArrayList<>();
+        List<Point> scene = new ArrayList<>();
+        List<KeyPoint> listOfKeypointsObject = keypointsObject.toList();
+        List<KeyPoint> listOfKeypointsScene = keypointsScene.toList();
+        for (int i = 0; i < listOfGoodMatches.size(); i++) {
+            //-- Get the keypoints from the good matches
+            obj.add(listOfKeypointsObject.get(listOfGoodMatches.get(i).queryIdx).pt);
+            scene.add(listOfKeypointsScene.get(listOfGoodMatches.get(i).trainIdx).pt);
+        }
+        MatOfPoint2f objMat = new MatOfPoint2f(), sceneMat = new MatOfPoint2f();
+        objMat.fromList(obj);
+        sceneMat.fromList(scene);
+        double ransacReprojThreshold = 3.0;
+        Mat H = Calib3d.findHomography(objMat, sceneMat, Calib3d.RANSAC, ransacReprojThreshold);
+        //-- Get the corners from the image_1 ( the object to be "detected" )
+        Mat objCorners = new Mat(4, 1, CvType.CV_32FC2), sceneCorners = new Mat();
+        float[] objCornersData = new float[(int) (objCorners.total() * objCorners.channels())];
+        objCorners.get(0, 0, objCornersData);
+        objCornersData[0] = 0;
+        objCornersData[1] = 0;
+        objCornersData[2] = ScoreTemplate.cols();
+        objCornersData[3] = 0;
+        objCornersData[4] = ScoreTemplate.cols();
+        objCornersData[5] = ScoreTemplate.rows();
+        objCornersData[6] = 0;
+        objCornersData[7] = ScoreTemplate.rows();
+        objCorners.put(0, 0, objCornersData);
+        Core.perspectiveTransform(objCorners, sceneCorners, H);
+        float[] sceneCornersData = new float[(int) (sceneCorners.total() * sceneCorners.channels())];
+        sceneCorners.get(0, 0, sceneCornersData);
+        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+        Imgproc.line(imgMatches, new Point(sceneCornersData[0] + ScoreTemplate.cols(), sceneCornersData[1]),
+                new Point(sceneCornersData[2] + ScoreTemplate.cols(), sceneCornersData[3]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[2] + ScoreTemplate.cols(), sceneCornersData[3]),
+                new Point(sceneCornersData[4] + ScoreTemplate.cols(), sceneCornersData[5]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[4] + ScoreTemplate.cols(), sceneCornersData[5]),
+                new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]),
+                new Point(sceneCornersData[0] + ScoreTemplate.cols(), sceneCornersData[1]), new Scalar(0, 255, 0), 4);
+
+        String fileKPMName = targetDir + "/kpmatch_" + fileName;
+        Imgcodecs.imwrite(fileKPMName, imgMatches);
+
+        String textResult = "===== Reading Text =====\n";
+//        // preprocess image
+//        String fileGrayName = findCannyEdgeFromImageData(fileFullName, fileName);
+//        Rect roiRect = findScreen(fileGrayName);
+//        Mat cropFrame = new Mat(frame, roiRect);
+//        String fileCropName = targetDir + "/crop_" + fileName;
+//        Imgcodecs.imwrite(fileCropName, cropFrame);
+//
+//        String fileGrayName2 = grayScalingImageDataMorph(fileFullName, fileName);
+//        Rect roiRect2 = findScreen(fileGrayName2);
+//        Mat cropFrame2 = new Mat(frame, roiRect2);
+//        String fileCropName2 = targetDir + "/crop2_" + fileName;
+//        Imgcodecs.imwrite(fileCropName2, cropFrame2);
+//
+//        // detect text positions - AWS Rekognition 적용할 수도 있음
+//        Mat outFrame = Imgcodecs.imread(fileCropName);
+//        Imgproc.cvtColor(cropFrame, cropFrame, Imgproc.COLOR_RGBA2RGB);
+//        int imgWidth = cropFrame.width();
+//        int imgHeight = cropFrame.height();
+//        double resWidth = Math.floor(imgWidth / 32) * 32;
+//        double resHeight = Math.floor(imgHeight / 32) * 32;
+//
+//        Size siz = new Size(resWidth, resHeight);
+//        int W = (int)(siz.width / 4); // width of the output geometry  / score maps
+//        int H = (int)(siz.height / 4); // height of those. the geometry has 4, vertically stacked maps, the score one 1
+//
+//        Mat blob = Dnn.blobFromImage(cropFrame, 1.0, siz, new Scalar(123.68, 116.78, 103.94), true, false);
+//        txtDetectNet.setInput(blob);
+//        List<Mat> outs = new ArrayList<>(2);
+//        List<String> outNames = new ArrayList<String>();
+//        outNames.add("feature_fusion/Conv_7/Sigmoid");
+//        outNames.add("feature_fusion/concat_3");
+//        txtDetectNet.forward(outs, outNames);
+//
+//        // Decode predicted bounding boxes.
+//        Mat scores = outs.get(0).reshape(1, H);
+//        // My lord and savior : http://answers.opencv.org/question/175676/javaandroid-access-4-dim-mat-planes/
+//        Mat geometry = outs.get(1).reshape(1, 5 * H); // don't hardcode it !
+//        List<Float> confidencesList = new ArrayList<>();
+//        List<RotatedRect> boxesList = decode(scores, geometry, confidencesList, scoreThresh);
+//
+//        // Apply non-maximum suppression procedure.
+//        MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
+//        RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
+//        MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
+//        MatOfInt indices = new MatOfInt();
+//        Dnn.NMSBoxesRotated(boxes, confidences, scoreThresh, nmsThresh, indices);
+//
+//        // Render detections
+//        Point ratio = new Point((float)cropFrame.cols()/siz.width, (float)cropFrame.rows()/siz.height);
+//        int[] indexes = indices.toArray();
+//        Arrays.sort(indexes);
+//
+//        for(int i = 0; i<indexes.length;++i) {
+//            try {
+//                RotatedRect rot = boxesArray[indexes[i]];
+//                //TODO: text 범위 인식 및 crop
+//                String cropName = targetDir + "/crop" + i + "_" + fileName;
+//                Rect cropRectBlob = rot.boundingRect();
+//                double widthPadding = cropRectBlob.width * ratio.x * 1.05;
+//                double heightPadding = cropRectBlob.height * ratio.y * 1.05;
+//                Rect cropRect = new Rect(new Point(cropRectBlob.x * ratio.x, cropRectBlob.y * ratio.y),
+//                        new Size(widthPadding, heightPadding));
+//                Mat text_roi = new Mat(cropFrame, cropRect);
+//                Imgcodecs.imwrite(cropName, text_roi);
+//
+//                //TODO: text 내용 인식 전처리
+//                //String grayName = grayScalingImageData(cropName, i, fileName);
+//
+//                // text 내용
+//                textResult += processingImageData(Paths.get(cropName));
+//                textResult += "=====\n";
+//                // 잘라낸 것 지우기
+//                File cropFile = new File(cropName);
+//                boolean isDeleted = cropFile.delete();
+//                // text 범위 인식 표시
+//                Point[] vertices = new Point[4];
+//                rot.points(vertices);
+//                //0: lower-left, 1: upper-left, 2: upper-right, 3: lower-right
+//                for (int j = 0; j < 4; ++j) {
+//                    vertices[j].x *= ratio.x;
+//                    vertices[j].y *= ratio.y;
+//                }
+//                for (int j = 0; j < 4; ++j) {
+//                    Imgproc.line(outFrame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 1);
+//                }
+//            }
+//            catch (Exception ex) {
+//                System.out.println("Unable to crop or recognize text at index " + i + ", caused by: " + ex.toString());
+//            }
+//        }
+//        Imgcodecs.imwrite(targetDir + "/out_" + fileName, outFrame);
+        //TODO: text 인식 범위 crop 후 tess
+
+
+        return textResult;
+    }
+
+    private static List<RotatedRect> decode(Mat scores, Mat geometry, List<Float> confidences, float scoreThresh) {
+        // size of 1 geometry plane
+        int W = geometry.cols();
+        int H = geometry.rows() / 5;
+        //System.out.println(geometry);
+        //System.out.println(scores);
+
+        List<RotatedRect> detections = new ArrayList<>();
+        for (int y = 0; y < H; ++y) {
+            Mat scoresData = scores.row(y);
+            Mat x0Data = geometry.submat(0, H, 0, W).row(y);
+            Mat x1Data = geometry.submat(H, 2 * H, 0, W).row(y);
+            Mat x2Data = geometry.submat(2 * H, 3 * H, 0, W).row(y);
+            Mat x3Data = geometry.submat(3 * H, 4 * H, 0, W).row(y);
+            Mat anglesData = geometry.submat(4 * H, 5 * H, 0, W).row(y);
+
+            for (int x = 0; x < W; ++x) {
+                double score = scoresData.get(0, x)[0];
+                if (score >= scoreThresh) {
+                    double offsetX = x * 4.0;
+                    double offsetY = y * 4.0;
+                    double angle = anglesData.get(0, x)[0];
+                    double cosA = Math.cos(angle);
+                    double sinA = Math.sin(angle);
+                    double x0 = x0Data.get(0, x)[0];
+                    double x1 = x1Data.get(0, x)[0];
+                    double x2 = x2Data.get(0, x)[0];
+                    double x3 = x3Data.get(0, x)[0];
+                    double h = x0 + x2;
+                    double w = x1 + x3;
+                    Point offset = new Point(offsetX + cosA * x1 + sinA * x2, offsetY - sinA * x1 + cosA * x2);
+                    Point p1 = new Point(-1 * sinA * h + offset.x, -1 * cosA * h + offset.y);
+                    Point p3 = new Point(-1 * cosA * w + offset.x, sinA * w + offset.y); // original trouble here !
+                    RotatedRect r = new RotatedRect(new Point(0.5 * (p1.x + p3.x), 0.5 * (p1.y + p3.y)), new Size(w, h), -1 * angle * 180 / Math.PI);
+                    detections.add(r);
+                    confidences.add((float) score);
+                }
+            }
+        }
+        return detections;
+    }
+
+    private Mat grayScalingImageData(String imgPath) {
+        Mat cropFrame = Imgcodecs.imread(imgPath);
+        Mat grayFrame = new Mat();
+        Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.medianBlur(grayFrame, grayFrame, 5);
+        //Imgproc.GaussianBlur(grayFrame, grayFrame, new Size(5,5), 0.0, 0.0);
+        //Imgproc.threshold(grayFrame, grayFrame, 0, 255, Imgproc.THRESH_OTSU);
+        //String grayName = targetDir + "/gray_" + fileName;
+        //Imgcodecs.imwrite(grayName, grayFrame);
+        return grayFrame;
+    }
+
+    private String findCannyEdgeFromMatrix(Mat cropFrame, String fileName) {
+        Mat grayFrame = new Mat();
+        Mat blurFrame = new Mat();
+        Mat cannyFrame = new Mat();
+        //Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.GaussianBlur(grayFrame, blurFrame, new Size(3,3), 0.0, 0.0);
+        String grayName = targetDir + "/gray_" + fileName;
+        Imgcodecs.imwrite(grayName, grayFrame);
+        String blurName = targetDir + "/blur_" + fileName;
+        Imgcodecs.imwrite(blurName, blurFrame);
+
+        Imgproc.Canny(blurFrame, cannyFrame, 75.0, 175.0);
+        // originally 75, 200 --> tried 70, 180
+        String outName = targetDir + "/result_" + fileName;
+        Imgcodecs.imwrite(outName, cannyFrame);
+        return outName;
+    }
+
+    private String findCannyEdgeFromImageData(String imgPath, String fileName) {
+        Mat cropFrame = Imgcodecs.imread(imgPath);
+        Mat grayFrame = Imgcodecs.imread(imgPath);
+        Mat blurFrame = new Mat();
+        Mat cannyFrame = new Mat();
+        Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+        //Imgproc.medianBlur(grayFrame, grayFrame, 3);
+        Imgproc.GaussianBlur(grayFrame, blurFrame, new Size(3, 3), 0.0, 0.0);
+        //Imgproc.threshold(grayFrame, grayFrame, 0, 255, Imgproc.THRESH_OTSU);
+        String grayName = targetDir + "/gray_" + fileName;
+        Imgcodecs.imwrite(grayName, grayFrame);
+        String blurName = targetDir + "/blur_" + fileName;
+        Imgcodecs.imwrite(blurName, blurFrame);
+        //TODO: find reasonable threshold (adaptive by each image)
+        for (int k = 0; k < 11; k++) {
+            double lowTh = k * 10.0;
+            double highTh = lowTh * 2 + 40.0;
+            Mat cnyFrame = new Mat();
+            Mat mrpFrame = new Mat();
+            Imgproc.Canny(blurFrame, cnyFrame, lowTh, highTh);
+            String cnyName = targetDir + "/canny" + k + "_" + fileName;
+            Imgcodecs.imwrite(cnyName, cnyFrame);
+            Rect roiRect = findScreen(cnyName);
+            //edge 뭉치기
+            //Mat mcKernel = new Mat(5, 5, CvType.CV_8U, Scalar.all(1));
+            Mat mcKernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, new Size(11, 11));
+            Imgproc.morphologyEx(cnyFrame, mrpFrame, Imgproc.MORPH_CLOSE, mcKernel);
+            String tmpName = targetDir + "/result" + k + "_" + fileName;
+            Imgcodecs.imwrite(tmpName, mrpFrame);
+            roiRect = findScreen(tmpName);
+        }
+        //TODO: find median of image - for adaptive threshold
+        double m = blurFrame.rows() * blurFrame.cols() / 2;
+        int bin = 0;
+        double med = -1.0;
+        List<Mat> listImage = new ArrayList<Mat>();
+        listImage.add(blurFrame);
+        MatOfInt grayChannel = new MatOfInt(0);
+        MatOfInt histSize = new MatOfInt(256);
+        MatOfFloat histRange = new MatOfFloat(0, 255);
+        Mat histImage = new Mat();
+        Imgproc.calcHist(listImage, grayChannel, new Mat(), histImage, histSize, histRange, false);
+        for (int i = 0; i < histSize.get(0, 0)[0]; i++) {
+            bin += Math.round(histImage.get(i, 0)[0]);
+            if (bin > m) {
+                med = i;
+                break;
+            }
+        }
+        // Adaptive canny
+        double sigma = 0.33;
+        double adaptLowTh = Math.max(0.0, (1.0 - sigma) * med);
+        double adaptHighTh = Math.min(255.0, (1.0 + sigma) * med);
+        Imgproc.Canny(blurFrame, cannyFrame, adaptLowTh, adaptHighTh);
+        // originally 75, 200 --> tried 70, 200
+        String outName = targetDir + "/result_" + fileName;
+        Imgcodecs.imwrite(outName, cannyFrame);
+        return outName;
+    }
+
+    private String grayScalingImageDataMorph(String imgPath, String fileName) {
+        Mat cropFrame = Imgcodecs.imread(imgPath);
+        Mat grayFrame = Imgcodecs.imread(imgPath);
+        Mat mgFrame = new Mat();
+        Mat thFrame = new Mat();
+        Mat outFrame = new Mat();
+        Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+        //TODO: Morph Gradient
+        Mat mgKernel = new Mat(3, 3, CvType.CV_8U, Scalar.all(1));
+        Mat mcKernel = new Mat(9, 5, CvType.CV_8U, Scalar.all(1));
+        Imgproc.morphologyEx(grayFrame, mgFrame, Imgproc.MORPH_GRADIENT, mgKernel);
+        //TODO: Adaptive Threshold or Smooth/Blur
+        //Imgproc.GaussianBlur(mgFrame, thFrame, new Size(5,5), 0.0, 0.0);
+        //Imgproc.threshold(mgFrame, thFrame, 0, 255, Imgproc.THRESH_OTSU);
+        Imgproc.adaptiveThreshold(mgFrame, thFrame, 255,
+                Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 3, 12);
+        //TODO: Morph Close
+        Imgproc.morphologyEx(thFrame, outFrame, Imgproc.MORPH_CLOSE, mcKernel);
+
+        String grayName = targetDir + "/gray2_" + fileName;
+        Imgcodecs.imwrite(grayName, grayFrame);
+        String mgName = targetDir + "/morph2_" + fileName;
+        Imgcodecs.imwrite(mgName, mgFrame);
+        String thName = targetDir + "/thresh2_" + fileName;
+        Imgcodecs.imwrite(thName, thFrame);
+        String outName = targetDir + "/result_morph_" + fileName;
+        Imgcodecs.imwrite(outName, outFrame);
+        return outName;
+    }
+
+
+    private Rect findScreen(String imgPath) {
+        Mat cannyFrame = Imgcodecs.imread(imgPath);
+        Mat tmpFrame = new Mat();
+        Imgproc.cvtColor(cannyFrame, tmpFrame, Imgproc.COLOR_RGB2GRAY);
+        // https://stackoverflow.com/questions/13203981/findcontours-error-support-only-8uc1-images
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(tmpFrame, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        MatOfPoint2f approxCurve = new MatOfPoint2f();
+        double largestArea = 0.0;
+        Rect largestRect = new Rect();
+        Rect currentRect = new Rect();
+        for (MatOfPoint contour : contours) {
+//            double contArea = Imgproc.contourArea(contour);
+//            if (contArea > largestArea) {
+            MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
+            double approxDistance = Imgproc.arcLength(contour2f, true) * 0.02;
+            Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
+
+            MatOfPoint points = new MatOfPoint(approxCurve.toArray());
+            currentRect = Imgproc.boundingRect(points);
+
+            double contArea = currentRect.area();
+            if (currentRect.width > 20.0 && currentRect.height > 10.0)
+                Imgproc.rectangle(cannyFrame, currentRect, new Scalar(0, 255, 0, 255));
+
+            if (contArea > largestArea) {
+                largestArea = contArea;
+                largestRect = currentRect;
+            }
+//            }
+        }
+        Imgproc.rectangle(cannyFrame, largestRect, new Scalar(0, 0, 255, 255));
+        Imgcodecs.imwrite(imgPath, cannyFrame);
+        return largestRect;
     }
 
     private String processingImageData(Path imgPath) {
@@ -61,6 +498,8 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         try {
             image = pixRead(imgPath.toString());
             tessAPI.SetImage(image);
+            // Warning: Invalid resolution 0 dpi. Using 70 instead.
+            tessAPI.SetSourceResolution(300);
 
             BytePointer outText = tessAPI.GetUTF8Text();
             if (outText != null) {
