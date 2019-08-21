@@ -13,10 +13,12 @@ import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 import org.opencv.xfeatures2d.SURF;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,6 +27,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.bytedeco.leptonica.global.lept.pixDestroy;
@@ -47,11 +50,9 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     private TessBaseAPI tessAPI = new TessBaseAPI();
     private Net txtDetectNet;
 
-    public static ImageRecognitionServiceImpl get() throws IOException {
-        return new ImageRecognitionServiceImpl();
-    }
+    private AWSRekognitionService awsRekognitionService;
 
-    private ImageRecognitionServiceImpl() throws IOException {
+    private ImageRecognitionServiceImpl(AWSRekognitionService awsRekognitionService) throws IOException {
         if (!Files.exists(targetDir)) {
             Files.createDirectories(targetDir);
         }
@@ -60,6 +61,8 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
         Loader.load(opencv_java.class);
         txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
+
+        this.awsRekognitionService = awsRekognitionService;
     }
 
 
@@ -76,15 +79,12 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Imgproc.cvtColor(ScoreTemplate, ScoreTemplate, Imgproc.COLOR_RGB2GRAY);
         Imgproc.Canny(ScoreTemplate, CannyTemplate, 70.0, 175.0);
 
-        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식
-        float scoreThresh = 0.5f;
-        float nmsThresh = 0.4f;
-
         String fileName = target.getFileName().toString();
         String fileFullName = targetDir + "/" + fileName;
 
         // Template Matching
         Mat frame = Imgcodecs.imread(fileFullName);
+        Mat ocrFrame = frame.clone();
         Mat grayFrame = grayScalingImageData(fileFullName);
         Mat resizedFrame = new Mat();
         Mat mtResult = new Mat();
@@ -114,7 +114,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         }
         Point resultLoc1 = new Point(bestMatchLocation.x / bestMatchScale, bestMatchLocation.y / bestMatchScale);
         Point resultLoc2 = new Point((bestMatchLocation.x + CannyTemplate.width()) / bestMatchScale, (bestMatchLocation.y + CannyTemplate.height()) / bestMatchScale);
-        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 0, 255, 255), 2);
+        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 255, 0, 255), 2);
         String fileMatchName = targetDir + "/matching_" + fileName;
         Imgcodecs.imwrite(fileMatchName, frame);
 
@@ -189,104 +189,95 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                 new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]), new Scalar(0, 255, 0), 4);
         Imgproc.line(imgMatches, new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]),
                 new Point(sceneCornersData[0] + ScoreTemplate.cols(), sceneCornersData[1]), new Scalar(0, 255, 0), 4);
-
+        // (0,1) - (2,3)
+        // (6,7) - (4,5)
+        // (x1, y1) - (x2, y2) -> (x2 + (x2-x1) * 0.6, y2 + (y2-y1) * 0.6)
+        // (x4, y4) - (x3, y3) -> ...
         String fileKPMName = targetDir + "/kpmatch_" + fileName;
         Imgcodecs.imwrite(fileKPMName, imgMatches);
 
+        // TODO: 숫자까지 포함하는 Rotatedrect 잡기
+        MatOfPoint obtainedContour = new MatOfPoint(
+                new Point(sceneCornersData[0], sceneCornersData[1]),
+                new Point(sceneCornersData[2] * 1.6 - sceneCornersData[0] * 0.6, sceneCornersData[3] * 1.6 - sceneCornersData[1] * 0.6),
+                new Point(sceneCornersData[4] * 1.6 - sceneCornersData[6] * 0.6, sceneCornersData[5] * 1.6 - sceneCornersData[7] * 0.6),
+                new Point(sceneCornersData[6], sceneCornersData[7]));
+        //Imgproc.fillPoly(frame, ocpoints, new Scalar(255, 0, 0), 3);
+
+        MatOfPoint2f approxCurve = new MatOfPoint2f();
+        MatOfPoint2f contour2f = new MatOfPoint2f(obtainedContour.toArray());
+        double approxDistance = Imgproc.arcLength(contour2f, true) * 0.02;
+        Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
+
+        MatOfPoint points = new MatOfPoint(approxCurve.toArray());
+        List<MatOfPoint> ocpoints = new ArrayList<>();
+        ocpoints.add(points);
+        Imgproc.polylines(frame, ocpoints, true, new Scalar(255, 0, 0), 3);
+//        Mat points = new Mat();
+//        RotatedRect obtainedRotatedRect = Imgproc.minAreaRect(approxCurve);
+//        Imgproc.boxPoints(obtainedRotatedRect, points);
+        Rect obtainedRect = Imgproc.boundingRect(points);
+        Imgproc.rectangle(frame, obtainedRect, new Scalar(0, 0, 255), 3);
+        MatOfPoint brPoints = new MatOfPoint(new Point(0, 0), new Point(obtainedRect.width, 0),
+                new Point(obtainedRect.width, obtainedRect.height), new Point(0, obtainedRect.height));
+        MatOfPoint2f brPoints2f = new MatOfPoint2f(brPoints.toArray());
+        Mat ptMat = Imgproc.getPerspectiveTransform(contour2f, brPoints2f);
+        Imgproc.warpPerspective(ocrFrame, ocrFrame, ptMat, new Size(obtainedRect.width, obtainedRect.height));
+
+        String fileScoreName = targetDir + "/score_" + fileName;
+        Imgcodecs.imwrite(fileScoreName, frame);
+
+        Mat scoreFrame = new Mat(grayFrame, obtainedRect);
+        Imgproc.GaussianBlur(scoreFrame, scoreFrame, new Size(3, 3), 0.0, 0.0);
+        //Imgproc.threshold(scoreFrame, scoreFrame, 127, 255, Imgproc.THRESH_BINARY);
+        String fileTessName = targetDir + "/tess_" + fileName;
+        Imgcodecs.imwrite(fileTessName, scoreFrame);
         String textResult = "===== Reading Text =====\n";
-//        // preprocess image
-//        String fileGrayName = findCannyEdgeFromImageData(fileFullName, fileName);
-//        Rect roiRect = findScreen(fileGrayName);
-//        Mat cropFrame = new Mat(frame, roiRect);
-//        String fileCropName = targetDir + "/crop_" + fileName;
-//        Imgcodecs.imwrite(fileCropName, cropFrame);
-//
-//        String fileGrayName2 = grayScalingImageDataMorph(fileFullName, fileName);
-//        Rect roiRect2 = findScreen(fileGrayName2);
-//        Mat cropFrame2 = new Mat(frame, roiRect2);
-//        String fileCropName2 = targetDir + "/crop2_" + fileName;
-//        Imgcodecs.imwrite(fileCropName2, cropFrame2);
-//
-//        // detect text positions - AWS Rekognition 적용할 수도 있음
+        textResult += processingImageData(Paths.get(fileTessName));
+        textResult += "=====\n";
+        // color version
+        //ocrFrame = new Mat(ocrFrame, obtainedRect);
+        int resizeFactor = 32;
+        Core.copyMakeBorder(ocrFrame, ocrFrame, 0, ocrFrame.height() % 2,
+                ocrFrame.width() % 2, 0, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
+        int widthRemainder = ocrFrame.width() % resizeFactor;
+        int heightRemainder = ocrFrame.height() % resizeFactor;
+        int hPadding = (resizeFactor - widthRemainder) / 2;
+        int vPadding = (resizeFactor - heightRemainder) / 2;
+        Core.copyMakeBorder(ocrFrame, ocrFrame, vPadding, vPadding,
+                hPadding, hPadding, Core.BORDER_CONSTANT, new Scalar(255, 255, 255));
+        Imgproc.GaussianBlur(ocrFrame, ocrFrame, new Size(3, 3), 0.0, 0.0);
+
+        fileTessName = targetDir + "/tess2_" + fileName;
+        Imgcodecs.imwrite(fileTessName, ocrFrame);
+        textResult += processingImageData(Paths.get(fileTessName));
+        textResult += "=====\n";
+        //TODO: AWS Rekognition
+        textResult += awsRekognitionService.detectScore(fileTessName);
+        textResult += "=====\n";
+
+        // gray version
+        Core.copyMakeBorder(scoreFrame, scoreFrame, 0, scoreFrame.height() % 2,
+                scoreFrame.width() % 2, 0, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
+        Core.copyMakeBorder(scoreFrame, scoreFrame, vPadding, vPadding,
+                hPadding, hPadding, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
+        fileTessName = targetDir + "/tess3_" + fileName;
+        Imgcodecs.imwrite(fileTessName, scoreFrame);
+        textResult += processingImageData(Paths.get(fileTessName));
+        textResult += "=====\n";
+        // resize color version
+        Size resize = new Size(ocrFrame.width() * 2, ocrFrame.height() * 2);
+        Imgproc.resize(ocrFrame, ocrFrame, resize);
+        fileTessName = targetDir + "/tess4_" + fileName;
+        Imgcodecs.imwrite(fileTessName, ocrFrame);
+        textResult += processingImageData(Paths.get(fileTessName));
+        textResult += "=====\n";
+
+//        // recognize text - AWS Rekognition 적용할 수도 있음
 //        Mat outFrame = Imgcodecs.imread(fileCropName);
 //        Imgproc.cvtColor(cropFrame, cropFrame, Imgproc.COLOR_RGBA2RGB);
-//        int imgWidth = cropFrame.width();
-//        int imgHeight = cropFrame.height();
-//        double resWidth = Math.floor(imgWidth / 32) * 32;
-//        double resHeight = Math.floor(imgHeight / 32) * 32;
-//
-//        Size siz = new Size(resWidth, resHeight);
-//        int W = (int)(siz.width / 4); // width of the output geometry  / score maps
-//        int H = (int)(siz.height / 4); // height of those. the geometry has 4, vertically stacked maps, the score one 1
-//
-//        Mat blob = Dnn.blobFromImage(cropFrame, 1.0, siz, new Scalar(123.68, 116.78, 103.94), true, false);
-//        txtDetectNet.setInput(blob);
-//        List<Mat> outs = new ArrayList<>(2);
-//        List<String> outNames = new ArrayList<String>();
-//        outNames.add("feature_fusion/Conv_7/Sigmoid");
-//        outNames.add("feature_fusion/concat_3");
-//        txtDetectNet.forward(outs, outNames);
-//
-//        // Decode predicted bounding boxes.
-//        Mat scores = outs.get(0).reshape(1, H);
-//        // My lord and savior : http://answers.opencv.org/question/175676/javaandroid-access-4-dim-mat-planes/
-//        Mat geometry = outs.get(1).reshape(1, 5 * H); // don't hardcode it !
-//        List<Float> confidencesList = new ArrayList<>();
-//        List<RotatedRect> boxesList = decode(scores, geometry, confidencesList, scoreThresh);
-//
-//        // Apply non-maximum suppression procedure.
-//        MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
-//        RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
-//        MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
-//        MatOfInt indices = new MatOfInt();
-//        Dnn.NMSBoxesRotated(boxes, confidences, scoreThresh, nmsThresh, indices);
-//
-//        // Render detections
-//        Point ratio = new Point((float)cropFrame.cols()/siz.width, (float)cropFrame.rows()/siz.height);
-//        int[] indexes = indices.toArray();
-//        Arrays.sort(indexes);
-//
-//        for(int i = 0; i<indexes.length;++i) {
-//            try {
-//                RotatedRect rot = boxesArray[indexes[i]];
-//                //TODO: text 범위 인식 및 crop
-//                String cropName = targetDir + "/crop" + i + "_" + fileName;
-//                Rect cropRectBlob = rot.boundingRect();
-//                double widthPadding = cropRectBlob.width * ratio.x * 1.05;
-//                double heightPadding = cropRectBlob.height * ratio.y * 1.05;
-//                Rect cropRect = new Rect(new Point(cropRectBlob.x * ratio.x, cropRectBlob.y * ratio.y),
-//                        new Size(widthPadding, heightPadding));
-//                Mat text_roi = new Mat(cropFrame, cropRect);
-//                Imgcodecs.imwrite(cropName, text_roi);
-//
-//                //TODO: text 내용 인식 전처리
-//                //String grayName = grayScalingImageData(cropName, i, fileName);
-//
-//                // text 내용
-//                textResult += processingImageData(Paths.get(cropName));
-//                textResult += "=====\n";
-//                // 잘라낸 것 지우기
-//                File cropFile = new File(cropName);
-//                boolean isDeleted = cropFile.delete();
-//                // text 범위 인식 표시
-//                Point[] vertices = new Point[4];
-//                rot.points(vertices);
-//                //0: lower-left, 1: upper-left, 2: upper-right, 3: lower-right
-//                for (int j = 0; j < 4; ++j) {
-//                    vertices[j].x *= ratio.x;
-//                    vertices[j].y *= ratio.y;
-//                }
-//                for (int j = 0; j < 4; ++j) {
-//                    Imgproc.line(outFrame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 1);
-//                }
-//            }
-//            catch (Exception ex) {
-//                System.out.println("Unable to crop or recognize text at index " + i + ", caused by: " + ex.toString());
-//            }
-//        }
-//        Imgcodecs.imwrite(targetDir + "/out_" + fileName, outFrame);
-        //TODO: text 인식 범위 crop 후 tess
 
+        //textResult += findRecognizeTextFromImageData(ocrFrame, fileName);
 
         return textResult;
     }
@@ -490,6 +481,91 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Imgproc.rectangle(cannyFrame, largestRect, new Scalar(0, 0, 255, 255));
         Imgcodecs.imwrite(imgPath, cannyFrame);
         return largestRect;
+    }
+
+    private String findRecognizeTextFromImageData(Mat ocrFrame, String fileName) {
+        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식
+        float scoreThresh = 0.5f;
+        float nmsThresh = 0.4f;
+
+        int imgWidth = ocrFrame.width();
+        int imgHeight = ocrFrame.height();
+        double resWidth = Math.floor(imgWidth / 32) * 32;
+        double resHeight = Math.floor(imgHeight / 32) * 32;
+
+        Size siz = new Size(resWidth, resHeight);
+        int W = (int) (siz.width / 4); // width of the output geometry  / score maps
+        int He = (int) (siz.height / 4); // height of those. the geometry has 4, vertically stacked maps, the score one 1
+
+        Mat blob = Dnn.blobFromImage(ocrFrame, 1.0, siz, new Scalar(123.68, 116.78, 103.94), true, false);
+        txtDetectNet.setInput(blob);
+        List<Mat> outs = new ArrayList<>(2);
+        List<String> outNames = new ArrayList<String>();
+        outNames.add("feature_fusion/Conv_7/Sigmoid");
+        outNames.add("feature_fusion/concat_3");
+        txtDetectNet.forward(outs, outNames);
+
+        // Decode predicted bounding boxes.
+        Mat scores = outs.get(0).reshape(1, He);
+        // My lord and savior : http://answers.opencv.org/question/175676/javaandroid-access-4-dim-mat-planes/
+        Mat geometry = outs.get(1).reshape(1, 5 * He); // don't hardcode it !
+        List<Float> confidencesList = new ArrayList<>();
+        List<RotatedRect> boxesList = decode(scores, geometry, confidencesList, scoreThresh);
+
+        // Apply non-maximum suppression procedure.
+        MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
+        RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
+        MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
+        MatOfInt indices = new MatOfInt();
+        Dnn.NMSBoxesRotated(boxes, confidences, scoreThresh, nmsThresh, indices);
+
+        // Render detections
+        Point ratio = new Point((float) ocrFrame.cols() / siz.width, (float) ocrFrame.rows() / siz.height);
+        int[] indexes = indices.toArray();
+        Arrays.sort(indexes);
+
+        Mat outFrame = ocrFrame.clone();
+        String textResult = "=====\n";
+        for (int i = 0; i < indexes.length; ++i) {
+            try {
+                RotatedRect rot = boxesArray[indexes[i]];
+                //TODO: text 범위 인식 및 crop
+                String cropName = targetDir + "/crop" + i + "_" + fileName;
+                Rect cropRectBlob = rot.boundingRect();
+                double widthPadding = cropRectBlob.width * ratio.x * 1.05;
+                double heightPadding = cropRectBlob.height * ratio.y * 1.05;
+                Rect cropRect = new Rect(new Point(cropRectBlob.x * ratio.x, cropRectBlob.y * ratio.y),
+                        new Size(widthPadding, heightPadding));
+                Mat text_roi = new Mat(ocrFrame, cropRect);
+                Imgcodecs.imwrite(cropName, text_roi);
+
+                //TODO: text 내용 인식 전처리
+                //String grayName = grayScalingImageData(cropName, i, fileName);
+
+                // text 내용
+                textResult += processingImageData(Paths.get(cropName));
+                textResult += "=====\n";
+                // 잘라낸 것 지우기
+                File cropFile = new File(cropName);
+                boolean isDeleted = cropFile.delete();
+                // text 범위 인식 표시
+                Point[] vertices = new Point[4];
+                rot.points(vertices);
+                //0: lower-left, 1: upper-left, 2: upper-right, 3: lower-right
+                for (int j = 0; j < 4; ++j) {
+                    vertices[j].x *= ratio.x;
+                    vertices[j].y *= ratio.y;
+                }
+                for (int j = 0; j < 4; ++j) {
+                    Imgproc.line(outFrame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 2);
+                }
+            } catch (Exception ex) {
+                System.out.println("Unable to crop or recognize text at index " + i + ", caused by: " + ex.toString());
+            }
+        }
+        Imgcodecs.imwrite(targetDir + "/out_" + fileName, outFrame);
+
+        return textResult;
     }
 
     private String processingImageData(Path imgPath) {
