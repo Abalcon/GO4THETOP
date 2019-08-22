@@ -58,7 +58,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         }
 
         tessAPI.Init(targetDir.toString(), "eng+jpn+kor");
-        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
+        // OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
         Loader.load(opencv_java.class);
         txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
 
@@ -68,175 +68,33 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
     public String recognizeImageData(String imgPath, InputStream imageData) throws IOException {
         assert (imageData != null);
-        // save the input image
+        // Save the input image
         Path target = getImagePath(imgPath);
         Files.copy(imageData, target, StandardCopyOption.REPLACE_EXISTING);
 
-        //TODO: Score Template 불러오기
+        // Load Score Template
         String scoreTmpFileName = targetDir + "/ScoreTemplate.jpg";
         Mat ScoreTemplate = Imgcodecs.imread(scoreTmpFileName);
         Mat CannyTemplate = new Mat();
         Imgproc.cvtColor(ScoreTemplate, ScoreTemplate, Imgproc.COLOR_RGB2GRAY);
         Imgproc.Canny(ScoreTemplate, CannyTemplate, 70.0, 175.0);
 
+        // Load Music Validation Template
+        String musicTmpFileName = targetDir + "/MusicValidationSample.jpg";
+        Mat musicTemplate = Imgcodecs.imread(musicTmpFileName);
+
+        // Read the input image (target)
         String fileName = target.getFileName().toString();
         String fileFullName = targetDir + "/" + fileName;
-
-        // Template Matching
         Mat frame = Imgcodecs.imread(fileFullName);
-        Mat ocrFrame = frame.clone();
-        Mat grayFrame = grayScalingImageData(fileFullName);
-        Mat resizedFrame = new Mat();
-        Mat mtResult = new Mat();
-        double bestMatchRate = -1.0;
-        Point bestMatchLocation = new Point();
-        double bestMatchScale = -1.0;
-        for (double imgScale = 1.0; imgScale >= 0.1; imgScale -= 0.05) {
-            Size resize = new Size(grayFrame.width() * imgScale, grayFrame.height() * imgScale);
-            Imgproc.resize(grayFrame, resizedFrame, resize);
 
-            if (resizedFrame.width() < CannyTemplate.width() || resizedFrame.height() < CannyTemplate.height())
-                break;
-
-            Imgproc.Canny(resizedFrame, resizedFrame, 70.0, 175.0);
-            Imgproc.matchTemplate(resizedFrame, CannyTemplate, mtResult, Imgproc.TM_CCOEFF);
-            Core.MinMaxLocResult res = Core.minMaxLoc(mtResult);
-            //Imgproc.rectangle(resizedFrame, res.maxLoc,
-            //        new Point(res.maxLoc.x + CannyTemplate.width(), res.maxLoc.y + CannyTemplate.height()), new Scalar(0, 0, 255), 1);
-            //String fileResizeName = targetDir + "/resize" + (int)(imgScale * 100) + "_" + fileName;
-            //Imgcodecs.imwrite(fileResizeName, resizedFrame);
-
-            if (res.maxVal > bestMatchRate) {
-                bestMatchRate = res.maxVal;
-                bestMatchLocation = res.maxLoc;
-                bestMatchScale = imgScale;
-            }
-        }
-        Point resultLoc1 = new Point(bestMatchLocation.x / bestMatchScale, bestMatchLocation.y / bestMatchScale);
-        Point resultLoc2 = new Point((bestMatchLocation.x + CannyTemplate.width()) / bestMatchScale, (bestMatchLocation.y + CannyTemplate.height()) / bestMatchScale);
-        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 255, 0, 255), 2);
-        String fileMatchName = targetDir + "/matching_" + fileName;
-        Imgcodecs.imwrite(fileMatchName, frame);
+        // Template Matching - 점수가 있는 영역 찾기
+        //templateMatching(frame, CannyTemplate, fileName);
 
         // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
-        double hessianThreshold = 400;
-        int nOctaves = 4, nOctaveLayers = 3;
-        boolean extended = false, upright = false;
-        SURF detector = SURF.create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
-        MatOfKeyPoint keypointsObject = new MatOfKeyPoint(), keypointsScene = new MatOfKeyPoint();
-        Mat descriptorsObject = new Mat(), descriptorsScene = new Mat();
-        detector.detectAndCompute(ScoreTemplate, new Mat(), keypointsObject, descriptorsObject);
-        detector.detectAndCompute(grayFrame, new Mat(), keypointsScene, descriptorsScene);
+        Mat ocrFrame = keypointMatching(frame, ScoreTemplate, fileName);
 
-        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
-        List<MatOfDMatch> knnMatches = new ArrayList<>();
-        matcher.knnMatch(descriptorsObject, descriptorsScene, knnMatches, 2);
-
-        double ratioThresh = 0.75;
-        List<DMatch> listOfGoodMatches = new ArrayList<>();
-        for (MatOfDMatch knnMatch : knnMatches) {
-            if (knnMatch.rows() > 1) {
-                DMatch[] matches = knnMatch.toArray();
-                if (matches[0].distance < ratioThresh * matches[1].distance) {
-                    listOfGoodMatches.add(matches[0]);
-                }
-            }
-        }
-        MatOfDMatch goodMatches = new MatOfDMatch();
-        goodMatches.fromList(listOfGoodMatches);
-
-        //-- Draw matches
-        Mat imgMatches = new Mat();
-        Features2d.drawMatches(ScoreTemplate, keypointsObject, grayFrame, keypointsScene, goodMatches, imgMatches, Scalar.all(-1),
-                Scalar.all(-1), new MatOfByte(), Features2d.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS);
-        //-- Localize the object
-        List<Point> obj = new ArrayList<>();
-        List<Point> scene = new ArrayList<>();
-        List<KeyPoint> listOfKeypointsObject = keypointsObject.toList();
-        List<KeyPoint> listOfKeypointsScene = keypointsScene.toList();
-        for (int i = 0; i < listOfGoodMatches.size(); i++) {
-            //-- Get the keypoints from the good matches
-            obj.add(listOfKeypointsObject.get(listOfGoodMatches.get(i).queryIdx).pt);
-            scene.add(listOfKeypointsScene.get(listOfGoodMatches.get(i).trainIdx).pt);
-        }
-        MatOfPoint2f objMat = new MatOfPoint2f(), sceneMat = new MatOfPoint2f();
-        objMat.fromList(obj);
-        sceneMat.fromList(scene);
-        double ransacReprojThreshold = 3.0;
-        Mat H = Calib3d.findHomography(objMat, sceneMat, Calib3d.RANSAC, ransacReprojThreshold);
-        //-- Get the corners from the image_1 ( the object to be "detected" )
-        Mat objCorners = new Mat(4, 1, CvType.CV_32FC2), sceneCorners = new Mat();
-        float[] objCornersData = new float[(int) (objCorners.total() * objCorners.channels())];
-        objCorners.get(0, 0, objCornersData);
-        objCornersData[0] = 0;
-        objCornersData[1] = 0;
-        objCornersData[2] = ScoreTemplate.cols();
-        objCornersData[3] = 0;
-        objCornersData[4] = ScoreTemplate.cols();
-        objCornersData[5] = ScoreTemplate.rows();
-        objCornersData[6] = 0;
-        objCornersData[7] = ScoreTemplate.rows();
-        objCorners.put(0, 0, objCornersData);
-        Core.perspectiveTransform(objCorners, sceneCorners, H);
-        float[] sceneCornersData = new float[(int) (sceneCorners.total() * sceneCorners.channels())];
-        sceneCorners.get(0, 0, sceneCornersData);
-        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-        Imgproc.line(imgMatches, new Point(sceneCornersData[0] + ScoreTemplate.cols(), sceneCornersData[1]),
-                new Point(sceneCornersData[2] + ScoreTemplate.cols(), sceneCornersData[3]), new Scalar(0, 255, 0), 4);
-        Imgproc.line(imgMatches, new Point(sceneCornersData[2] + ScoreTemplate.cols(), sceneCornersData[3]),
-                new Point(sceneCornersData[4] + ScoreTemplate.cols(), sceneCornersData[5]), new Scalar(0, 255, 0), 4);
-        Imgproc.line(imgMatches, new Point(sceneCornersData[4] + ScoreTemplate.cols(), sceneCornersData[5]),
-                new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]), new Scalar(0, 255, 0), 4);
-        Imgproc.line(imgMatches, new Point(sceneCornersData[6] + ScoreTemplate.cols(), sceneCornersData[7]),
-                new Point(sceneCornersData[0] + ScoreTemplate.cols(), sceneCornersData[1]), new Scalar(0, 255, 0), 4);
-        // (0,1) - (2,3)
-        // (6,7) - (4,5)
-        // (x1, y1) - (x2, y2) -> (x2 + (x2-x1) * 0.6, y2 + (y2-y1) * 0.6)
-        // (x4, y4) - (x3, y3) -> ...
-        String fileKPMName = targetDir + "/kpmatch_" + fileName;
-        Imgcodecs.imwrite(fileKPMName, imgMatches);
-
-        // TODO: 숫자까지 포함하는 Rotatedrect 잡기
-        MatOfPoint obtainedContour = new MatOfPoint(
-                new Point(sceneCornersData[0], sceneCornersData[1]),
-                new Point(sceneCornersData[2] * 1.6 - sceneCornersData[0] * 0.6, sceneCornersData[3] * 1.6 - sceneCornersData[1] * 0.6),
-                new Point(sceneCornersData[4] * 1.6 - sceneCornersData[6] * 0.6, sceneCornersData[5] * 1.6 - sceneCornersData[7] * 0.6),
-                new Point(sceneCornersData[6], sceneCornersData[7]));
-        //Imgproc.fillPoly(frame, ocpoints, new Scalar(255, 0, 0), 3);
-
-        MatOfPoint2f approxCurve = new MatOfPoint2f();
-        MatOfPoint2f contour2f = new MatOfPoint2f(obtainedContour.toArray());
-        double approxDistance = Imgproc.arcLength(contour2f, true) * 0.02;
-        Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
-
-        MatOfPoint points = new MatOfPoint(approxCurve.toArray());
-        List<MatOfPoint> ocpoints = new ArrayList<>();
-        ocpoints.add(points);
-        Imgproc.polylines(frame, ocpoints, true, new Scalar(255, 0, 0), 3);
-//        Mat points = new Mat();
-//        RotatedRect obtainedRotatedRect = Imgproc.minAreaRect(approxCurve);
-//        Imgproc.boxPoints(obtainedRotatedRect, points);
-        Rect obtainedRect = Imgproc.boundingRect(points);
-        Imgproc.rectangle(frame, obtainedRect, new Scalar(0, 0, 255), 3);
-        MatOfPoint brPoints = new MatOfPoint(new Point(0, 0), new Point(obtainedRect.width, 0),
-                new Point(obtainedRect.width, obtainedRect.height), new Point(0, obtainedRect.height));
-        MatOfPoint2f brPoints2f = new MatOfPoint2f(brPoints.toArray());
-        Mat ptMat = Imgproc.getPerspectiveTransform(contour2f, brPoints2f);
-        Imgproc.warpPerspective(ocrFrame, ocrFrame, ptMat, new Size(obtainedRect.width, obtainedRect.height));
-
-        String fileScoreName = targetDir + "/score_" + fileName;
-        Imgcodecs.imwrite(fileScoreName, frame);
-
-        Mat scoreFrame = new Mat(grayFrame, obtainedRect);
-        Imgproc.GaussianBlur(scoreFrame, scoreFrame, new Size(3, 3), 0.0, 0.0);
-        //Imgproc.threshold(scoreFrame, scoreFrame, 127, 255, Imgproc.THRESH_BINARY);
-        String fileTessName = targetDir + "/tess_" + fileName;
-        Imgcodecs.imwrite(fileTessName, scoreFrame);
         String textResult = "===== Reading Text =====\n";
-        textResult += processingImageData(Paths.get(fileTessName));
-        textResult += "=====\n";
-        // color version
-        //ocrFrame = new Mat(ocrFrame, obtainedRect);
         int resizeFactor = 32;
         Core.copyMakeBorder(ocrFrame, ocrFrame, 0, ocrFrame.height() % 2,
                 ocrFrame.width() % 2, 0, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
@@ -248,38 +106,18 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                 hPadding, hPadding, Core.BORDER_CONSTANT, new Scalar(255, 255, 255));
         Imgproc.GaussianBlur(ocrFrame, ocrFrame, new Size(3, 3), 0.0, 0.0);
 
-        fileTessName = targetDir + "/tess2_" + fileName;
-        Imgcodecs.imwrite(fileTessName, ocrFrame);
-        textResult += processingImageData(Paths.get(fileTessName));
-        textResult += "=====\n";
-        //TODO: AWS Rekognition
-        textResult += awsRekognitionService.detectScore(fileTessName);
-        textResult += "=====\n";
-
-        // gray version
-        Core.copyMakeBorder(scoreFrame, scoreFrame, 0, scoreFrame.height() % 2,
-                scoreFrame.width() % 2, 0, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
-        Core.copyMakeBorder(scoreFrame, scoreFrame, vPadding, vPadding,
-                hPadding, hPadding, Core.BORDER_CONSTANT, new Scalar(0, 0, 0));
-        fileTessName = targetDir + "/tess3_" + fileName;
-        Imgcodecs.imwrite(fileTessName, scoreFrame);
-        textResult += processingImageData(Paths.get(fileTessName));
-        textResult += "=====\n";
-        // resize color version
-        Size resize = new Size(ocrFrame.width() * 2, ocrFrame.height() * 2);
-        Imgproc.resize(ocrFrame, ocrFrame, resize);
-        fileTessName = targetDir + "/tess4_" + fileName;
+        String fileTessName = targetDir + "/tess_" + fileName;
         Imgcodecs.imwrite(fileTessName, ocrFrame);
         textResult += processingImageData(Paths.get(fileTessName));
         textResult += "=====\n";
 
-//        // recognize text - AWS Rekognition 적용할 수도 있음
-//        Mat outFrame = Imgcodecs.imread(fileCropName);
-//        Imgproc.cvtColor(cropFrame, cropFrame, Imgproc.COLOR_RGBA2RGB);
+        // Score Detection with AWS Rekognition
+        String detectScore = awsRekognitionService.detectScore(fileTessName);
+        textResult += detectScore;
+        textResult += "\n=====";
+        System.out.println(textResult);
 
-        //textResult += findRecognizeTextFromImageData(ocrFrame, fileName);
-
-        return textResult;
+        return detectScore;
     }
 
     private static List<RotatedRect> decode(Mat scores, Mat geometry, List<Float> confidences, float scoreThresh) {
@@ -322,18 +160,6 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             }
         }
         return detections;
-    }
-
-    private Mat grayScalingImageData(String imgPath) {
-        Mat cropFrame = Imgcodecs.imread(imgPath);
-        Mat grayFrame = new Mat();
-        Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
-        //Imgproc.medianBlur(grayFrame, grayFrame, 5);
-        //Imgproc.GaussianBlur(grayFrame, grayFrame, new Size(5,5), 0.0, 0.0);
-        //Imgproc.threshold(grayFrame, grayFrame, 0, 255, Imgproc.THRESH_OTSU);
-        //String grayName = targetDir + "/gray_" + fileName;
-        //Imgcodecs.imwrite(grayName, grayFrame);
-        return grayFrame;
     }
 
     private String findCannyEdgeFromMatrix(Mat cropFrame, String fileName) {
@@ -444,6 +270,156 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         return outName;
     }
 
+    private void templateMatching(Mat frame, Mat template, String fileName) {
+        Mat grayFrame = new Mat();
+        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+        Mat resizedFrame = new Mat();
+        Mat mtResult = new Mat();
+        double bestMatchRate = -1.0;
+        Point bestMatchLocation = new Point();
+        double bestMatchScale = -1.0;
+        for (double imgScale = 1.0; imgScale >= 0.1; imgScale -= 0.05) {
+            Size resize = new Size(grayFrame.width() * imgScale, grayFrame.height() * imgScale);
+            Imgproc.resize(grayFrame, resizedFrame, resize);
+
+            if (resizedFrame.width() < template.width() || resizedFrame.height() < template.height())
+                break;
+
+            Imgproc.Canny(resizedFrame, resizedFrame, 70.0, 175.0);
+            Imgproc.matchTemplate(resizedFrame, template, mtResult, Imgproc.TM_CCOEFF);
+            Core.MinMaxLocResult res = Core.minMaxLoc(mtResult);
+            //Imgproc.rectangle(resizedFrame, res.maxLoc,
+            //        new Point(res.maxLoc.x + CannyTemplate.width(), res.maxLoc.y + CannyTemplate.height()), new Scalar(0, 0, 255), 1);
+            //String fileResizeName = targetDir + "/resize" + (int)(imgScale * 100) + "_" + fileName;
+            //Imgcodecs.imwrite(fileResizeName, resizedFrame);
+
+            if (res.maxVal > bestMatchRate) {
+                bestMatchRate = res.maxVal;
+                bestMatchLocation = res.maxLoc;
+                bestMatchScale = imgScale;
+            }
+        }
+        Point resultLoc1 = new Point(bestMatchLocation.x / bestMatchScale, bestMatchLocation.y / bestMatchScale);
+        Point resultLoc2 = new Point((bestMatchLocation.x + template.width()) / bestMatchScale, (bestMatchLocation.y + template.height()) / bestMatchScale);
+        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 255, 0, 255), 2);
+        String fileMatchName = targetDir + "/matching_" + fileName;
+        Imgcodecs.imwrite(fileMatchName, frame);
+    }
+
+    private Mat keypointMatching(Mat frame, Mat template, String fileName) {
+        Mat result = frame.clone();
+        // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
+        Mat grayFrame = new Mat();
+        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+
+        double hessianThreshold = 400;
+        int nOctaves = 4, nOctaveLayers = 3;
+        boolean extended = false, upright = false;
+        SURF detector = SURF.create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
+        MatOfKeyPoint keypointsObject = new MatOfKeyPoint(), keypointsScene = new MatOfKeyPoint();
+        Mat descriptorsObject = new Mat(), descriptorsScene = new Mat();
+        detector.detectAndCompute(template, new Mat(), keypointsObject, descriptorsObject);
+        detector.detectAndCompute(grayFrame, new Mat(), keypointsScene, descriptorsScene);
+
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+        List<MatOfDMatch> knnMatches = new ArrayList<>();
+        matcher.knnMatch(descriptorsObject, descriptorsScene, knnMatches, 2);
+
+        double ratioThresh = 0.75;
+        List<DMatch> listOfGoodMatches = new ArrayList<>();
+        for (MatOfDMatch knnMatch : knnMatches) {
+            if (knnMatch.rows() > 1) {
+                DMatch[] matches = knnMatch.toArray();
+                if (matches[0].distance < ratioThresh * matches[1].distance) {
+                    listOfGoodMatches.add(matches[0]);
+                }
+            }
+        }
+        MatOfDMatch goodMatches = new MatOfDMatch();
+        goodMatches.fromList(listOfGoodMatches);
+
+        //-- Draw matches
+        Mat imgMatches = new Mat();
+        Features2d.drawMatches(template, keypointsObject, grayFrame, keypointsScene, goodMatches, imgMatches, Scalar.all(-1),
+                Scalar.all(-1), new MatOfByte(), Features2d.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS);
+        //-- Localize the object
+        List<Point> obj = new ArrayList<>();
+        List<Point> scene = new ArrayList<>();
+        List<KeyPoint> listOfKeypointsObject = keypointsObject.toList();
+        List<KeyPoint> listOfKeypointsScene = keypointsScene.toList();
+        for (int i = 0; i < listOfGoodMatches.size(); i++) {
+            //-- Get the keypoints from the good matches
+            obj.add(listOfKeypointsObject.get(listOfGoodMatches.get(i).queryIdx).pt);
+            scene.add(listOfKeypointsScene.get(listOfGoodMatches.get(i).trainIdx).pt);
+        }
+        MatOfPoint2f objMat = new MatOfPoint2f(), sceneMat = new MatOfPoint2f();
+        objMat.fromList(obj);
+        sceneMat.fromList(scene);
+        double ransacReprojThreshold = 3.0;
+        Mat H = Calib3d.findHomography(objMat, sceneMat, Calib3d.RANSAC, ransacReprojThreshold);
+        //-- Get the corners from the image_1 ( the object to be "detected" )
+        Mat objCorners = new Mat(4, 1, CvType.CV_32FC2), sceneCorners = new Mat();
+        float[] objCornersData = new float[(int) (objCorners.total() * objCorners.channels())];
+        objCorners.get(0, 0, objCornersData);
+        objCornersData[0] = 0;
+        objCornersData[1] = 0;
+        objCornersData[2] = template.cols();
+        objCornersData[3] = 0;
+        objCornersData[4] = template.cols();
+        objCornersData[5] = template.rows();
+        objCornersData[6] = 0;
+        objCornersData[7] = template.rows();
+        objCorners.put(0, 0, objCornersData);
+        Core.perspectiveTransform(objCorners, sceneCorners, H);
+        float[] sceneCornersData = new float[(int) (sceneCorners.total() * sceneCorners.channels())];
+        sceneCorners.get(0, 0, sceneCornersData);
+        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+        Imgproc.line(imgMatches, new Point(sceneCornersData[0] + template.cols(), sceneCornersData[1]),
+                new Point(sceneCornersData[2] + template.cols(), sceneCornersData[3]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[2] + template.cols(), sceneCornersData[3]),
+                new Point(sceneCornersData[4] + template.cols(), sceneCornersData[5]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[4] + template.cols(), sceneCornersData[5]),
+                new Point(sceneCornersData[6] + template.cols(), sceneCornersData[7]), new Scalar(0, 255, 0), 4);
+        Imgproc.line(imgMatches, new Point(sceneCornersData[6] + template.cols(), sceneCornersData[7]),
+                new Point(sceneCornersData[0] + template.cols(), sceneCornersData[1]), new Scalar(0, 255, 0), 4);
+        // (0,1) - (2,3)
+        // (6,7) - (4,5)
+        // (x1, y1) - (x2, y2) -> (x2 + (x2-x1) * 0.6, y2 + (y2-y1) * 0.6)
+        // (x4, y4) - (x3, y3) -> ...
+        String fileKPMName = targetDir + "/kpmatch_" + fileName;
+        Imgcodecs.imwrite(fileKPMName, imgMatches);
+
+        // 숫자까지 포함하는 Rotatedrect 잡기
+        MatOfPoint obtainedContour = new MatOfPoint(
+                new Point(sceneCornersData[0], sceneCornersData[1]),
+                new Point(sceneCornersData[2] * 1.6 - sceneCornersData[0] * 0.6, sceneCornersData[3] * 1.6 - sceneCornersData[1] * 0.6),
+                new Point(sceneCornersData[4] * 1.6 - sceneCornersData[6] * 0.6, sceneCornersData[5] * 1.6 - sceneCornersData[7] * 0.6),
+                new Point(sceneCornersData[6], sceneCornersData[7]));
+        //Imgproc.fillPoly(frame, ocpoints, new Scalar(255, 0, 0), 3);
+
+        MatOfPoint2f approxCurve = new MatOfPoint2f();
+        MatOfPoint2f contour2f = new MatOfPoint2f(obtainedContour.toArray());
+        double approxDistance = Imgproc.arcLength(contour2f, true) * 0.02;
+        Imgproc.approxPolyDP(contour2f, approxCurve, approxDistance, true);
+
+        MatOfPoint points = new MatOfPoint(approxCurve.toArray());
+        List<MatOfPoint> ocpoints = new ArrayList<>();
+        ocpoints.add(points);
+        Imgproc.polylines(frame, ocpoints, true, new Scalar(255, 0, 0), 3);
+//        Mat points = new Mat();
+//        RotatedRect obtainedRotatedRect = Imgproc.minAreaRect(approxCurve);
+//        Imgproc.boxPoints(obtainedRotatedRect, points);
+        Rect obtainedRect = Imgproc.boundingRect(points);
+        Imgproc.rectangle(frame, obtainedRect, new Scalar(0, 0, 255), 3);
+        MatOfPoint brPoints = new MatOfPoint(new Point(0, 0), new Point(obtainedRect.width, 0),
+                new Point(obtainedRect.width, obtainedRect.height), new Point(0, obtainedRect.height));
+        MatOfPoint2f brPoints2f = new MatOfPoint2f(brPoints.toArray());
+        Mat ptMat = Imgproc.getPerspectiveTransform(contour2f, brPoints2f);
+
+        Imgproc.warpPerspective(result, result, ptMat, new Size(obtainedRect.width, obtainedRect.height));
+        return result;
+    }
+
 
     private Rect findScreen(String imgPath) {
         Mat cannyFrame = Imgcodecs.imread(imgPath);
@@ -457,7 +433,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         MatOfPoint2f approxCurve = new MatOfPoint2f();
         double largestArea = 0.0;
         Rect largestRect = new Rect();
-        Rect currentRect = new Rect();
+        Rect currentRect;
         for (MatOfPoint contour : contours) {
 //            double contArea = Imgproc.contourArea(contour);
 //            if (contArea > largestArea) {
@@ -500,7 +476,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Mat blob = Dnn.blobFromImage(ocrFrame, 1.0, siz, new Scalar(123.68, 116.78, 103.94), true, false);
         txtDetectNet.setInput(blob);
         List<Mat> outs = new ArrayList<>(2);
-        List<String> outNames = new ArrayList<String>();
+        List<String> outNames = new ArrayList<>();
         outNames.add("feature_fusion/Conv_7/Sigmoid");
         outNames.add("feature_fusion/concat_3");
         txtDetectNet.forward(outs, outNames);
