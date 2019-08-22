@@ -36,15 +36,15 @@ public class AWSRekognitionService {
             DetectTextResult result = client.detectText(request);
             List<TextDetection> textDetections = result.getTextDetections();
             System.out.println("Detected lines and words for " + imgPath);
-//            for (TextDetection text : textDetections) {
-//
-//                System.out.println("Detected: " + text.getDetectedText());
-//                System.out.println("Confidence: " + text.getConfidence().toString());
-//                System.out.println("Id : " + text.getId());
-//                System.out.println("Parent Id: " + text.getParentId());
-//                System.out.println("Type: " + text.getType());
-//                System.out.println();
-//            }
+            for (TextDetection text : textDetections) {
+
+                System.out.println("Detected: " + text.getDetectedText());
+                System.out.println("Confidence: " + text.getConfidence().toString());
+                System.out.println("Id : " + text.getId());
+                System.out.println("Parent Id: " + text.getParentId());
+                System.out.println("Type: " + text.getType());
+                System.out.println();
+            }
 
             int totalDetections = textDetections.size();
             for (int i = totalDetections - 3; i < totalDetections; i++) {

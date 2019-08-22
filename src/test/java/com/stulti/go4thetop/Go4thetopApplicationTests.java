@@ -148,27 +148,28 @@ public class Go4thetopApplicationTests {
     @Test
     public void extractScoresFromImagesTest() throws Exception {
         String testFilePath = "src/test/resources/testimages/";
-        oneImage(testFilePath, "test_blue1.jpg", "EX SCORE 35");
-        oneImage(testFilePath, "test_blue2.jpg", "EX SCORE 1362");
-        oneImage(testFilePath, "test_blue3.jpg", "EX SCORE 1494");
+        String invalidMusicError = "InvalidMusicError";
+        oneImage(testFilePath, "test_blue1.jpg", "EX SCORE 35"); // Splash Gold
+        oneImage(testFilePath, "test_blue2.jpg", invalidMusicError); // 1362
+        oneImage(testFilePath, "test_blue3.jpg", invalidMusicError); // 1494
         //oneImage(testFilePath,"test_blue5.jpg", "EX SCORE 1503"); // EX SCORE 1 503으로 뜨는 듯
-        oneImage(testFilePath, "test_blue6.jpg", "EX SCORE 1123");
-        oneImage(testFilePath, "test_blue7.jpg", "EX SCORE 979");
-        oneImage(testFilePath, "test_blue8.jpg", "EX SCORE 1241");
-        oneImage(testFilePath, "test_blue9.jpg", "EX SCORE 902");
+        oneImage(testFilePath, "test_blue6.jpg", invalidMusicError); // 1123
+        oneImage(testFilePath, "test_blue7.jpg", invalidMusicError); // 979
+        oneImage(testFilePath, "test_blue8.jpg", invalidMusicError); // 1241
+        oneImage(testFilePath, "test_blue9.jpg", invalidMusicError); // 902
         //oneImage(testFilePath,"test_blue10.jpg", "EX SCORE 1599"); // EX SCORE 1 599로 뜨는 듯
-        oneImage(testFilePath, "test_blue11.jpg", "EX SCORE 915");
-        oneImage(testFilePath, "test_blue12.jpg", "EX SCORE 1675");
-        oneImage(testFilePath, "test_blue13.jpg", "EX SCORE 1443");
-        oneImage(testFilePath, "test_blue14.jpg", "EX SCORE 918");
-        oneImage(testFilePath, "test_blue15.jpg", "EX SCORE 1775");
-        oneImage(testFilePath, "test_blue16.jpg", "EX SCORE 1939");
-        oneImage(testFilePath, "test_blue17.jpg", "EX SCORE 1436");
-        oneImage(testFilePath, "test_blue19.jpg", "EX SCORE 1256");
-        oneImage(testFilePath, "test_blue21.jpg", "EX SCORE 1202");
-        oneImage(testFilePath, "test_blue22.jpg", "EX SCORE 1752");
-        oneImage(testFilePath, "test_blue23.jpg", "EX SCORE 1130");
-        oneImage(testFilePath, "test_blue24.jpg", "EX SCORE 903");
+        oneImage(testFilePath, "test_blue11.jpg", invalidMusicError); // 915
+        oneImage(testFilePath, "test_blue12.jpg", "EX SCORE 1675"); // Splash Gold
+        oneImage(testFilePath, "test_blue13.jpg", invalidMusicError); // 1443
+        oneImage(testFilePath, "test_blue14.jpg", invalidMusicError); // 918
+        oneImage(testFilePath, "test_blue15.jpg", invalidMusicError); // 1775
+        oneImage(testFilePath, "test_blue16.jpg", invalidMusicError); // 1939
+        oneImage(testFilePath, "test_blue17.jpg", invalidMusicError); // 1436
+        oneImage(testFilePath, "test_blue19.jpg", invalidMusicError); // 1256
+        oneImage(testFilePath, "test_blue21.jpg", invalidMusicError); // 1202
+        oneImage(testFilePath, "test_blue22.jpg", invalidMusicError); // 1752
+        oneImage(testFilePath, "test_blue23.jpg", invalidMusicError); // 1130
+        oneImage(testFilePath, "test_blue24.jpg", invalidMusicError); // 903
     }
 
     private void oneImage(String filePath, String fileName, String expectedOutput) throws IOException {

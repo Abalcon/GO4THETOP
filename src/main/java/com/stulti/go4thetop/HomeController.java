@@ -99,6 +99,11 @@ public class HomeController {
         String result = "";
         try {
             result = imgService.recognizeImageData(imgName, request.getInputStream());
+            if (result.equals("InvalidMusicError")) {
+                throw new InvalidMusicNameException();
+            }
+        } catch (InvalidMusicNameException ex) {
+            throw new InvalidMusicNameException();
         } catch (Exception ex) {
             throw new ImageRecognitionFailException();
         }
