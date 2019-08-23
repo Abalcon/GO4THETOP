@@ -4,6 +4,7 @@ import Home from './HomeComponent';
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
 import MainEvent from './MainEventComponent';
+import {Donation} from './DonationComponent';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
@@ -76,6 +77,12 @@ class Main extends Component {
             )
         };
 
+        const DonationPage = () => {
+            return (
+                <Donation/>
+            )
+        };
+
         return (
             <div>
                 <Header />
@@ -85,6 +92,7 @@ class Main extends Component {
                         <Route path="/credits" component={CreditsPage} />
                         <Route path="/preliminary" component={PreliminaryPage} />
                         <Route path="/mainevent" component={MainEventPage} />
+                        <Route path="/donate" component={DonationPage}/>
                         <Redirect to="/home" />
                     </Switch>
 

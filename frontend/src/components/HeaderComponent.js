@@ -61,17 +61,24 @@ class Header extends Component {
                                         </span>Main Event
                                     </NavLink>
                                 </NavItem>
+                                <NavItem>
+                                    <NavLink className="nav-link" to='/donate'>
+                                        <span className="fa fa-krw fa-lg">
+
+                                        </span>Donation & Goods
+                                    </NavLink>
+                                </NavItem>
                             </Nav>
                         </Collapse>
                     </div>
                 </Navbar>
-                <Jumbotron style={jumbotronStyle}>
+                <Jumbotron style={jumbotronStyle} className="mb-1">
                     <div className="container">
                         <div className="row row-header">
                             <div className="col-12" style={{textAlign: "right"}}>
                                 <h1>GO4THETOP</h1>
                                 <h4>New Era, New Aces.</h4>
-                                <span>2019. 10. 12.<br/></span>
+                                <span>2019. 11. 2.<br/></span>
                                 <span>Bucheon Attack</span>
                             </div>
                         </div>

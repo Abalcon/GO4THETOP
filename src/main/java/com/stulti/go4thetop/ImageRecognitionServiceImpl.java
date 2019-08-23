@@ -76,7 +76,11 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         String scoreTmpFileName = targetDir + "/ScoreTemplate.jpg";
         Mat ScoreTemplate = Imgcodecs.imread(scoreTmpFileName);
         Imgproc.cvtColor(ScoreTemplate, ScoreTemplate, Imgproc.COLOR_RGB2GRAY);
-
+        // for eA-App images
+        String scoreTmpAppFileName = targetDir + "/ScoreTemplateApp.jpg";
+        Mat ScoreAppTemplate = Imgcodecs.imread(scoreTmpAppFileName);
+        Imgproc.cvtColor(ScoreAppTemplate, ScoreAppTemplate, Imgproc.COLOR_RGB2GRAY);
+        // TODO: 지금은 임시로 1곡만 되어있는데 예선 지정곡 4곡을 적용해야 한다
         // Load Music Validation Template
         String musicTmpFileName = targetDir + "/MusicValidationSample.jpg";
         Mat musicTemplate = Imgcodecs.imread(musicTmpFileName);
@@ -92,10 +96,18 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
         // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         float[] scoreRegionData = findRegionWithKeypointMatching(frame, ScoreTemplate, fileName); // Get crop with score
-        Mat ocrFrame = new Mat();
+        Mat ocrFrame;
         if (scoreRegionData != null) {
             ocrFrame = getScoreCrop(frame, scoreRegionData, 0.6);
+        } else {
+            scoreRegionData = findRegionWithKeypointMatching(frame, ScoreAppTemplate, fileName);
+            if (scoreRegionData != null) {
+                ocrFrame = getScoreCrop(frame, scoreRegionData, 0.5);
+            } else {
+                return "InvalidImageError";
+            }
         }
+        // TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
         Mat vldFrame = new Mat();
         float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate, fileName);
         if (musicRegionData != null) {
@@ -103,7 +115,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         } else {
             return "InvalidMusicError";
         }
-
+        // TODO: 곡 이름이 다른데 곡 이름 영역이 인식되었을 경우 2단계 처리를 해야한다
         String textResult = "===== Reading Text =====\n";
         int resizeFactor = 32;
         Core.copyMakeBorder(ocrFrame, ocrFrame, 0, ocrFrame.height() % 2,
@@ -203,7 +215,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Imgcodecs.imwrite(grayName, grayFrame);
         String blurName = targetDir + "/blur_" + fileName;
         Imgcodecs.imwrite(blurName, blurFrame);
-        //TODO: find reasonable threshold (adaptive by each image)
+        // find reasonable threshold (adaptive by each image)
         for (int k = 0; k < 11; k++) {
             double lowTh = k * 10.0;
             double highTh = lowTh * 2 + 40.0;
@@ -221,7 +233,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             Imgcodecs.imwrite(tmpName, mrpFrame);
             roiRect = findScreen(tmpName);
         }
-        //TODO: find median of image - for adaptive threshold
+        // find median of image - for adaptive threshold
         double m = blurFrame.rows() * blurFrame.cols() / 2;
         int bin = 0;
         double med = -1.0;
@@ -257,16 +269,16 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Mat thFrame = new Mat();
         Mat outFrame = new Mat();
         Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
-        //TODO: Morph Gradient
+        // Morph Gradient
         Mat mgKernel = new Mat(3, 3, CvType.CV_8U, Scalar.all(1));
         Mat mcKernel = new Mat(9, 5, CvType.CV_8U, Scalar.all(1));
         Imgproc.morphologyEx(grayFrame, mgFrame, Imgproc.MORPH_GRADIENT, mgKernel);
-        //TODO: Adaptive Threshold or Smooth/Blur
+        // Adaptive Threshold or Smooth/Blur
         //Imgproc.GaussianBlur(mgFrame, thFrame, new Size(5,5), 0.0, 0.0);
         //Imgproc.threshold(mgFrame, thFrame, 0, 255, Imgproc.THRESH_OTSU);
         Imgproc.adaptiveThreshold(mgFrame, thFrame, 255,
                 Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 3, 12);
-        //TODO: Morph Close
+        // Morph Close
         Imgproc.morphologyEx(thFrame, outFrame, Imgproc.MORPH_CLOSE, mcKernel);
 
         String grayName = targetDir + "/gray2_" + fileName;
@@ -323,7 +335,6 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     private float[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName) {
         // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         int matchCountThreshold = 10;
-        //Imgproc.cvtColor(template, template, Imgproc.COLOR_RGB2GRAY);
         Mat grayFrame = new Mat();
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
 
@@ -388,7 +399,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             objCornersData[6] = 0;
             objCornersData[7] = template.rows();
             objCorners.put(0, 0, objCornersData);
-            Core.perspectiveTransform(objCorners, sceneCorners, H); //FIXME: template과 닮은 부분을 못 찾을 경우 여기서 에러난다
+            Core.perspectiveTransform(objCorners, sceneCorners, H); // template과 닮은 부분을 못 찾을 경우 여기서 에러났었다
             float[] sceneCornersData = new float[(int) (sceneCorners.total() * sceneCorners.channels())];
             sceneCorners.get(0, 0, sceneCornersData);
             //-- Draw lines between the corners (the mapped object in the scene - image_2 )
@@ -484,7 +495,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     }
 
     private String findRecognizeTextFromImageData(Mat ocrFrame, String fileName) {
-        //TODO: OpenCV로 텍스트가 있는 곳을 먼저 인식
+        // OpenCV로 인식된 텍스트가 있는 부분이 들어온다
         float scoreThresh = 0.5f;
         float nmsThresh = 0.4f;
 
@@ -529,7 +540,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         for (int i = 0; i < indexes.length; ++i) {
             try {
                 RotatedRect rot = boxesArray[indexes[i]];
-                //TODO: text 범위 인식 및 crop
+                // text 범위 인식 및 crop
                 String cropName = targetDir + "/crop" + i + "_" + fileName;
                 Rect cropRectBlob = rot.boundingRect();
                 double widthPadding = cropRectBlob.width * ratio.x * 1.05;
@@ -538,9 +549,6 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                         new Size(widthPadding, heightPadding));
                 Mat text_roi = new Mat(ocrFrame, cropRect);
                 Imgcodecs.imwrite(cropName, text_roi);
-
-                //TODO: text 내용 인식 전처리
-                //String grayName = grayScalingImageData(cropName, i, fileName);
 
                 // text 내용
                 textResult += processingImageData(Paths.get(cropName));

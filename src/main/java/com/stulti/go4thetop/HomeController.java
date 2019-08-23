@@ -1,6 +1,5 @@
 package com.stulti.go4thetop;
 
-import org.bytedeco.tesseract.TessBaseAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -70,15 +69,17 @@ public class HomeController {
         return ctdRepo.findByMail(mail);
     }
 
-    //TODO: 예선 기록 제출 사진 인식
-    TessBaseAPI tessAPI = new TessBaseAPI();
-
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Contender Information is Incorrect.")
     private class IncorrectContenderInfoException extends RuntimeException {
         // 이메일 주소, 참가자 이름, 댄서 이름 중에 하나라도 일치하지 않는 경우
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid Music for the preliminary round.")
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "The image you submitted is not a result screen.")
+    private class InvalidImageFileException extends RuntimeException {
+        // 올바른 이미지가 아닌 경우 - 기록 사진으로 분류할 수 없는 이미지
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid music for the preliminary round.")
     private class InvalidMusicNameException extends RuntimeException {
         // 예선 과제곡이 아니거나, 참가하지 않는 부문에 속한 곡(Lower/Upper 미참가자가 Lower/Upper 과제곡을 제출)인 경우
     }
@@ -96,18 +97,25 @@ public class HomeController {
     @PostMapping(value = "/preliminary/sample")
     public @ResponseBody
     String resultImageSample(String imgName, HttpServletRequest request) throws IOException {
-        String result = "";
+        String result;
         try {
             result = imgService.recognizeImageData(imgName, request.getInputStream());
+            if (result.equals("InvalidImageError")) {
+                throw new InvalidImageFileException();
+            }
             if (result.equals("InvalidMusicError")) {
                 throw new InvalidMusicNameException();
             }
+
+            //TODO:
+        } catch (InvalidImageFileException ex) {
+            throw new InvalidImageFileException();
         } catch (InvalidMusicNameException ex) {
             throw new InvalidMusicNameException();
         } catch (Exception ex) {
             throw new ImageRecognitionFailException();
         }
-        //TODO: 파일 업로드 부분 설정
+
         return result;
     }
 }
