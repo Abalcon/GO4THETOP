@@ -25,7 +25,7 @@ class Preliminary extends Component {
                                postContender={this.props.postContender}/>
                     </TabPanel>
                     <TabPanel>
-                        <RecordSubmit/>
+                        <RecordSubmit postHeatRecord={this.props.postHeatRecord}/>
                     </TabPanel>
                     <TabPanel>
                         <Ranking contenders={this.props.contenders}

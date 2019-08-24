@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.IOException;
 import java.util.List;
 
@@ -117,5 +119,36 @@ public class HomeController {
         }
 
         return result;
+    }
+
+    @PostMapping(value = "/preliminary/lower")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void saveLowerRecord(String cardName, MultipartHttpServletRequest request) throws IOException {
+        System.out.println("The contender called " + cardName + " try to submit records!");
+        String result;
+        try {
+            if (ctdRepo.findByCardName(cardName).isEmpty()) {
+                throw new IncorrectContenderInfoException();
+            }
+            Part filePart = request.getPart("lower1");
+            String fileName = cardName + "_" + filePart.getSubmittedFileName();
+            result = imgService.recognizeImageData(fileName, filePart.getInputStream());
+            if (result.equals("InvalidImageError")) {
+                throw new InvalidImageFileException();
+            }
+            if (result.equals("InvalidMusicError")) {
+                throw new InvalidMusicNameException();
+            }
+
+            //TODO:
+        } catch (IncorrectContenderInfoException | InvalidImageFileException | InvalidMusicNameException ex) {
+            ex.printStackTrace();
+            throw ex;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new ImageRecognitionFailException();
+        }
+
+        //return result;
     }
 }

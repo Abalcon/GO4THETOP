@@ -10,4 +10,6 @@ import java.util.List;
 public interface ContenderRepository extends JpaRepository<Contender, Long>
 {
     public List<Contender> findByMail(@Param("mail") String mail);
+
+    public List<Contender> findByCardName(@Param("cardName") String cardName);
 }

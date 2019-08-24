@@ -8,7 +8,7 @@ import {Donation} from './DonationComponent';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {postContender, fetchContenders} from "../redux/actionCreators";
+import {postContender, fetchContenders, postHeatRecord} from "../redux/actionCreators";
 import {renderToStaticMarkup} from "react-dom/server";
 import {withLocalize} from "react-localize-redux";
 import globalTranslations from "../translations/global.json";
@@ -27,7 +27,9 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(postContender(ctdID, email, fullname, nameread, cardname, lower, upper, watch, snstype, snsid, comments)),
     fetchContenders: () => {
         dispatch(fetchContenders())
-    }
+    },
+    postHeatRecord: (cardName, division, image1, image2) =>
+        dispatch(postHeatRecord(cardName, division, image1, image2))
 });
 
 class Main extends Component {
@@ -67,7 +69,8 @@ class Main extends Component {
                 <Preliminary contenders={this.props.contenders.contenders}
                              contendersLoading={this.props.contenders.isLoading}
                              contendersErrMsg={this.props.contenders.errMsg}
-                             postContender={this.props.postContender}/>
+                             postContender={this.props.postContender}
+                             postHeatRecord={this.props.postHeatRecord}/>
             );
         };
 
