@@ -5,18 +5,14 @@ import org.bytedeco.leptonica.PIX;
 import org.bytedeco.tesseract.TessBaseAPI;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.*;
-import org.opencv.dnn.Dnn;
-import org.opencv.dnn.Net;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Features2d;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
 import org.opencv.xfeatures2d.SURF;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -25,7 +21,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.bytedeco.leptonica.global.lept.pixDestroy;
@@ -46,7 +41,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     }
 
     private TessBaseAPI tessAPI = new TessBaseAPI();
-    private Net txtDetectNet;
+    //private Net txtDetectNet;
 
     private AWSRekognitionService awsRekognitionService;
 
@@ -58,7 +53,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         tessAPI.Init(targetDir.toString(), "eng");
         // OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
         //Loader.load(opencv_java.class);
-        txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
+        //txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
 
         this.awsRekognitionService = awsRekognitionService;
     }
@@ -550,88 +545,6 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         Imgproc.rectangle(cannyFrame, largestRect, new Scalar(0, 0, 255, 255));
         Imgcodecs.imwrite(imgPath, cannyFrame);
         return largestRect;
-    }
-
-    private String findRecognizeTextFromImageData(Mat ocrFrame, String fileName) {
-        // OpenCV로 인식된 텍스트가 있는 부분이 들어온다
-        float scoreThresh = 0.5f;
-        float nmsThresh = 0.4f;
-
-        int imgWidth = ocrFrame.width();
-        int imgHeight = ocrFrame.height();
-        double resWidth = Math.floor(imgWidth / 32) * 32;
-        double resHeight = Math.floor(imgHeight / 32) * 32;
-
-        Size siz = new Size(resWidth, resHeight);
-        int W = (int) (siz.width / 4); // width of the output geometry  / score maps
-        int He = (int) (siz.height / 4); // height of those. the geometry has 4, vertically stacked maps, the score one 1
-
-        Mat blob = Dnn.blobFromImage(ocrFrame, 1.0, siz, new Scalar(123.68, 116.78, 103.94), true, false);
-        txtDetectNet.setInput(blob);
-        List<Mat> outs = new ArrayList<>(2);
-        List<String> outNames = new ArrayList<>();
-        outNames.add("feature_fusion/Conv_7/Sigmoid");
-        outNames.add("feature_fusion/concat_3");
-        txtDetectNet.forward(outs, outNames);
-
-        // Decode predicted bounding boxes.
-        Mat scores = outs.get(0).reshape(1, He);
-        // My lord and savior : http://answers.opencv.org/question/175676/javaandroid-access-4-dim-mat-planes/
-        Mat geometry = outs.get(1).reshape(1, 5 * He); // don't hardcode it !
-        List<Float> confidencesList = new ArrayList<>();
-        List<RotatedRect> boxesList = decode(scores, geometry, confidencesList, scoreThresh);
-
-        // Apply non-maximum suppression procedure.
-        MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confidencesList));
-        RotatedRect[] boxesArray = boxesList.toArray(new RotatedRect[0]);
-        MatOfRotatedRect boxes = new MatOfRotatedRect(boxesArray);
-        MatOfInt indices = new MatOfInt();
-        Dnn.NMSBoxesRotated(boxes, confidences, scoreThresh, nmsThresh, indices);
-
-        // Render detections
-        Point ratio = new Point((float) ocrFrame.cols() / siz.width, (float) ocrFrame.rows() / siz.height);
-        int[] indexes = indices.toArray();
-        Arrays.sort(indexes);
-
-        Mat outFrame = ocrFrame.clone();
-        String textResult = "=====\n";
-        for (int i = 0; i < indexes.length; ++i) {
-            try {
-                RotatedRect rot = boxesArray[indexes[i]];
-                // text 범위 인식 및 crop
-                String cropName = targetDir + "/crop" + i + "_" + fileName;
-                Rect cropRectBlob = rot.boundingRect();
-                double widthPadding = cropRectBlob.width * ratio.x * 1.05;
-                double heightPadding = cropRectBlob.height * ratio.y * 1.05;
-                Rect cropRect = new Rect(new Point(cropRectBlob.x * ratio.x, cropRectBlob.y * ratio.y),
-                        new Size(widthPadding, heightPadding));
-                Mat text_roi = new Mat(ocrFrame, cropRect);
-                Imgcodecs.imwrite(cropName, text_roi);
-
-                // text 내용
-                textResult += processingImageData(Paths.get(cropName));
-                textResult += "=====\n";
-                // 잘라낸 것 지우기
-                File cropFile = new File(cropName);
-                boolean isDeleted = cropFile.delete();
-                // text 범위 인식 표시
-                Point[] vertices = new Point[4];
-                rot.points(vertices);
-                //0: lower-left, 1: upper-left, 2: upper-right, 3: lower-right
-                for (int j = 0; j < 4; ++j) {
-                    vertices[j].x *= ratio.x;
-                    vertices[j].y *= ratio.y;
-                }
-                for (int j = 0; j < 4; ++j) {
-                    Imgproc.line(outFrame, vertices[j], vertices[(j + 1) % 4], new Scalar(0, 0, 255), 2);
-                }
-            } catch (Exception ex) {
-                System.out.println("Unable to crop or recognize text at index " + i + ", caused by: " + ex.toString());
-            }
-        }
-        Imgcodecs.imwrite(targetDir + "/out_" + fileName, outFrame);
-
-        return textResult;
     }
 
     private String processingImageData(Path imgPath) {
