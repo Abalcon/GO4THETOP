@@ -1,9 +1,7 @@
 package com.stulti.go4thetop;
 
 import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.Loader;
 import org.bytedeco.leptonica.PIX;
-import org.bytedeco.opencv.opencv_java;
 import org.bytedeco.tesseract.TessBaseAPI;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.*;
@@ -59,7 +57,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
         tessAPI.Init(targetDir.toString(), "eng");
         // OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
-        Loader.load(opencv_java.class);
+        //Loader.load(opencv_java.class);
         txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
 
         this.awsRekognitionService = awsRekognitionService;
