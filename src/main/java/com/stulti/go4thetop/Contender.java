@@ -3,6 +3,7 @@ package com.stulti.go4thetop;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -34,6 +35,9 @@ public class Contender {
     private Boolean watching;
     @Column(length = 1024)
     private String comments;
+    // 2019.08.25: 기록 갱신 시각
+    private LocalDateTime lowerUpdateDate;
+    private LocalDateTime upperUpdateDate;
 
     private Contender() {}
 

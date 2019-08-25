@@ -170,8 +170,27 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
         // Score Detection with AWS Rekognition
         String detectScore = awsRekognitionService.detectScore(fileTessName);
+        String musicCode = division + musicNumber;
         try {
-            Integer.parseInt(detectScore);
+            int score = Integer.parseInt(detectScore);
+            switch (musicCode) {
+                case "upper1":
+                    if (score > 1800)
+                        return "InvalidDifficultyError";
+                    break;
+                case "upper2":
+                    if (score > 1572)
+                        return "InvalidDifficultyError";
+                    break;
+                case "lower1":
+                    if (score > 921)
+                        return "InvalidDifficultyError";
+                    break;
+                case "lower2":
+                    if (score > 1170)
+                        return "InvalidDifficultyError";
+                    break;
+            }
         } catch (NumberFormatException ex) {
             return "UnavailableGameScoreError";
         }
@@ -179,7 +198,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         textResult += "\n=====";
         System.out.println(textResult);
 
-        String result = division + musicNumber + "_" + detectScore;
+        String result = musicCode + "_" + detectScore;
         return result;
     }
 

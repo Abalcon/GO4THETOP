@@ -122,7 +122,7 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
         images.append(newHeatRecord.division + "2", new Blob([newHeatRecord.image2]), newHeatRecord.image2.name);
     // newContender.date = new Date.toISOString();
     // localURL, awsApiURL
-    return fetch(localURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
+    return fetch(awsApiURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
         method: "POST",
         body: images,
         // headers: {

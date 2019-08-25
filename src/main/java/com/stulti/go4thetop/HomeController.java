@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://www.go4thetop.net"}, maxAge = 3600)
@@ -94,6 +95,11 @@ public class HomeController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Cannot check EX SCORE of your submission.")
     private class UnavailableGameScoreException extends RuntimeException {
         // EX SCORE를 인식할 수 없는 경우
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Cannot check EX SCORE of your submission.")
+    private class InvalidDifficultyException extends RuntimeException {
+        // 예선 지정곡은 맞으나, 지정된 난이도가 아닌 경우
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "An error occurred in processing your submission.")
@@ -225,6 +231,9 @@ public class HomeController {
         if (result.equals("UnavailableGameScoreError")) {
             throw new UnavailableGameScoreException();
         }
+        if (result.equals("InvalidDifficultyError")) {
+            throw new InvalidDifficultyException();
+        }
     }
 
     private void updateScore(Contender contender, String[] scoreInfo) {
@@ -238,27 +247,40 @@ public class HomeController {
                 switch (music) {
                     case "lower1":
                         prevScore = contender.getLowerTrack1();
-                        if (score > prevScore)
+                        if (score > prevScore) {
                             contender.setLowerTrack1(score);
+                            contender.setLowerTotal(score + contender.getLowerTrack2());
+                            contender.setLowerUpdateDate(LocalDateTime.now());
+                        }
                         break;
                     case "lower2":
                         prevScore = contender.getLowerTrack2();
-                        if (score > prevScore)
+                        if (score > prevScore) {
                             contender.setLowerTrack2(score);
+                            contender.setLowerTotal(score + contender.getLowerTrack1());
+                            contender.setLowerUpdateDate(LocalDateTime.now());
+                        }
                         break;
                     case "upper1":
                         prevScore = contender.getUpperTrack1();
-                        if (score > prevScore)
+                        if (score > prevScore) {
                             contender.setUpperTrack1(score);
+                            contender.setUpperTotal(score + contender.getUpperTrack2());
+                            contender.setUpperUpdateDate(LocalDateTime.now());
+                        }
                         break;
                     case "upper2":
                         prevScore = contender.getUpperTrack2();
-                        if (score > prevScore)
+                        if (score > prevScore) {
                             contender.setUpperTrack2(score);
+                            contender.setUpperTotal(score + contender.getUpperTrack1());
+                            contender.setUpperUpdateDate(LocalDateTime.now());
+                        }
                         break;
                 }
             }
         }
+
         ctdRepo.save(contender);
     }
 }

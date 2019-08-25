@@ -45,7 +45,7 @@ class RecordSubmit extends Component {
             //     values.participation.some(val => val === "lower"), values.participation.some(val => val === "upper"),
             //     values.participation.some(val => val === "watching"), values.snstype, values.snsid, values.message);
 
-            //alert('예선 기간이 아직 시작되지 않았습니다!\nCurrent State is: ' + JSON.stringify(values));
+            //alert('예선 기간이 아직 시작되지 않았습니다!\n예선은 8월 26일 오전 7시부터입니다.');
             this.props.postHeatRecord(values.cardname.toUpperCase(), values.division, values.image1, values.image2);
         }
     }
