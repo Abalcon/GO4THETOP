@@ -57,7 +57,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             Files.createDirectories(targetDir);
         }
 
-        tessAPI.Init(targetDir.toString(), "eng+jpn+kor");
+        tessAPI.Init(targetDir.toString(), "eng");
         // OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
         Loader.load(opencv_java.class);
         txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
