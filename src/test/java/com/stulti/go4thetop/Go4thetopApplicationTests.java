@@ -117,28 +117,6 @@ public class Go4thetopApplicationTests {
         }
     }
 
-//    @Test
-//    public void registrationConfirmMailTest() {
-//        //MailServiceImpl testMailService = new MailServiceImpl();
-//        //testMailService.setMailSender(mailSender);
-//        testMailService.sendRegistConfirmMail(testContender);
-//    }
-
-//    @Test
-//    public void entryExistenceCheckTest() throws Exception {
-//        String expectValue = "[" + asJsonString(testContender2) + "]";
-//
-//        mockMvc.perform(post("/entry").content(asJsonString(testContender2)).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk()).andExpect(content().json(asJsonString(testContender2)));
-//
-//        mockMvc.perform(get("/entry/search/findByMail").requestAttr("mail", testContender2.getMail()))
-//                .andExpect(status().isOk()).andExpect(content().json(expectValue));
-//
-////        Contender existingContender = entryService.addContender(testContender2).execute().body();
-////        Collection<Contender> checkDuplicate = entryService.findByMail("extinbase@naver.com").execute().body();
-////        assertTrue(checkDuplicate.contains(existingContender));
-//    }
-
     /*
     [예선 참가 신청 작업 완료 후 진행]
     2. 예선 기록 제출
@@ -149,30 +127,60 @@ public class Go4thetopApplicationTests {
     public void extractScoresFromImagesTest() throws Exception {
         String testFilePath = "src/test/resources/testimages/";
         String invalidMusicError = "InvalidMusicError";
-        oneImage(testFilePath, "test_blue1.jpg", "EX SCORE 35"); // Splash Gold
-        oneImage(testFilePath, "test_blue2.jpg", invalidMusicError); // 1362
-        oneImage(testFilePath, "test_blue3.jpg", invalidMusicError); // 1494
-        //oneImage(testFilePath,"test_blue5.jpg", "EX SCORE 1503"); // EX SCORE 1 503으로 뜨는 듯
-        oneImage(testFilePath, "test_blue6.jpg", invalidMusicError); // 1123
-        oneImage(testFilePath, "test_blue7.jpg", invalidMusicError); // 979
-        oneImage(testFilePath, "test_blue8.jpg", invalidMusicError); // 1241
-        oneImage(testFilePath, "test_blue9.jpg", invalidMusicError); // 902
-        //oneImage(testFilePath,"test_blue10.jpg", "EX SCORE 1599"); // EX SCORE 1 599로 뜨는 듯
-        oneImage(testFilePath, "test_blue11.jpg", invalidMusicError); // 915
-        oneImage(testFilePath, "test_blue12.jpg", "EX SCORE 1675"); // Splash Gold
-        oneImage(testFilePath, "test_blue13.jpg", invalidMusicError); // 1443
-        oneImage(testFilePath, "test_blue14.jpg", invalidMusicError); // 918
-        oneImage(testFilePath, "test_blue15.jpg", invalidMusicError); // 1775
-        oneImage(testFilePath, "test_blue16.jpg", invalidMusicError); // 1939
-        oneImage(testFilePath, "test_blue17.jpg", invalidMusicError); // 1436
-        oneImage(testFilePath, "test_blue19.jpg", invalidMusicError); // 1256
-        oneImage(testFilePath, "test_blue21.jpg", invalidMusicError); // 1202
-        oneImage(testFilePath, "test_blue22.jpg", invalidMusicError); // 1752
-        oneImage(testFilePath, "test_blue23.jpg", invalidMusicError); // 1130
-        oneImage(testFilePath, "test_blue24.jpg", invalidMusicError); // 903
+        oneImage(testFilePath, "test_blue1.jpg", "lower", invalidMusicError); // Splash Gold
+        oneImage(testFilePath, "test_blue1.jpg", "upper", invalidMusicError); // Splash Gold
+        oneImage(testFilePath, "test_blue2.jpg", "lower", invalidMusicError); // 1362
+        oneImage(testFilePath, "test_blue2.jpg", "upper", invalidMusicError); // 1362
+        oneImage(testFilePath, "test_blue3.jpg", "lower", invalidMusicError); // 1494
+        oneImage(testFilePath, "test_blue3.jpg", "upper", invalidMusicError); // 1494
+        oneImage(testFilePath, "test_blue5.jpg", "lower", invalidMusicError);
+        oneImage(testFilePath, "test_blue5.jpg", "upper", invalidMusicError); // EX SCORE 1 503으로 뜨는 듯
+        oneImage(testFilePath, "test_blue6.jpg", "lower", invalidMusicError); // 1123
+        oneImage(testFilePath, "test_blue7.jpg", "lower", invalidMusicError); // 979
+        oneImage(testFilePath, "test_blue8.jpg", "lower", invalidMusicError); // 1241
+        oneImage(testFilePath, "test_blue9.jpg", "lower", invalidMusicError); // 902
+        oneImage(testFilePath, "test_blue6.jpg", "upper", invalidMusicError); // 1123
+        oneImage(testFilePath, "test_blue7.jpg", "upper", invalidMusicError); // 979
+        oneImage(testFilePath, "test_blue8.jpg", "upper", invalidMusicError); // 1241
+        oneImage(testFilePath, "test_blue9.jpg", "upper", invalidMusicError); // 902
+        oneImage(testFilePath, "test_blue10.jpg", "lower", invalidMusicError); // EX SCORE 1 599로 뜨는 듯
+        oneImage(testFilePath, "test_blue10.jpg", "upper", invalidMusicError); // EX SCORE 1 599로 뜨는 듯
+        oneImage(testFilePath, "test_blue11.jpg", "lower", invalidMusicError); // 915
+        oneImage(testFilePath, "test_blue11.jpg", "upper", invalidMusicError); // 915
+        oneImage(testFilePath, "test_blue12.jpg", "lower", invalidMusicError); // Splash Gold
+        oneImage(testFilePath, "test_blue12.jpg", "upper", invalidMusicError); // Splash Gold
+        oneImage(testFilePath, "test_blue14.jpg", "lower", invalidMusicError); // 918
+        oneImage(testFilePath, "test_blue15.jpg", "lower", invalidMusicError); // 1775
+        oneImage(testFilePath, "test_blue16.jpg", "lower", invalidMusicError); // 1939
+        oneImage(testFilePath, "test_blue17.jpg", "lower", invalidMusicError); // 1436
+        oneImage(testFilePath, "test_blue19.jpg", "lower", invalidMusicError); // 1256
+        oneImage(testFilePath, "test_blue21.jpg", "lower", invalidMusicError); // 1202
+        oneImage(testFilePath, "test_blue22.jpg", "lower", invalidMusicError); // 1752
+        oneImage(testFilePath, "test_blue23.jpg", "lower", invalidMusicError); // 1130
+        oneImage(testFilePath, "test_blue24.jpg", "lower", invalidMusicError); // 903
+        oneImage(testFilePath, "test_blue14.jpg", "upper", invalidMusicError); // 918
+        oneImage(testFilePath, "test_blue15.jpg", "upper", invalidMusicError); // 1775
+        oneImage(testFilePath, "test_blue16.jpg", "upper", invalidMusicError); // 1939
+        oneImage(testFilePath, "test_blue17.jpg", "upper", invalidMusicError); // 1436
+        oneImage(testFilePath, "test_blue19.jpg", "upper", invalidMusicError); // 1256
+        oneImage(testFilePath, "test_blue21.jpg", "upper", invalidMusicError); // 1202
+        oneImage(testFilePath, "test_blue22.jpg", "upper", invalidMusicError); // 1752
+        oneImage(testFilePath, "test_blue23.jpg", "upper", invalidMusicError); // 1130
+        oneImage(testFilePath, "test_blue24.jpg", "upper", invalidMusicError); // 903
+
+        oneImage(testFilePath, "test_blue13.jpg", "lower", invalidMusicError);
+        oneImage(testFilePath, "test_blue13.jpg", "upper", "upper2_1443"); // Neverland 1443
+        oneImage(testFilePath, "heat_lower1.jpeg", "lower", "lower2_1132"); // Starry Sky 1132
+        oneImage(testFilePath, "heat_lower1.jpeg", "upper", invalidMusicError);
+        oneImage(testFilePath, "heat_lower2.jpeg", "lower", "lower1_875"); // Unreal 875
+        oneImage(testFilePath, "heat_lower2.jpeg", "upper", invalidMusicError);
+        oneImage(testFilePath, "heat_upper1.jpeg", "lower", invalidMusicError);
+        oneImage(testFilePath, "heat_upper1.jpeg", "upper", "upper1_1737"); // Aerial Flower 1737
+        oneImage(testFilePath, "heat_upper2.jpeg", "lower", invalidMusicError);
+        oneImage(testFilePath, "heat_upper2.jpeg", "upper", "upper2_1521"); // Neverland 1521 - versus
     }
 
-    private void oneImage(String filePath, String fileName, String expectedOutput) throws IOException {
+    private void oneImage(String filePath, String fileName, String division, String expectedOutput) throws IOException {
         String fileFullName = filePath + fileName;
         File file = new File(fileFullName);
         BufferedImage scoreImage = ImageIO.read(file);
@@ -183,7 +191,7 @@ public class Go4thetopApplicationTests {
         InputStream is = new ByteArrayInputStream(imageInByte);
         baos.close();
 
-        String output = imgService.recognizeImageData(fileName, is);
+        String output = imgService.recognizeImageData(fileName, is, division);
         assertEquals(expectedOutput, output);
     }
 }

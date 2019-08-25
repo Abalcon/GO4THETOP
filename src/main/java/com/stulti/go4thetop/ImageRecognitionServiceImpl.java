@@ -66,7 +66,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
     }
 
 
-    public String recognizeImageData(String imgPath, InputStream imageData) throws IOException {
+    public String recognizeImageData(String imgPath, InputStream imageData, String division) throws IOException {
         assert (imageData != null);
         // Save the input image
         Path target = getImagePath(imgPath);
@@ -80,11 +80,38 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         String scoreTmpAppFileName = targetDir + "/ScoreTemplateApp.jpg";
         Mat ScoreAppTemplate = Imgcodecs.imread(scoreTmpAppFileName);
         Imgproc.cvtColor(ScoreAppTemplate, ScoreAppTemplate, Imgproc.COLOR_RGB2GRAY);
-        // TODO: 지금은 임시로 1곡만 되어있는데 예선 지정곡 4곡을 적용해야 한다
-        // Load Music Validation Template
-        String musicTmpFileName = targetDir + "/MusicValidationSample.jpg";
-        Mat musicTemplate = Imgcodecs.imread(musicTmpFileName);
-        Imgproc.cvtColor(musicTemplate, musicTemplate, Imgproc.COLOR_RGB2GRAY);
+
+        // Load Music Validation Template - 예선 지정곡 4곡 적용
+        String music1, music2;
+        Mat musicTemplate1, musicTemplate2;
+        switch (division) {
+            case "lower":
+                music1 = targetDir + "/MusicLowerPic1-1.jpeg";
+                musicTemplate1 = Imgcodecs.imread(music1);
+                Imgproc.cvtColor(musicTemplate1, musicTemplate1, Imgproc.COLOR_RGB2GRAY);
+                music2 = targetDir + "/MusicLowerPic2-1.jpeg";
+                musicTemplate2 = Imgcodecs.imread(music2);
+                Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
+                break;
+            case "upper":
+                music1 = targetDir + "/MusicUpperPic1.jpeg";
+                musicTemplate1 = Imgcodecs.imread(music1);
+                Imgproc.cvtColor(musicTemplate1, musicTemplate1, Imgproc.COLOR_RGB2GRAY);
+                music2 = targetDir + "/MusicUpperPic2.jpg";
+                musicTemplate2 = Imgcodecs.imread(music2);
+                Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
+                break;
+            case "sample":
+                music1 = targetDir + "/MusicValidationSample.jpg";
+                musicTemplate1 = Imgcodecs.imread(music1);
+                Imgproc.cvtColor(musicTemplate1, musicTemplate1, Imgproc.COLOR_RGB2GRAY);
+                music2 = targetDir + "/MusicValidationSample.jpg";
+                musicTemplate2 = Imgcodecs.imread(music2);
+                Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
+                break;
+            default:
+                return "InvalidDivisionError";
+        }
 
         // Read the input image (target)
         String fileName = target.getFileName().toString();
@@ -108,13 +135,21 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             }
         }
         // TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
+        int musicNumber = 0;
         Mat vldFrame = new Mat();
-        float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate, fileName);
+        float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate1, fileName);
         if (musicRegionData != null) {
             vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
+            musicNumber = 1;
         } else {
-            return "InvalidMusicError";
+            musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate2, fileName);
+            if (musicRegionData != null) {
+                vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
+                musicNumber = 2;
+            } else
+                return "InvalidMusicError";
         }
+
         // TODO: 곡 이름이 다른데 곡 이름 영역이 인식되었을 경우 2단계 처리를 해야한다
         String textResult = "===== Reading Text =====\n";
         int resizeFactor = 32;
@@ -135,11 +170,17 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
         // Score Detection with AWS Rekognition
         String detectScore = awsRekognitionService.detectScore(fileTessName);
+        try {
+            Integer.parseInt(detectScore);
+        } catch (NumberFormatException ex) {
+            return "UnavailableGameScoreError";
+        }
         textResult += detectScore;
         textResult += "\n=====";
         System.out.println(textResult);
 
-        return detectScore;
+        String result = division + musicNumber + "_" + detectScore;
+        return result;
     }
 
     private static List<RotatedRect> decode(Mat scores, Mat geometry, List<Float> confidences, float scoreThresh) {
@@ -334,7 +375,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
     private float[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName) {
         // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
-        int matchCountThreshold = 10;
+        int matchCountThreshold = 15; // 190824 - Increase Threshold
         Mat grayFrame = new Mat();
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
 
@@ -420,7 +461,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
             return sceneCornersData;
         } else {
-            System.out.println("Not enough matches are found for " + fileName);
+            System.out.println("Not enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
             return null;
         }
     }

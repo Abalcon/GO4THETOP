@@ -31,28 +31,38 @@ public class AWSRekognitionService {
         DetectTextRequest request = new DetectTextRequest().withImage(new Image().withBytes(buf));
 
         String detectResult = "";
-        StringBuilder sb = new StringBuilder();
+        //StringBuilder sb = new StringBuilder();
         try {
             DetectTextResult result = client.detectText(request);
             List<TextDetection> textDetections = result.getTextDetections();
-            System.out.println("Detected lines and words for " + imgPath);
-            for (TextDetection text : textDetections) {
-
-                System.out.println("Detected: " + text.getDetectedText());
-                System.out.println("Confidence: " + text.getConfidence().toString());
-                System.out.println("Id : " + text.getId());
-                System.out.println("Parent Id: " + text.getParentId());
-                System.out.println("Type: " + text.getType());
-                System.out.println();
-            }
+//            System.out.println("Detected lines and words for " + imgPath);
+//            for (TextDetection text : textDetections) {
+//
+//                System.out.println("Detected: " + text.getDetectedText());
+//                System.out.println("Confidence: " + text.getConfidence().toString());
+//                System.out.println("Id : " + text.getId());
+//                System.out.println("Parent Id: " + text.getParentId());
+//                System.out.println("Type: " + text.getType());
+//                System.out.println();
+//            }
 
             int totalDetections = textDetections.size();
-            for (int i = totalDetections - 3; i < totalDetections; i++) {
-                sb.append(textDetections.get(i).getDetectedText());
-                sb.append(" ");
+//            for (int i = totalDetections - 3; i < totalDetections; i++) {
+//                sb.append(textDetections.get(i).getDetectedText());
+//                sb.append(" ");
+//            }
+//            sb.deleteCharAt(sb.length() - 1);
+//            detectResult = sb.toString();
+
+            String exScore = textDetections.get(totalDetections - 1).getDetectedText();
+            String fellout = textDetections.get(totalDetections - 2).getDetectedText();
+            try {
+                Integer.parseInt(fellout);
+                detectResult = fellout + exScore;
+            } catch (NumberFormatException ex) {
+                detectResult = exScore;
             }
-            sb.deleteCharAt(sb.length() - 1);
-            detectResult = sb.toString();
+
         } catch (AmazonRekognitionException e) {
             e.printStackTrace();
         }

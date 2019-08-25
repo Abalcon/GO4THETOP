@@ -4,5 +4,5 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface ImageRecognitionService {
-    String recognizeImageData(String imgPath, InputStream imageData) throws IOException;
+    String recognizeImageData(String imgPath, InputStream imageData, String division) throws IOException;
 }
