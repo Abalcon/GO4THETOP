@@ -145,7 +145,7 @@ public class HomeController {
             if (contenderWithCardName.isEmpty() || !contenderWithCardName.get(0).getLower()) {
                 throw new IncorrectContenderInfoException();
             }
-
+            cardName = cardName.replace(".", "_"); // "." 때문에 opencv에서 잘못 인식함
             Part filePart1 = request.getPart("lower1");
             if (filePart1 != null) {
                 String fileName1 = cardName + "_" + filePart1.getSubmittedFileName();
@@ -186,7 +186,7 @@ public class HomeController {
             if (contenderWithCardName.isEmpty() || !contenderWithCardName.get(0).getUpper()) {
                 throw new IncorrectContenderInfoException();
             }
-
+            cardName = cardName.replace(".", "_"); // "." 때문에 opencv에서 잘못 인식함
             Part filePart1 = request.getPart("upper1");
             if (filePart1 != null) {
                 String fileName1 = cardName + "_" + filePart1.getSubmittedFileName();
