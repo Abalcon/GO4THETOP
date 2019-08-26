@@ -146,6 +146,7 @@ public class HomeController {
                 throw new IncorrectContenderInfoException();
             }
             cardName = cardName.replace(".", "_"); // "." 때문에 opencv에서 잘못 인식함
+            cardName = cardName.replace("-", "_"); // "-" 때문에 opencv에서 잘못 인식함
             Part filePart1 = request.getPart("lower1");
             if (filePart1 != null) {
                 String fileName1 = cardName + "_" + filePart1.getSubmittedFileName();
@@ -160,7 +161,7 @@ public class HomeController {
                 checkValidity(result2);
             }
 
-            //TODO: 도출된 점수를 DB에 반영 - "lower1_1024"
+            // 도출된 점수를 DB에 반영 - "lower1_1024"
             String[] scoreInfo = {result1, result2};
             updateScore(contenderWithCardName.get(0), scoreInfo);
 
@@ -201,7 +202,7 @@ public class HomeController {
                 checkValidity(result2);
             }
 
-            //TODO: 도출된 점수를 DB에 반영 - "upper1_2048"
+            // 도출된 점수를 DB에 반영 - "upper1_2048"
             String[] scoreInfo = {result1, result2};
             updateScore(contenderWithCardName.get(0), scoreInfo);
 

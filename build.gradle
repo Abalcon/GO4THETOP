@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
 group = 'com.stulti'
-version = '1.0-preliminary-start'
+version = '1.1-preliminary-start'
 sourceCompatibility = '8'
 
 configurations {

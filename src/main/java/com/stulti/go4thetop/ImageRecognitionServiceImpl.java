@@ -126,6 +126,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             if (scoreRegionData != null) {
                 ocrFrame = getScoreCrop(frame, scoreRegionData, 0.5);
             } else {
+                System.out.println("The image named " + fileName + " seems not a result screen.");
                 return "InvalidImageError";
             }
         }
@@ -141,8 +142,10 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             if (musicRegionData != null) {
                 vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
                 musicNumber = 2;
-            } else
+            } else {
+                System.out.println("The image named " + fileName + " seems not suitable for preliminary round.");
                 return "InvalidMusicError";
+            }
         }
 
         // TODO: 곡 이름이 다른데 곡 이름 영역이 인식되었을 경우 2단계 처리를 해야한다
@@ -170,23 +173,32 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             int score = Integer.parseInt(detectScore);
             switch (musicCode) {
                 case "upper1":
-                    if (score > 1800)
-                        return "InvalidDifficultyError";
+                    if (score > 1800) {
+                        System.out.println("Score cap check failed for " + fileTessName + ": upper1 - " + score + " / 1800");
+                        //return "InvalidDifficultyError";
+                    }
                     break;
                 case "upper2":
-                    if (score > 1572)
-                        return "InvalidDifficultyError";
+                    if (score > 1572) {
+                        System.out.println("Score cap check failed for " + fileTessName + ": upper2 - " + score + " / 1572");
+                        //return "InvalidDifficultyError";
+                    }
                     break;
                 case "lower1":
-                    if (score > 921)
+                    if (score > 921) {
+                        System.out.println("Score cap check failed for " + fileTessName + ": lower1 - " + score + " / 1800");
                         return "InvalidDifficultyError";
+                    }
                     break;
                 case "lower2":
-                    if (score > 1170)
+                    if (score > 1170) {
+                        System.out.println("Score cap check failed for " + fileTessName + ": lower2 - " + score + " / 1800");
                         return "InvalidDifficultyError";
+                    }
                     break;
             }
         } catch (NumberFormatException ex) {
+            System.out.println("Cannot find EX SCORE for " + fileTessName);
             return "UnavailableGameScoreError";
         }
         textResult += detectScore;
@@ -389,7 +401,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
     private float[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName) {
         // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
-        int matchCountThreshold = 15; // 190824 - Increase Threshold
+        int matchCountThreshold = 10; // 190824 - Increase Threshold to 15, 190827 - Decrease to 10 (Starry Sky, other noises)
         Mat grayFrame = new Mat();
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
 

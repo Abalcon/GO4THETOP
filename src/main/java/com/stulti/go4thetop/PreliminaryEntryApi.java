@@ -8,7 +8,7 @@ import java.util.Collection;
 public interface PreliminaryEntryApi {
 
     // The path where we expect the VideoSvc to live
-    public static final String Entry_API_PATH = "/entry";
+    String Entry_API_PATH = "/entry";
 
     /*
     https://stackoverflow.com/questions/32269064/unable-to-create-call-adapter-for-class-example-simple
