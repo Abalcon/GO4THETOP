@@ -190,17 +190,17 @@ public class Go4thetopApplicationTests {
         sb.append(oneImage(testFilePath, "test_upper2_normal1.jpg", "upper", "upper2_1500"));
         sb.append(oneImage(testFilePath, "test_lower1_somelight.jpg", "lower", "lower1_877"));
         sb.append(oneImage(testFilePath, "test_lower2_somelight.jpg", "lower", "lower2_1128"));
-        sb.append(oneImage(testFilePath, "test_lower1_normal2.jpg", "lower", "lower1_899"));
-        sb.append(oneImage(testFilePath, "test_lower2_normal2.jpg", "lower", "lower2_1130")); // lower2_1130, 9 matches
-        sb.append(oneImage(testFilePath, "test_lower1_normal3.jpg", "lower", "lower1_919"));
-        sb.append(oneImage(testFilePath, "test_lower2_normal3.jpg", "lower", "lower2_1169"));
-        sb.append(oneImage(testFilePath, "test_lower1_normal4.jpg", "lower", "lower1_921"));
-        sb.append(oneImage(testFilePath, "test_lower2_normal4.jpg", "lower", "lower2_1169"));
-        sb.append(oneImage(testFilePath, "test_lower1_normal5.jpg", "lower", "lower1_918")); // versus
-        sb.append(oneImage(testFilePath, "test_lower2_normal5.jpg", "lower", "lower2_1165"));
-        sb.append(oneImage(testFilePath, "test_lower1_normal6.jpg", "lower", "lower1_800"));
-        sb.append(oneImage(testFilePath, "test_lower2_normal6.jpg", "lower", "lower2_1104"));
-        sb.append(oneImage(testFilePath, "test_lower1_toovague.jpg", "lower", invalidImageError));
+//        sb.append(oneImage(testFilePath, "test_lower1_normal2.jpg", "lower", "lower1_899"));
+//        sb.append(oneImage(testFilePath, "test_lower2_normal2.jpg", "lower", "lower2_1130")); // lower2_1130, 9 matches
+//        sb.append(oneImage(testFilePath, "test_lower1_normal3.jpg", "lower", "lower1_919"));
+//        sb.append(oneImage(testFilePath, "test_lower2_normal3.jpg", "lower", "lower2_1169"));
+//        sb.append(oneImage(testFilePath, "test_lower1_normal4.jpg", "lower", "lower1_921"));
+//        sb.append(oneImage(testFilePath, "test_lower2_normal4.jpg", "lower", "lower2_1169"));
+//        sb.append(oneImage(testFilePath, "test_lower1_normal5.jpg", "lower", "lower1_918")); // versus
+//        sb.append(oneImage(testFilePath, "test_lower2_normal5.jpg", "lower", "lower2_1165"));
+//        sb.append(oneImage(testFilePath, "test_lower1_normal6.jpg", "lower", "lower1_800"));
+//        sb.append(oneImage(testFilePath, "test_lower2_normal6.jpg", "lower", "lower2_1104"));
+//        sb.append(oneImage(testFilePath, "test_lower1_toovague.jpg", "lower", invalidImageError));
 //        sb.append(oneImage(testFilePath, "test_lower1_toolarge.jpg", "lower", "lower1_842"));
 //        sb.append(oneImage(testFilePath, "test_lower2_toolarge.jpg", "lower", "lower2_1117"));
 
