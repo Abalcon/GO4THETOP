@@ -84,7 +84,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                 music1 = targetDir + "/MusicLowerPic1-1.jpeg";
                 musicTemplate1 = Imgcodecs.imread(music1);
                 Imgproc.cvtColor(musicTemplate1, musicTemplate1, Imgproc.COLOR_RGB2GRAY);
-                music2 = targetDir + "/MusicLowerPic2-1.jpeg";
+                music2 = targetDir + "/MusicLowerPic2.jpg"; // MusicLowerPic2.jpg는 그림까지, MusicLowerName2.jpg는 곡명 부분만
                 musicTemplate2 = Imgcodecs.imread(music2);
                 Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
                 break;
@@ -186,13 +186,13 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                     break;
                 case "lower1":
                     if (score > 921) {
-                        System.out.println("Score cap check failed for " + fileTessName + ": lower1 - " + score + " / 1800");
+                        System.out.println("Score cap check failed for " + fileTessName + ": lower1 - " + score + " / 921");
                         return "InvalidDifficultyError";
                     }
                     break;
                 case "lower2":
                     if (score > 1170) {
-                        System.out.println("Score cap check failed for " + fileTessName + ": lower2 - " + score + " / 1800");
+                        System.out.println("Score cap check failed for " + fileTessName + ": lower2 - " + score + " / 1170");
                         return "InvalidDifficultyError";
                     }
                     break;
@@ -401,7 +401,8 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
     private float[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName) {
         // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
-        int matchCountThreshold = 10; // 190824 - Increase Threshold to 15, 190827 - Decrease to 10 (Starry Sky, other noises)
+        int matchCountThreshold = 20; // 190824 - Increase Threshold to 15, 190827 - Decrease to 10 (Starry Sky, other noises)
+        // 190828 Increase to 20 and change template to higher resolution
         Mat grayFrame = new Mat();
         Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
 
@@ -432,6 +433,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         goodMatches.fromList(listOfGoodMatches);
 
         if (listOfGoodMatches.size() >= matchCountThreshold) {
+            System.out.println("Enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
             //-- Draw matches
             Mat imgMatches = new Mat();
             Features2d.drawMatches(template, keypointsObject, grayFrame, keypointsScene, goodMatches, imgMatches, Scalar.all(-1),

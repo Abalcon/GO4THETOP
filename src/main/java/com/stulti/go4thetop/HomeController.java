@@ -75,6 +75,9 @@ public class HomeController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Contender Information is Incorrect.")
     private class IncorrectContenderInfoException extends RuntimeException {
         // 이메일 주소, 참가자 이름, 댄서 이름 중에 하나라도 일치하지 않는 경우
+        private IncorrectContenderInfoException(String message) {
+            super(message);
+        }
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid division.")
@@ -143,7 +146,7 @@ public class HomeController {
         try {
             List<Contender> contenderWithCardName = ctdRepo.findByCardName(cardName);
             if (contenderWithCardName.isEmpty() || !contenderWithCardName.get(0).getLower()) {
-                throw new IncorrectContenderInfoException();
+                throw new IncorrectContenderInfoException("Dancer name or division is incorrect.");
             }
             cardName = cardName.replace(".", "_"); // "." 때문에 opencv에서 잘못 인식함
             cardName = cardName.replace("-", "_"); // "-" 때문에 opencv에서 잘못 인식함
@@ -185,7 +188,7 @@ public class HomeController {
         try {
             List<Contender> contenderWithCardName = ctdRepo.findByCardName(cardName);
             if (contenderWithCardName.isEmpty() || !contenderWithCardName.get(0).getUpper()) {
-                throw new IncorrectContenderInfoException();
+                throw new IncorrectContenderInfoException("Dancer name or division is incorrect.");
             }
             cardName = cardName.replace(".", "_"); // "." 때문에 opencv에서 잘못 인식함
             Part filePart1 = request.getPart("upper1");

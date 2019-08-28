@@ -60,8 +60,6 @@ public class Go4thetopApplicationTests {
 //        }
 //    }
 
-    //    @Autowired
-//    private JavaMailSender mailSender;
     //FIXME: Autowired가 되도록 Bean 설정 필요
     private DummyMailSender mailSender = new DummyMailSender();
     @Autowired
@@ -69,8 +67,8 @@ public class Go4thetopApplicationTests {
 
     private final String TEST_URL = "http://localhost:9000";
     // HTTP 통신 확인용
-    Level level = Level.BODY;
-    HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(level);
+    private Level level = Level.BODY;
+    private HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor().setLevel(level);
     private OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
     // 일종의 Mock Client
     private PreliminaryEntryApi entryService = new Retrofit.Builder().baseUrl(TEST_URL)
@@ -126,61 +124,91 @@ public class Go4thetopApplicationTests {
     @Test
     public void extractScoresFromImagesTest() throws Exception {
         String testFilePath = "src/test/resources/testimages/";
+        String invalidImageError = "InvalidImageError";
         String invalidMusicError = "InvalidMusicError";
-//        oneImage(testFilePath, "test_blue1.jpg", "lower", invalidMusicError); // Splash Gold
-//        oneImage(testFilePath, "test_blue1.jpg", "upper", invalidMusicError); // Splash Gold
-//        oneImage(testFilePath, "test_blue2.jpg", "lower", invalidMusicError); // 1362
-//        oneImage(testFilePath, "test_blue2.jpg", "upper", invalidMusicError); // 1362
-//        oneImage(testFilePath, "test_blue3.jpg", "lower", invalidMusicError); // 1494
-//        oneImage(testFilePath, "test_blue3.jpg", "upper", invalidMusicError); // 1494
-//        oneImage(testFilePath, "test_blue5.jpg", "lower", invalidMusicError);
-//        oneImage(testFilePath, "test_blue5.jpg", "upper", invalidMusicError); // EX SCORE 1 503으로 뜨는 듯
-//        oneImage(testFilePath, "test_blue6.jpg", "lower", invalidMusicError); // 1123
-//        oneImage(testFilePath, "test_blue7.jpg", "lower", invalidMusicError); // 979
-//        oneImage(testFilePath, "test_blue8.jpg", "lower", invalidMusicError); // 1241
-//        oneImage(testFilePath, "test_blue9.jpg", "lower", invalidMusicError); // 902
-//        oneImage(testFilePath, "test_blue6.jpg", "upper", invalidMusicError); // 1123
-//        oneImage(testFilePath, "test_blue7.jpg", "upper", invalidMusicError); // 979
-//        oneImage(testFilePath, "test_blue8.jpg", "upper", invalidMusicError); // 1241
-//        oneImage(testFilePath, "test_blue9.jpg", "upper", invalidMusicError); // 902
-//        oneImage(testFilePath, "test_blue10.jpg", "lower", invalidMusicError); // EX SCORE 1 599로 뜨는 듯
-//        oneImage(testFilePath, "test_blue10.jpg", "upper", invalidMusicError); // EX SCORE 1 599로 뜨는 듯
-//        oneImage(testFilePath, "test_blue11.jpg", "lower", invalidMusicError); // 915
-//        oneImage(testFilePath, "test_blue11.jpg", "upper", invalidMusicError); // 915
-//        oneImage(testFilePath, "test_blue12.jpg", "lower", invalidMusicError); // Splash Gold
-//        oneImage(testFilePath, "test_blue12.jpg", "upper", invalidMusicError); // Splash Gold
-//        oneImage(testFilePath, "test_blue14.jpg", "lower", invalidMusicError); // 918
-//        oneImage(testFilePath, "test_blue15.jpg", "lower", invalidMusicError); // 1775
-//        oneImage(testFilePath, "test_blue16.jpg", "lower", invalidMusicError); // 1939
-//        oneImage(testFilePath, "test_blue17.jpg", "lower", invalidMusicError); // 1436
-//        oneImage(testFilePath, "test_blue19.jpg", "lower", invalidMusicError); // 1256
-//        oneImage(testFilePath, "test_blue21.jpg", "lower", invalidMusicError); // 1202
-//        oneImage(testFilePath, "test_blue22.jpg", "lower", invalidMusicError); // 1752
-//        oneImage(testFilePath, "test_blue23.jpg", "lower", invalidMusicError); // 1130
-//        oneImage(testFilePath, "test_blue24.jpg", "lower", invalidMusicError); // 903
-//        oneImage(testFilePath, "test_blue14.jpg", "upper", invalidMusicError); // 918
-//        oneImage(testFilePath, "test_blue15.jpg", "upper", invalidMusicError); // 1775
-//        oneImage(testFilePath, "test_blue16.jpg", "upper", invalidMusicError); // 1939
-//        oneImage(testFilePath, "test_blue17.jpg", "upper", invalidMusicError); // 1436
-//        oneImage(testFilePath, "test_blue19.jpg", "upper", invalidMusicError); // 1256
-//        oneImage(testFilePath, "test_blue21.jpg", "upper", invalidMusicError); // 1202
-//        oneImage(testFilePath, "test_blue22.jpg", "upper", invalidMusicError); // 1752
-//        oneImage(testFilePath, "test_blue23.jpg", "upper", invalidMusicError); // 1130
-//        oneImage(testFilePath, "test_blue24.jpg", "upper", invalidMusicError); // 903
 
-        oneImage(testFilePath, "test_blue13.jpg", "lower", invalidMusicError);
-        oneImage(testFilePath, "test_blue13.jpg", "upper", "upper2_1443"); // Neverland 1443
-        oneImage(testFilePath, "heat_lower1.jpeg", "lower", "lower2_1132"); // Starry Sky 1132
-        oneImage(testFilePath, "heat_lower1.jpeg", "upper", invalidMusicError);
-        oneImage(testFilePath, "heat_lower2.jpeg", "lower", "lower1_875"); // Unreal 875
-        oneImage(testFilePath, "heat_lower2.jpeg", "upper", invalidMusicError);
-        oneImage(testFilePath, "heat_upper1.jpeg", "lower", invalidMusicError);
-        oneImage(testFilePath, "heat_upper1.jpeg", "upper", "upper1_1737"); // Aerial Flower 1737
-        oneImage(testFilePath, "heat_upper2.jpeg", "lower", invalidMusicError);
-        oneImage(testFilePath, "heat_upper2.jpeg", "upper", "upper2_1521"); // Neverland 1521 - versus
+        String errors = "";
+        StringBuilder sb = new StringBuilder();
+        // Determine the threshold for music matching
+//        sb.append(oneImage(testFilePath, "test_blue1.jpg", "lower", invalidMusicError)); // Splash Gold
+//        sb.append(oneImage(testFilePath, "test_blue1.jpg", "upper", invalidMusicError)); // Splash Gold
+//        sb.append(oneImage(testFilePath, "test_blue2.jpg", "lower", invalidMusicError)); // 1362
+//        sb.append(oneImage(testFilePath, "test_blue2.jpg", "upper", invalidMusicError)); // 1362
+//        sb.append(oneImage(testFilePath, "test_blue3.jpg", "lower", invalidMusicError)); // 1494
+//        sb.append(oneImage(testFilePath, "test_blue3.jpg", "upper", invalidMusicError)); // 1494
+//        sb.append(oneImage(testFilePath, "test_blue5.jpg", "lower", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "test_blue5.jpg", "upper", invalidMusicError)); // EX SCORE 1 503으로 뜨는 듯
+//        sb.append(oneImage(testFilePath, "test_blue6.jpg", "lower", invalidMusicError)); // 1123
+//        sb.append(oneImage(testFilePath, "test_blue7.jpg", "lower", invalidMusicError)); // 979
+//        sb.append(oneImage(testFilePath, "test_blue8.jpg", "lower", invalidMusicError)); // 1241
+//        sb.append(oneImage(testFilePath, "test_blue9.jpg", "lower", invalidMusicError)); // 902
+//        sb.append(oneImage(testFilePath, "test_blue6.jpg", "upper", invalidMusicError)); // 1123
+//        sb.append(oneImage(testFilePath, "test_blue7.jpg", "upper", invalidMusicError)); // 979
+//        sb.append(oneImage(testFilePath, "test_blue8.jpg", "upper", invalidMusicError)); // 1241
+//        sb.append(oneImage(testFilePath, "test_blue9.jpg", "upper", invalidMusicError)); // 902
+//        sb.append(oneImage(testFilePath, "test_blue10.jpg", "lower", invalidMusicError)); // EX SCORE 1 599로 뜨는 듯
+//        sb.append(oneImage(testFilePath, "test_blue10.jpg", "upper", invalidMusicError)); // EX SCORE 1 599로 뜨는 듯
+//        sb.append(oneImage(testFilePath, "test_blue11.jpg", "lower", invalidMusicError)); // 915
+//        sb.append(oneImage(testFilePath, "test_blue11.jpg", "upper", invalidMusicError)); // 915
+//        sb.append(oneImage(testFilePath, "test_blue12.jpg", "lower", invalidMusicError)); // Splash Gold
+//        sb.append(oneImage(testFilePath, "test_blue12.jpg", "upper", invalidMusicError)); // Splash Gold
+//        sb.append(oneImage(testFilePath, "test_blue14.jpg", "lower", invalidMusicError)); // 918
+//        sb.append(oneImage(testFilePath, "test_blue15.jpg", "lower", invalidMusicError)); // 1775
+//        sb.append(oneImage(testFilePath, "test_blue16.jpg", "lower", invalidMusicError)); // 1939
+//        sb.append(oneImage(testFilePath, "test_blue17.jpg", "lower", invalidMusicError)); // 1436
+//        sb.append(oneImage(testFilePath, "test_blue19.jpg", "lower", invalidMusicError)); // 1256
+//        sb.append(oneImage(testFilePath, "test_blue21.jpg", "lower", invalidMusicError)); // 1202
+//        sb.append(oneImage(testFilePath, "test_blue22.jpg", "lower", invalidMusicError)); // 1752
+//        sb.append(oneImage(testFilePath, "test_blue23.jpg", "lower", invalidMusicError)); // 1130
+//        sb.append(oneImage(testFilePath, "test_blue24.jpg", "lower", invalidMusicError)); // 903
+//        sb.append(oneImage(testFilePath, "test_blue14.jpg", "upper", invalidMusicError)); // 918
+//        sb.append(oneImage(testFilePath, "test_blue15.jpg", "upper", invalidMusicError)); // 1775
+//        sb.append(oneImage(testFilePath, "test_blue16.jpg", "upper", invalidMusicError)); // 1939
+//        sb.append(oneImage(testFilePath, "test_blue17.jpg", "upper", invalidMusicError)); // 1436
+//        sb.append(oneImage(testFilePath, "test_blue19.jpg", "upper", invalidMusicError)); // 1256
+//        sb.append(oneImage(testFilePath, "test_blue21.jpg", "upper", invalidMusicError)); // 1202
+//        sb.append(oneImage(testFilePath, "test_blue22.jpg", "upper", invalidMusicError)); // 1752
+//        sb.append(oneImage(testFilePath, "test_blue23.jpg", "upper", invalidMusicError)); // 1130
+//        sb.append(oneImage(testFilePath, "test_blue24.jpg", "upper", invalidMusicError)); // 903
+
+        // sample images (small size)
+        sb.append(oneImage(testFilePath, "test_blue13.jpg", "lower", invalidMusicError));
+        sb.append(oneImage(testFilePath, "test_blue13.jpg", "upper", "upper2_1443")); // Neverland 1443
+        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "lower", "lower2_1132")); // Starry Sky 1132
+        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "upper", invalidMusicError));
+        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "lower", "lower1_875")); // Unreal 875
+        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "upper", invalidMusicError));
+        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "lower", invalidMusicError));
+        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "upper", "upper1_1737")); // Aerial Flower 1737
+        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "lower", invalidMusicError));
+        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "upper", "upper2_1521")); // Neverland 1521 - versus
+
+        // previously submitted images
+// sb.append(oneImage(testFilePath, "test_upper1_toomuchlight.jpg", "upper", invalidMusicError)); // upper1_1784 or invalidMusicError
+// sb.append(oneImage(testFilePath, "test_upper2_toomuchlight.jpeg", "upper", invalidMusicError)); // upper2_1557 or invalidMusicError
+        sb.append(oneImage(testFilePath, "test_upper1_normal1.jpg", "upper", "upper1_1739"));
+        sb.append(oneImage(testFilePath, "test_upper2_normal1.jpg", "upper", "upper2_1500"));
+        sb.append(oneImage(testFilePath, "test_lower1_somelight.jpg", "lower", "lower1_877"));
+        sb.append(oneImage(testFilePath, "test_lower2_somelight.jpg", "lower", "lower2_1128"));
+        sb.append(oneImage(testFilePath, "test_lower1_normal2.jpg", "lower", "lower1_899"));
+        sb.append(oneImage(testFilePath, "test_lower2_normal2.jpg", "lower", "lower2_1130")); // lower2_1130, 9 matches
+        sb.append(oneImage(testFilePath, "test_lower1_normal3.jpg", "lower", "lower1_919"));
+        sb.append(oneImage(testFilePath, "test_lower2_normal3.jpg", "lower", "lower2_1169"));
+        sb.append(oneImage(testFilePath, "test_lower1_normal4.jpg", "lower", "lower1_921"));
+        sb.append(oneImage(testFilePath, "test_lower2_normal4.jpg", "lower", "lower2_1169"));
+        sb.append(oneImage(testFilePath, "test_lower1_normal5.jpg", "lower", "lower1_918")); // versus
+        sb.append(oneImage(testFilePath, "test_lower2_normal5.jpg", "lower", "lower2_1165"));
+        sb.append(oneImage(testFilePath, "test_lower1_normal6.jpg", "lower", "lower1_800"));
+        sb.append(oneImage(testFilePath, "test_lower2_normal6.jpg", "lower", "lower2_1104"));
+        sb.append(oneImage(testFilePath, "test_lower1_toovague.jpg", "lower", invalidImageError));
+//        sb.append(oneImage(testFilePath, "test_lower1_toolarge.jpg", "lower", "lower1_842"));
+//        sb.append(oneImage(testFilePath, "test_lower2_toolarge.jpg", "lower", "lower2_1117"));
+
+        errors = sb.toString();
+        assertEquals("", errors);
     }
 
-    private void oneImage(String filePath, String fileName, String division, String expectedOutput) throws IOException {
+    private String oneImage(String filePath, String fileName, String division, String expectedOutput) throws IOException {
         String fileFullName = filePath + fileName;
         File file = new File(fileFullName);
         BufferedImage scoreImage = ImageIO.read(file);
@@ -191,6 +219,10 @@ public class Go4thetopApplicationTests {
         InputStream is = new ByteArrayInputStream(imageInByte);
         baos.close();
         String output = imgService.recognizeImageData(fileName, is, division);
-        assertEquals(expectedOutput, output);
+        //assertEquals(expectedOutput, output);
+        if (output.equals(expectedOutput))
+            return "";
+
+        return "Result for file: " + fileName + "- Expected: " + expectedOutput + " / Actual: " + output + "\n";
     }
 }
