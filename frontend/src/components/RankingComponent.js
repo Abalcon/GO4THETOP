@@ -19,9 +19,9 @@ function upperScoreCompare(a, b) {
 
 function setRowColor(index) {
     if (index === 0)
-        return {backgroundColor: 'Aqua'};
+        return {align: 'center', backgroundColor: 'Gold'};
     else if (index < 15)
-        return {backgroundColor: 'Aquamarine'};
+        return {align: 'center', backgroundColor: 'Silver'};
 }
 
 const Ranking = (props) => {
@@ -30,26 +30,32 @@ const Ranking = (props) => {
         .map((contender, index) => {
             return (
                 <tr key={contender.id} style={setRowColor(index)}>
-                    <th scope="row">{contender.cardName}</th>
+                    <th scope="row">{index + 1}</th>
+                    <td>{contender.cardName}</td>
                     <td>{contender.lowerTrack1}</td>
                     <td>{contender.lowerTrack2}</td>
                     <td>{contender.lowerTotal}</td>
+                    <td>{contender.lowerTotal - 2091}</td>
                 </tr>
             );
         });
 
     const upperContenders = props.contenders.filter((contender) => (contender.upper && contender.upperTotal > 0))
         .sort(upperScoreCompare)
-        .map((contender) => {
+        .map((contender, index) => {
             return (
-                <tr key={contender.id}>
-                    <th scope="row">{contender.cardName}</th>
+                <tr key={contender.id} style={setRowColor(index)}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{contender.cardName}</td>
                     <td>{contender.upperTrack1}</td>
                     <td>{contender.upperTrack2}</td>
                     <td>{contender.upperTotal}</td>
+                    <td>{contender.upperTotal - 3372}</td>
                 </tr>
             );
         });
+
+    const tableStyle = {textAlign: 'center'};
 
     if (props.isLoading) {
         return (
@@ -80,13 +86,15 @@ const Ranking = (props) => {
                     <TabPanel>
                         <h5>Lower 순위</h5>
                         <div className="row">
-                            <Table bordered>
+                            <Table bordered responsive style={tableStyle}>
                                 <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>Dancer Name</th>
                                     <th>Unreal</th>
                                     <th>Starry Sky</th>
                                     <th>Total Score</th>
+                                    <th>Max Diff.</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -98,13 +106,15 @@ const Ranking = (props) => {
                     <TabPanel>
                         <h5>Upper 순위</h5>
                         <div className="row">
-                            <Table bordered>
+                            <Table bordered responsive style={tableStyle}>
                                 <thead>
                                 <tr>
+                                    <th>Rank</th>
                                     <th>Dancer Name</th>
                                     <th>天空の華</th>
                                     <th>Neverland</th>
                                     <th>Total Score</th>
+                                    <th>Max Diff.</th>
                                 </tr>
                                 </thead>
                                 <tbody>

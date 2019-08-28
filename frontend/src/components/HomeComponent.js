@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import {Card, CardBody, CardHeader, CardText, CardTitle} from "reactstrap";
+import {Card, CardBody, CardHeader, CardText, CardTitle, CardSubtitle} from "reactstrap";
 
 class Home extends Component {
 
     render () {
         const notices = this.props.notices.map((notice) => {
-            let newText = notice.content.split('\n').map((item, i) => <span key={i}>{item}<br/></span>);
+            let newText = notice.content.split('\n').map((item, i) => <span key={i}>{unescape(item)}<br/></span>);
 
             return (
                 <div key={notice.id} className="col-12 m-1">
@@ -13,7 +13,7 @@ class Home extends Component {
                         <CardHeader tag="h3">{notice.date}</CardHeader>
                         <CardBody>
                             <CardTitle tag="h5">{notice.subject}</CardTitle>
-                            {/*<CardSubtitle>{notice.subject}</CardSubtitle>*/}
+                            <CardSubtitle>{notice.images}</CardSubtitle>
                             <CardText>{newText}</CardText>
                         </CardBody>
                     </Card>

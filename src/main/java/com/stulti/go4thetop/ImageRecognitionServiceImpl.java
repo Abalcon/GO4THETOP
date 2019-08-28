@@ -1,10 +1,7 @@
 package com.stulti.go4thetop;
 
-import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.Loader;
-import org.bytedeco.leptonica.PIX;
 import org.bytedeco.opencv.opencv_java;
-import org.bytedeco.tesseract.TessBaseAPI;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.*;
 import org.opencv.features2d.DescriptorMatcher;
@@ -25,9 +22,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.bytedeco.leptonica.global.lept.pixDestroy;
-import static org.bytedeco.leptonica.global.lept.pixRead;
-
 /*
  * https://github.com/juleswhite/mobile-cloud-asgn1/blob/master/src/main/java/org/magnum/dataup/VideoFileManager.java
  */
@@ -42,7 +36,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         return targetDir.resolve(ts.getTime() + "_" + imgPath);
     }
 
-    private TessBaseAPI tessAPI = new TessBaseAPI();
+    //private TessBaseAPI tessAPI = new TessBaseAPI();
     //private Net txtDetectNet;
 
     private AWSRekognitionService awsRekognitionService;
@@ -52,7 +46,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             Files.createDirectories(targetDir);
         }
 
-        tessAPI.Init(targetDir.toString(), "eng");
+        //tessAPI.Init(targetDir.toString(), "eng");
         // OpenCV로 텍스트가 있는 곳을 먼저 인식 - Model 불러오기
         Loader.load(opencv_java.class);
         //txtDetectNet = Dnn.readNetFromTensorflow(targetDir + "/frozen_east_text_detection.pb");
@@ -113,16 +107,27 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         String fileFullName = targetDir + "/" + fileName;
         Mat frame = Imgcodecs.imread(fileFullName);
 
+        // Resize if image is too large
+        int sizeThresh = 4096;
+        double reduceFactor = 0.5;
+        if (frame.width() >= sizeThresh || frame.height() >= sizeThresh) {
+            System.out.println("The image named " + fileName + " is quite large, should be resized.");
+            Size resize = new Size(frame.width() * reduceFactor, frame.height() * reduceFactor);
+            Imgproc.resize(frame, frame, resize);
+        }
+
         // Template Matching - 점수가 있는 영역 찾기
         //templateMatching(frame, CannyTemplate, fileName);
 
         // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         float[] scoreRegionData = findRegionWithKeypointMatching(frame, ScoreTemplate, fileName); // Get crop with score
+        ScoreTemplate.release();
         Mat ocrFrame;
         if (scoreRegionData != null) {
             ocrFrame = getScoreCrop(frame, scoreRegionData, 0.6);
         } else {
             scoreRegionData = findRegionWithKeypointMatching(frame, ScoreAppTemplate, fileName);
+            ScoreAppTemplate.release();
             if (scoreRegionData != null) {
                 ocrFrame = getScoreCrop(frame, scoreRegionData, 0.5);
             } else {
@@ -131,24 +136,32 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             }
         }
         // TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
-        int musicNumber = 0;
-        Mat vldFrame = new Mat();
+        int musicNumber;
+        Mat vldFrame;
         float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate1, fileName);
+        musicTemplate1.release();
         if (musicRegionData != null) {
             vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
             musicNumber = 1;
+            vldFrame.release();
+            musicTemplate2.release();
+            frame.release();
         } else {
             musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate2, fileName);
+            musicTemplate2.release();
             if (musicRegionData != null) {
                 vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
                 musicNumber = 2;
+                vldFrame.release();
+                frame.release();
             } else {
                 System.out.println("The image named " + fileName + " seems not suitable for preliminary round.");
+                frame.release();
                 return "InvalidMusicError";
             }
         }
 
-        // TODO: 곡 이름이 다른데 곡 이름 영역이 인식되었을 경우 2단계 처리를 해야한다
+        // 곡 이름이 다른데 곡 이름 영역이 인식되었을 경우 2단계 처리를 해야한다
         String textResult = "===== Reading Text =====\n";
         int resizeFactor = 32;
         Core.copyMakeBorder(ocrFrame, ocrFrame, 0, ocrFrame.height() % 2,
@@ -163,8 +176,9 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 
         String fileTessName = targetDir + "/tess_" + fileName;
         Imgcodecs.imwrite(fileTessName, ocrFrame);
-        textResult += processingImageData(Paths.get(fileTessName));
-        textResult += "=====\n";
+//        textResult += processingImageData(Paths.get(fileTessName));
+//        textResult += "=====\n";
+        ocrFrame.release();
 
         // Score Detection with AWS Rekognition
         String detectScore = awsRekognitionService.detectScore(fileTessName);
@@ -205,8 +219,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         textResult += "\n=====";
         System.out.println(textResult);
 
-        String result = musicCode + "_" + detectScore;
-        return result;
+        return musicCode + "_" + detectScore;
     }
 
     private static List<RotatedRect> decode(Mat scores, Mat geometry, List<Float> confidences, float scoreThresh) {
@@ -326,36 +339,6 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         // originally 75, 200 --> tried 70, 200
         String outName = targetDir + "/result_" + fileName;
         Imgcodecs.imwrite(outName, cannyFrame);
-        return outName;
-    }
-
-    private String grayScalingImageDataMorph(String imgPath, String fileName) {
-        Mat cropFrame = Imgcodecs.imread(imgPath);
-        Mat grayFrame = Imgcodecs.imread(imgPath);
-        Mat mgFrame = new Mat();
-        Mat thFrame = new Mat();
-        Mat outFrame = new Mat();
-        Imgproc.cvtColor(cropFrame, grayFrame, Imgproc.COLOR_RGB2GRAY);
-        // Morph Gradient
-        Mat mgKernel = new Mat(3, 3, CvType.CV_8U, Scalar.all(1));
-        Mat mcKernel = new Mat(9, 5, CvType.CV_8U, Scalar.all(1));
-        Imgproc.morphologyEx(grayFrame, mgFrame, Imgproc.MORPH_GRADIENT, mgKernel);
-        // Adaptive Threshold or Smooth/Blur
-        //Imgproc.GaussianBlur(mgFrame, thFrame, new Size(5,5), 0.0, 0.0);
-        //Imgproc.threshold(mgFrame, thFrame, 0, 255, Imgproc.THRESH_OTSU);
-        Imgproc.adaptiveThreshold(mgFrame, thFrame, 255,
-                Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, 3, 12);
-        // Morph Close
-        Imgproc.morphologyEx(thFrame, outFrame, Imgproc.MORPH_CLOSE, mcKernel);
-
-        String grayName = targetDir + "/gray2_" + fileName;
-        Imgcodecs.imwrite(grayName, grayFrame);
-        String mgName = targetDir + "/morph2_" + fileName;
-        Imgcodecs.imwrite(mgName, mgFrame);
-        String thName = targetDir + "/thresh2_" + fileName;
-        Imgcodecs.imwrite(thName, thFrame);
-        String outName = targetDir + "/result_morph_" + fileName;
-        Imgcodecs.imwrite(outName, outFrame);
         return outName;
     }
 
@@ -487,9 +470,14 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             String fileKPMName = targetDir + "/kpmatch_" + fileName;
             Imgcodecs.imwrite(fileKPMName, imgMatches);
 
+            H.release();
+            objCorners.release();
+            grayFrame.release();
+
             return sceneCornersData;
         } else {
             System.out.println("Not enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
+            grayFrame.release();
             return null;
         }
     }
@@ -560,36 +548,41 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         }
         Imgproc.rectangle(cannyFrame, largestRect, new Scalar(0, 0, 255, 255));
         Imgcodecs.imwrite(imgPath, cannyFrame);
+
+        hierarchy.release();
+        tmpFrame.release();
+        cannyFrame.release();
+
         return largestRect;
     }
 
-    private String processingImageData(Path imgPath) {
-        String result = "";
-        PIX image = null;
-        try {
-            image = pixRead(imgPath.toString());
-            tessAPI.SetImage(image);
-            // Warning: Invalid resolution 0 dpi. Using 70 instead.
-            tessAPI.SetSourceResolution(300);
-
-            BytePointer outText = tessAPI.GetUTF8Text();
-            if (outText != null) {
-                result = outText.getString();
-                outText.deallocate();
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
-        } finally {
-            pixDestroy(image);
-        }
-
-        return result;
-    }
+//    private String processingImageData(Path imgPath) {
+//        String result = "";
+//        PIX image = null;
+//        try {
+//            image = pixRead(imgPath.toString());
+//            tessAPI.SetImage(image);
+//            // Warning: Invalid resolution 0 dpi. Using 70 instead.
+//            tessAPI.SetSourceResolution(300);
+//
+//            BytePointer outText = tessAPI.GetUTF8Text();
+//            if (outText != null) {
+//                result = outText.getString();
+//                outText.deallocate();
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//            throw ex;
+//        } finally {
+//            pixDestroy(image);
+//        }
+//
+//        return result;
+//    }
 
     @PreDestroy
     void cleanup() {
         System.out.println("Closing TessBaseAPI!");
-        tessAPI.End();
+        //tessAPI.End();
     }
 }

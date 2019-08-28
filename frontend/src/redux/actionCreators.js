@@ -40,7 +40,8 @@ export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, 
                 if (response.ok)
                     return response;
                 else {
-                    let error = new Error('Error' + response.status + ': ' + response.statusText);
+                    console.log(response);
+                    let error = new Error('Error' + response.status + ': ' + response.statusText + ' - ' + response.body);
                     error.response = response;
                     throw error;
                 }
@@ -68,7 +69,8 @@ export const fetchContenders = () => (dispatch) => {
                 if (response.ok)
                     return response;
                 else {
-                    let error = new Error('Error' + response.status + ': ' + response.statusText);
+                    console.log(response);
+                    let error = new Error('Error' + response.status + ': ' + response.statusText + ' - ' + response.body);
                     error.response = response;
                     throw error;
                 }
@@ -96,12 +98,13 @@ export const showContenders = (contenders) => ({
     payload: contenders
 });
 
-export const addHeatRecord = (record) => ({
-    type: actionTypes.ADD_HEATRECORD,
-    payload: record
+export const addHeatRecord = () => ({
+    type: actionTypes.ADD_HEATRECORD
 });
 
 export const postHeatRecord = (cardName, division, image1, image2) => (dispatch) => {
+    dispatch(addHeatRecord(true));
+
     function extractImageFile(image) {
         if (image !== undefined) {
             return image[0];
@@ -122,7 +125,7 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
         images.append(newHeatRecord.division + "2", new Blob([newHeatRecord.image2]), newHeatRecord.image2.name);
     // newContender.date = new Date.toISOString();
     // localURL, awsApiURL
-    return fetch(awsApiURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
+    return fetch(localURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
         method: "POST",
         body: images,
         // headers: {
@@ -135,7 +138,8 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
                     console.log('Yes we get response!');
                     return response;
                 } else {
-                    let error = new Error('Error' + response.status + ': ' + response.statusText);
+                    console.log(response);
+                    let error = new Error('Error' + response.status + ': ' + response.statusText + ' - ' + response.body);
                     error.response = response;
                     throw error;
                 }
@@ -145,11 +149,12 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
                 throw errmsg;
             })
         .then(result => {
-            //dispatch(addContender(result));
             alert('기록 제출에 성공했습니다! (Succeed to submit your records!)');
+            dispatch(fetchContenders());
         })
         .catch(error => {
             console.log('Failed to submit: ', error.message);
             alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + error.message);
+            dispatch(fetchContenders());
         });
 };

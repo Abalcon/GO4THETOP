@@ -118,7 +118,8 @@ class RecordSubmit extends Component {
                     </Row>
                     <Row className="form-group">
                         <Col md={{size: 10, offset: 2}}>
-                            <Button type="submit" color="primary">
+                            <Button type="submit" color="primary" disabled={this.props.isProcessing}>
+                                {this.props.isProcessing && <i className="fa fa-refresh fa-spinner"></i>}
                                 Show us what you've got!
                             </Button>
                         </Col>
