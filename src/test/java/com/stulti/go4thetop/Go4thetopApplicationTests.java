@@ -172,16 +172,16 @@ public class Go4thetopApplicationTests {
 //        sb.append(oneImage(testFilePath, "test_blue24.jpg", "upper", invalidMusicError)); // 903
 
         // sample images (small size)
-        sb.append(oneImage(testFilePath, "test_blue13.jpg", "lower", invalidMusicError));
-        sb.append(oneImage(testFilePath, "test_blue13.jpg", "upper", "upper2_1443")); // Neverland 1443
-        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "lower", "lower2_1132")); // Starry Sky 1132
-        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "upper", invalidMusicError));
-        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "lower", "lower1_875")); // Unreal 875
-        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "upper", invalidMusicError));
-        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "lower", invalidMusicError));
-        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "upper", "upper1_1737")); // Aerial Flower 1737
-        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "lower", invalidMusicError));
-        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "upper", "upper2_1521")); // Neverland 1521 - versus
+//        sb.append(oneImage(testFilePath, "test_blue13.jpg", "lower", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "test_blue13.jpg", "upper", "upper2_1443")); // Neverland 1443
+//        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "lower", "lower2_1132")); // Starry Sky 1132
+//        sb.append(oneImage(testFilePath, "heat_lower1.jpeg", "upper", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "lower", "lower1_875")); // Unreal 875
+//        sb.append(oneImage(testFilePath, "heat_lower2.jpeg", "upper", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "lower", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "heat_upper1.jpeg", "upper", "upper1_1737")); // Aerial Flower 1737
+//        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "lower", invalidMusicError));
+//        sb.append(oneImage(testFilePath, "heat_upper2.jpeg", "upper", "upper2_1521")); // Neverland 1521 - versus
 
         // previously submitted images
 // sb.append(oneImage(testFilePath, "test_upper1_toomuchlight.jpg", "upper", invalidMusicError)); // upper1_1784 or invalidMusicError
