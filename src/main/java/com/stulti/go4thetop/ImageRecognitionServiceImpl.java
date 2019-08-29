@@ -123,19 +123,23 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         float[] scoreRegionData = findRegionWithKeypointMatching(frame, ScoreTemplate, fileName); // Get crop with score
         ScoreTemplate.release();
         Mat ocrFrame;
+        String imageType;
         if (scoreRegionData != null) {
             ocrFrame = getScoreCrop(frame, scoreRegionData, 0.6);
+            imageType = "CAM";
+            ScoreAppTemplate.release();
         } else {
             scoreRegionData = findRegionWithKeypointMatching(frame, ScoreAppTemplate, fileName);
             ScoreAppTemplate.release();
             if (scoreRegionData != null) {
                 ocrFrame = getScoreCrop(frame, scoreRegionData, 0.5);
+                imageType = "APP";
             } else {
                 System.out.println("The image named " + fileName + " seems not a result screen.");
                 return "InvalidImageError";
             }
         }
-        // TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
+        // Music Validation TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
         int musicNumber;
         Mat vldFrame;
         float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate1, fileName);
@@ -146,7 +150,12 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             vldFrame.release();
             musicTemplate2.release();
             frame.release();
-        } else {
+        } else { // e-Amusement App 사진으로 올린 경우
+            if (division.equals("lower") && imageType.equals("APP")) { // Starry Sky는 별도의 template 사용
+                music2 = targetDir + "/MusicLowerApp2.jpg"; // Lower Music 2 for APP images
+                musicTemplate2 = Imgcodecs.imread(music2);
+                Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
+            }
             musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate2, fileName);
             musicTemplate2.release();
             if (musicRegionData != null) {
@@ -181,7 +190,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         ocrFrame.release();
 
         // Score Detection with AWS Rekognition
-        String detectScore = awsRekognitionService.detectScore(fileTessName);
+        String detectScore = awsRekognitionService.detectScore(fileTessName, imageType);
         String musicCode = division + musicNumber;
         try {
             int score = Integer.parseInt(detectScore);

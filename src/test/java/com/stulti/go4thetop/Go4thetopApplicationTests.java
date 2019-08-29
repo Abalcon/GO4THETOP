@@ -204,6 +204,12 @@ public class Go4thetopApplicationTests {
 //        sb.append(oneImage(testFilePath, "test_lower1_toolarge.jpg", "lower", "lower1_842"));
 //        sb.append(oneImage(testFilePath, "test_lower2_toolarge.jpg", "lower", "lower2_1117"));
 
+        // e-Amusement App으로 찍은 사진
+        sb.append(oneImage(testFilePath, "test_lower1_app1.jpg", "lower", "lower1_909"));
+        sb.append(oneImage(testFilePath, "test_lower2_app1.jpg", "lower", "lower2_1159"));
+        sb.append(oneImage(testFilePath, "test_upper1_app1.jpg", "upper", "upper1_1769"));
+        sb.append(oneImage(testFilePath, "test_upper2_app1.jpg", "upper", "upper2_1544"));
+
         errors = sb.toString();
         assertEquals("", errors);
     }

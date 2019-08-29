@@ -20,7 +20,7 @@ public class AWSRekognitionService {
         this.client = client;
     }
 
-    public String detectScore(String imgPath) throws IOException {
+    public String detectScore(String imgPath, String imgType) throws IOException {
         BufferedImage scoreImage = ImageIO.read(new File(imgPath));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(scoreImage, "jpg", baos);
@@ -48,13 +48,40 @@ public class AWSRekognitionService {
 
             int totalDetections = textDetections.size();
 
-            String exScore = textDetections.get(totalDetections - 1).getDetectedText();
-            String fellout = textDetections.get(totalDetections - 2).getDetectedText();
-            try {
-                Integer.parseInt(fellout);
-                detectResult = fellout + exScore;
-            } catch (NumberFormatException ex) {
-                detectResult = exScore;
+            if (imgType.equals("CAM")) {
+                String exScore = textDetections.get(totalDetections - 1).getDetectedText();
+                String fellout = textDetections.get(totalDetections - 2).getDetectedText();
+                try {
+                    Integer.parseInt(fellout);
+                    detectResult = fellout + exScore;
+                } catch (NumberFormatException ex) {
+                    detectResult = exScore;
+                }
+            } else if (imgType.equals("APP")) {
+                int appScore = 0;
+                for (TextDetection text : textDetections) {
+                    if (text.getType().equals("LINE")) {
+                        try {
+                            String lineText = text.getDetectedText().trim().replaceAll("\\s", "");
+                            if (lineText.length() == 13) { // MARVELOUS
+                                System.out.println(lineText.substring(9));
+                                appScore += Integer.parseInt(lineText.substring(9)) * 3;
+                            } else if (lineText.length() == 11) { // PERFECT (PEREECT로 오인식하는 문제가 있다)
+                                System.out.println(lineText.substring(7));
+                                appScore += Integer.parseInt(lineText.substring(7)) * 2;
+                            } else if (lineText.length() == 9) { // GREAT
+                                System.out.println(lineText.substring(5));
+                                appScore += Integer.parseInt(lineText.substring(5));
+                            } else if (lineText.length() <= 8 && lineText.contains("K")) { // O.K.
+                                System.out.println(lineText.substring(4));
+                                appScore += Integer.parseInt(lineText.substring(4)) * 3;
+                            }
+                        } catch (NumberFormatException ex) {
+                            System.out.println("Oops, looks like the image is not good");
+                        }
+                    }
+                }
+                detectResult = appScore + "";
             }
 
         } catch (AmazonRekognitionException e) {
