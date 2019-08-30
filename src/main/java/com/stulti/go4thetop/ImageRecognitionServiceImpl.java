@@ -139,7 +139,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                 return "InvalidImageError";
             }
         }
-        // Music Validation TODO: eA-App 사진으로 올린 경우에 대한 곡 이름 Template 설정 필요
+        // Music Validation
         int musicNumber;
         Mat vldFrame;
         float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate1, fileName);

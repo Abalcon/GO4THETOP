@@ -68,6 +68,7 @@ class Main extends Component {
             return (
                 <Preliminary contenders={this.props.contenders.contenders}
                              contendersLoading={this.props.contenders.isLoading}
+                             isProcessing={this.props.contenders.isProcessing}
                              contendersErrMsg={this.props.contenders.errMsg}
                              postContender={this.props.postContender}
                              postHeatRecord={this.props.postHeatRecord}/>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Control, Errors, Field, LocalForm} from "react-redux-form";
-import {Button, Col, Label, Row} from "reactstrap";
+import {Button, Card, CardImg, Col, Label, Row} from "reactstrap";
 //import { Breadcrumb, BreadcrumbItem, Button, Form, FormGroup, Label, Input, Col } from 'reactstrap';
 const required = (val) => val && val.length;
 const maxLength = (len) => (val) => !(val) || (val.length <= len);
@@ -53,7 +53,11 @@ class RecordSubmit extends Component {
     render() {
         return (
             <div className="container">
-                <h4>기록 제출</h4>
+                <div className="row col-md-10">
+                    <Card>
+                        <CardImg top src="assets/images/HeatCaution.jpg" alt="HeatWarn"/>
+                    </Card>
+                </div>
 
                 <h5>* : 필수 항목입니다.</h5>
                 {/*<h5 style={{color: 'red'}}>(7/25) 같은 이메일 주소로 2명 이상 신청할 수 없습니다</h5>*/}

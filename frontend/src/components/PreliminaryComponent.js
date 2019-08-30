@@ -4,7 +4,7 @@ import Entry from './EntryComponent';
 import RecordSubmit from './RecordSubmitComponent';
 import Ranking from './RankingComponent';
 import { Tab, TabList, Tabs, TabPanel } from 'react-tabs';
-import LoadingOverlay from 'react-loading-overlay';
+import {Loading} from "./LoadingComponent";
 
 class Preliminary extends Component {
 
@@ -21,9 +21,16 @@ class Preliminary extends Component {
         });
     };
 
+
     render() {
-        return (
-            <LoadingOverlay active={this.props.contenders.isProcessing} text='Please wait...'>
+        if (this.props.isProcessing) {
+            return (
+                <div className="container">
+                    <Loading/>
+                </div>
+            );
+        } else {
+            return (
                 <div className="container">
                     <Tabs onChange={this.handleChange.bind(this)} value={this.state.slideIndex}>
                         <TabList>
@@ -54,8 +61,8 @@ class Preliminary extends Component {
                     {/*<h4>예선</h4>*/}
                     {/*<p>Go4TheTop 3회 예선 진행 사항을 표시하는 페이지입니다</p>*/}
                 </div>
-            </LoadingOverlay>
-        );
+            );
+        }
     };
 }
 
