@@ -80,8 +80,6 @@ public class RecordSubmitController {
             if (result.equals("InvalidMusicError")) {
                 throw new InvalidMusicNameException();
             }
-
-            //TODO:
         } catch (InvalidImageFileException | InvalidMusicNameException ex) {
             throw ex;
         } catch (Exception ex) {

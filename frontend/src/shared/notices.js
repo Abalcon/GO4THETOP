@@ -7,7 +7,7 @@ export const NOTICES =
             id: 0,
             date: '2019-08-24',
             subject: 'GO4THETOP 3회 예선 안내',
-            images: <div className="row">
+            images: <div>
                 <CardImg src='assets/images/HeatLower.png' alt='HeatLower'/>
                 <CardImg src='assets/images/HeatUpper.png' alt='HeatUpper'/>
                 <CardImg src='assets/images/HeatSchedule.png' alt='HeatSchedule'/>

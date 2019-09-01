@@ -49,8 +49,8 @@ public class AWSRekognitionService {
             int totalDetections = textDetections.size();
 
             if (imgType.equals("CAM")) {
-                String exScore = textDetections.get(totalDetections - 1).getDetectedText();
-                String fellout = textDetections.get(totalDetections - 2).getDetectedText();
+                String exScore = textDetections.get(totalDetections - 1).getDetectedText().replaceAll("\\s", "");
+                String fellout = textDetections.get(totalDetections - 2).getDetectedText().replaceAll("\\s", "");
                 try {
                     Integer.parseInt(fellout);
                     detectResult = fellout + exScore;
@@ -86,8 +86,6 @@ public class AWSRekognitionService {
 
         } catch (AmazonRekognitionException e) {
             e.printStackTrace();
-        } finally {
-
         }
 
         return detectResult;

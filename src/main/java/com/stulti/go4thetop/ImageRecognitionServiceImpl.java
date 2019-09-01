@@ -60,6 +60,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         // Save the input image
         Path target = getImagePath(imgPath);
         Files.copy(imageData, target, StandardCopyOption.REPLACE_EXISTING);
+        imageData.close();
 
         // Load Score Template
         String scoreTmpFileName = targetDir + "/ScoreTemplate.jpg";
@@ -105,36 +106,36 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         // Read the input image (target)
         String fileName = target.getFileName().toString();
         String fileFullName = targetDir + "/" + fileName;
-        Mat frame = Imgcodecs.imread(fileFullName);
+        Mat targetImage = Imgcodecs.imread(fileFullName);
 
         // Resize if image is too large
         int sizeThresh = 4096;
         double reduceFactor = 0.5;
-        if (frame.width() >= sizeThresh || frame.height() >= sizeThresh) {
+        if (targetImage.width() >= sizeThresh || targetImage.height() >= sizeThresh) {
             System.out.println("The image named " + fileName + " is quite large, should be resized.");
-            Size resize = new Size(frame.width() * reduceFactor, frame.height() * reduceFactor);
-            Imgproc.resize(frame, frame, resize);
+            Size resize = new Size(targetImage.width() * reduceFactor, targetImage.height() * reduceFactor);
+            Imgproc.resize(targetImage, targetImage, resize);
         }
 
         // Template Matching - 점수가 있는 영역 찾기
-        //templateMatching(frame, CannyTemplate, fileName);
+        //templateMatching(targetImage, CannyTemplate, fileName);
 
         // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         int scoreKeypointThreshold = 15, musicKeypointThreshold = 20;
 
-        float[] scoreRegionData = findRegionWithKeypointMatching(frame, ScoreTemplate, fileName, scoreKeypointThreshold); // Get crop with score
+        float[] scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreTemplate, fileName, scoreKeypointThreshold); // Get crop with score
         ScoreTemplate.release();
-        Mat ocrFrame;
+        Mat ocrFrame = new Mat();
         String imageType;
         if (scoreRegionData != null) {
-            ocrFrame = getScoreCrop(frame, scoreRegionData, 0.6);
+            getScoreCrop(targetImage, ocrFrame, scoreRegionData, 0.6);
             imageType = "CAM";
             ScoreAppTemplate.release();
         } else {
-            scoreRegionData = findRegionWithKeypointMatching(frame, ScoreAppTemplate, fileName, scoreKeypointThreshold);
+            scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreAppTemplate, fileName, scoreKeypointThreshold);
             ScoreAppTemplate.release();
             if (scoreRegionData != null) {
-                ocrFrame = getScoreCrop(frame, scoreRegionData, 0.5);
+                getScoreCrop(targetImage, ocrFrame, scoreRegionData, 0.5);
                 imageType = "APP";
             } else {
                 System.out.println("The image named " + fileName + " seems not a result screen.");
@@ -143,31 +144,31 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         }
         // Music Validation
         int musicNumber;
-        Mat vldFrame;
-        float[] musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate1, fileName, musicKeypointThreshold);
+        //Mat vldFrame = new Mat();
+        float[] musicRegionData = findRegionWithKeypointMatching(targetImage, musicTemplate1, fileName, musicKeypointThreshold);
         musicTemplate1.release();
         if (musicRegionData != null) {
-            vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
+            //getScoreCrop(targetImage, vldFrame, musicRegionData, 0.0);
             musicNumber = 1;
-            vldFrame.release();
+            //vldFrame.release();
             musicTemplate2.release();
-            frame.release();
+            targetImage.release();
         } else { // e-Amusement App 사진으로 올린 경우
             if (division.equals("lower") && imageType.equals("APP")) { // Starry Sky는 별도의 template 사용
                 music2 = targetDir + "/MusicLowerApp2.jpg"; // Lower Music 2 for APP images
                 musicTemplate2 = Imgcodecs.imread(music2);
                 Imgproc.cvtColor(musicTemplate2, musicTemplate2, Imgproc.COLOR_RGB2GRAY);
             }
-            musicRegionData = findRegionWithKeypointMatching(frame, musicTemplate2, fileName, musicKeypointThreshold);
+            musicRegionData = findRegionWithKeypointMatching(targetImage, musicTemplate2, fileName, musicKeypointThreshold);
             musicTemplate2.release();
             if (musicRegionData != null) {
-                vldFrame = getScoreCrop(frame, musicRegionData, 0.0);
+                //getScoreCrop(targetImage, vldFrame, musicRegionData, 0.0);
                 musicNumber = 2;
-                vldFrame.release();
-                frame.release();
+                //vldFrame.release();
+                targetImage.release();
             } else {
                 System.out.println("The image named " + fileName + " seems not suitable for preliminary round.");
-                frame.release();
+                targetImage.release();
                 return "InvalidMusicError";
             }
         }
@@ -346,9 +347,13 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
                     listOfGoodMatches.add(matches[0]);
                 }
             }
+            knnMatch.release();
         }
         MatOfDMatch goodMatches = new MatOfDMatch();
         goodMatches.fromList(listOfGoodMatches);
+
+        descriptorsObject.release();
+        descriptorsScene.release();
 
         if (listOfGoodMatches.size() >= matchCountThreshold) {
             System.out.println("Enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
@@ -405,19 +410,25 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             String fileKPMName = targetDir + "/kpmatch_" + fileName;
             Imgcodecs.imwrite(fileKPMName, imgMatches);
 
+            keypointsObject.release();
+            goodMatches.release();
             H.release();
+            objMat.release();
             objCorners.release();
+            imgMatches.release();
             grayFrame.release();
 
             return sceneCornersData;
         } else {
             System.out.println("Not enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
+            keypointsObject.release();
+            goodMatches.release();
             grayFrame.release();
             return null;
         }
     }
 
-    private Mat getScoreCrop(Mat frame, float[] sceneCornersData, double expandRight) {
+    private void getScoreCrop(Mat frame, Mat result, float[] sceneCornersData, double expandRight) {
         // 숫자까지 포함하는 Rotatedrect 잡기
         MatOfPoint obtainedContour = new MatOfPoint(
                 new Point(sceneCornersData[0], sceneCornersData[1]),
@@ -443,9 +454,18 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         MatOfPoint2f brPoints2f = new MatOfPoint2f(brPoints.toArray());
         Mat ptMat = Imgproc.getPerspectiveTransform(contour2f, brPoints2f);
 
-        Mat result = frame.clone();
-        Imgproc.warpPerspective(result, result, ptMat, new Size(obtainedRect.width, obtainedRect.height));
-        return result;
+        //Mat result = frame.clone();
+        Imgproc.warpPerspective(frame, result, ptMat, new Size(obtainedRect.width, obtainedRect.height));
+
+        obtainedContour.release();
+        approxCurve.release();
+        contour2f.release();
+        points.release();
+        brPoints.release();
+        brPoints2f.release();
+        ptMat.release();
+
+        //return result;
     }
 
 //    private Rect findScreen(String imgPath) {
