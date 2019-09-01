@@ -15,7 +15,7 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... strings) throws Exception {
+    public void run(String... strings) {
 //        this.repository.save(new Contender("extinbase@gmail.com",
 //                "DJ 스툴티", "Stult_i", false, true, "AutomationCreator"));
         repository.findAll().forEach(System.out::println);

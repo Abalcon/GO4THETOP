@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 public class AWSRekognitionService {
-    private AmazonRekognition client;
+    private final AmazonRekognition client;
 
     public AWSRekognitionService(AmazonRekognition client) {
         this.client = client;
@@ -86,6 +86,8 @@ public class AWSRekognitionService {
 
         } catch (AmazonRekognitionException e) {
             e.printStackTrace();
+        } finally {
+
         }
 
         return detectResult;

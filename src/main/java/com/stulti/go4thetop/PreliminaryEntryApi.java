@@ -15,19 +15,19 @@ public interface PreliminaryEntryApi {
     Retrofit2로 넘어가면서 Call<>을 씌워야하도록 바뀌었다
     */
     @GET(Entry_API_PATH)
-    public Call<Collection<Contender>> getContenderList();
+    Call<Collection<Contender>> getContenderList();
 
     @POST(Entry_API_PATH)
-    public Call<Contender> addContender(@Body Contender ctd);
+    Call<Contender> addContender(@Body Contender ctd);
 
     @GET(Entry_API_PATH + "/{id}")
-    public Contender getContenderById(@Path("id") long id);
+    Contender getContenderById(@Path("id") long id);
 
     @GET(Entry_API_PATH + "/{mail}")
-    public Contender getContenderByMail(@Path("mail") String mail);
+    Contender getContenderByMail(@Path("mail") String mail);
 
     @GET(Entry_API_PATH + "/search/findByMail")
-    public Call<Collection<Contender>> findByMail(@Query("mail") String mail);
+    Call<Collection<Contender>> findByMail(@Query("mail") String mail);
 
     /*
     https://jongmin92.github.io/2018/01/29/Programming/android-retrofit2-okhttp3/

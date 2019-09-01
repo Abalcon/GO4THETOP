@@ -21,7 +21,7 @@ public class MailServiceImpl implements MailService {
     @Autowired
     public JavaMailSender mailSender;
 
-    private String registerConfirmSubject = "GO4THETOP 예선 참가 신청 완료 안내";
+    private final String registerConfirmSubject = "GO4THETOP 예선 참가 신청 완료 안내";
 
     /* References
     https://support.google.com/mail/answer/7104828?hl=en
