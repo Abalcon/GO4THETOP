@@ -49,7 +49,10 @@ class RecordSubmit extends Component {
                         <CardImg top src="assets/images/HeatCaution.jpg" alt="HeatWarn"/>
                     </Card>
                 </div>
-
+                <h5>
+                    (9/4) 현재 天空の華의 경우 사진이 촬영된 점포에 따라 인식이 되지 않는 경우가 확인되고 있습니다.<br/>
+                    여러 차례 시도해도 안된다면 메일로 수동 제출을 부탁드립니다.
+                </h5>
                 <h5>* : 필수 항목입니다.</h5>
                 {/*<h5 style={{color: 'red'}}>(7/25) 같은 이메일 주소로 2명 이상 신청할 수 없습니다</h5>*/}
                 <LocalForm onSubmit={(value) => this.handleSubmit(value)}>
