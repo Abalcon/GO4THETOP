@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
@@ -119,10 +120,22 @@ public class RecordSubmitController {
             String[] scoreInfo = {result1, result2};
             updateScore(contenderWithCardName.get(0), scoreInfo);
 
-        } catch (IncorrectContenderInfoException | InvalidImageFileException |
-                InvalidMusicNameException | UnavailableGameScoreException ex) {
-            ex.printStackTrace();
-            throw ex;
+        } catch (IncorrectContenderInfoException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "카드 이름이 잘못되었거나, Lower 부문에 참가신청하지 않았습니다\n" +
+                            "(Dancer name is incorrect, or not participated in lower division)", ex);
+        } catch (InvalidImageFileException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "제출한 사진이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
+                            + "(Image is invalid. Please check your images)", ex);
+        } catch (InvalidMusicNameException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
+                            + "(Failed to check music information. Please check whether the image is noisy)", ex);
+        } catch (UnavailableGameScoreException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
+                            + "(Failed to check score. Please check whether the image is noisy)", ex);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ImageRecognitionFailException();
@@ -160,10 +173,22 @@ public class RecordSubmitController {
             String[] scoreInfo = {result1, result2};
             updateScore(contenderWithCardName.get(0), scoreInfo);
 
-        } catch (IncorrectContenderInfoException | InvalidImageFileException |
-                InvalidMusicNameException | UnavailableGameScoreException ex) {
-            ex.printStackTrace();
-            throw ex;
+        } catch (IncorrectContenderInfoException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "카드 이름이 잘못되었거나, Upper 부문에 참가신청하지 않았습니다\n" +
+                            "(Dancer name is incorrect, or not participated in upper division)", ex);
+        } catch (InvalidImageFileException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "제출한 사진이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
+                            + "(Image is invalid. Please check your images)", ex);
+        } catch (InvalidMusicNameException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
+                            + "(Failed to check music information. Please check whether the image is noisy)", ex);
+        } catch (UnavailableGameScoreException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
+                            + "(Failed to check score. Please check whether the image is noisy)", ex);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ImageRecognitionFailException();

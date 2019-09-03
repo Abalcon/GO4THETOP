@@ -26,21 +26,12 @@ class RecordSubmit extends Component {
     //     //this.handleSubmit = this.handleSubmit.bind(this);
     // }
 
-    handleChange(value) {
-        if (value.image1 !== undefined) {
-            console.log(value.image1);
-            console.log(value.image1[0].name);
-            console.log(value.image1[0].type);
-        }
-    }
-
     handleSubmit(values) {
         // 실제 웹 서비스처럼 '정말 신청하겠습니까?' 같은게 필요하다. 일단은 브라우저 디폴트로
         //console.log('Current State is: ' + JSON.stringify(values));
         //alert('참가 신청 기간은 아직 시작되지 않았습니다!\nCurrent State is: ' + JSON.stringify(values));
 
         if (window.confirm('GO4THETOP 3rd Season 예선 기록을 제출하시겠습니까?')) {
-            // TODO: 예선 기록 제출 Redux
             // this.props.postContender(this.props.ctdID, values.email, values.fullname, values.nameread, values.cardname.toUpperCase(),
             //     values.participation.some(val => val === "lower"), values.participation.some(val => val === "upper"),
             //     values.participation.some(val => val === "watching"), values.snstype, values.snsid, values.message);
@@ -61,8 +52,7 @@ class RecordSubmit extends Component {
 
                 <h5>* : 필수 항목입니다.</h5>
                 {/*<h5 style={{color: 'red'}}>(7/25) 같은 이메일 주소로 2명 이상 신청할 수 없습니다</h5>*/}
-                <LocalForm onChange={(value) => this.handleChange(value)}
-                           onSubmit={(value) => this.handleSubmit(value)}>
+                <LocalForm onSubmit={(value) => this.handleSubmit(value)}>
                     <Row className="form-group">
                         <Label htmlFor="cardname" md={6}>게임 내 표기 이름(Dancer/Card Name) *</Label>
                         <Col md={9}>

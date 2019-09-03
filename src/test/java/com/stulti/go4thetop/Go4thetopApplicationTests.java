@@ -210,6 +210,13 @@ public class Go4thetopApplicationTests {
         sb.append(oneImage(testFilePath, "test_upper1_app1.jpg", "upper", "upper1_1769"));
         sb.append(oneImage(testFilePath, "test_upper2_app1.jpg", "upper", "upper2_1544"));
 
+        sb.append(oneImage(testFilePath, "test_upper1_app2.jpeg", "upper", "upper1_1780"));
+        sb.append(oneImage(testFilePath, "test_upper2_app2.jpeg", "upper", "upper2_1531"));
+        sb.append(oneImage(testFilePath, "test_lower1_app3.jpg", "lower", "lower1_915"));
+        sb.append(oneImage(testFilePath, "test_lower2_app3.jpg", "lower", "lower2_1165"));
+        sb.append(oneImage(testFilePath, "test_upper1_app3.jpg", "upper", "upper1_1772"));
+        sb.append(oneImage(testFilePath, "test_upper2_app3.jpg", "upper", "upper2_1538"));
+
         errors = sb.toString();
         assertEquals("", errors);
     }

@@ -123,7 +123,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         // Keypoint Matching - mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         int scoreKeypointThreshold = 15, musicKeypointThreshold = 20;
 
-        float[] scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreTemplate, fileName, scoreKeypointThreshold); // Get crop with score
+        double[] scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreTemplate, fileName, scoreKeypointThreshold); // Get crop with score
         ScoreTemplate.release();
         Mat ocrFrame = new Mat();
         String imageType;
@@ -132,20 +132,25 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             imageType = "CAM";
             ScoreAppTemplate.release();
         } else {
-            scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreAppTemplate, fileName, scoreKeypointThreshold);
+            // FIXME: e-Amusement App 사진은 기울임 보정을 하지 않도록 수정
+            //scoreRegionData = findRegionWithKeypointMatching(targetImage, ScoreAppTemplate, fileName, scoreKeypointThreshold);
+            scoreRegionData = templateMatching(targetImage, ScoreAppTemplate, fileName);
             ScoreAppTemplate.release();
             if (scoreRegionData != null) {
-                getScoreCrop(targetImage, ocrFrame, scoreRegionData, 0.5);
+                ocrFrame = getAppScoreCrop(targetImage, scoreRegionData, 0.5);
                 imageType = "APP";
             } else {
                 System.out.println("The image named " + fileName + " seems not a result screen.");
+                targetImage.release();
+                musicTemplate1.release();
+                musicTemplate2.release();
                 return "InvalidImageError";
             }
         }
         // Music Validation
         int musicNumber;
         //Mat vldFrame = new Mat();
-        float[] musicRegionData = findRegionWithKeypointMatching(targetImage, musicTemplate1, fileName, musicKeypointThreshold);
+        double[] musicRegionData = findRegionWithKeypointMatching(targetImage, musicTemplate1, fileName, musicKeypointThreshold);
         musicTemplate1.release();
         if (musicRegionData != null) {
             //getScoreCrop(targetImage, vldFrame, musicRegionData, 0.0);
@@ -184,7 +189,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         int vPadding = (resizeFactor - heightRemainder) / 2;
         Core.copyMakeBorder(ocrFrame, ocrFrame, vPadding, vPadding,
                 hPadding, hPadding, Core.BORDER_CONSTANT, new Scalar(255, 255, 255));
-        Imgproc.GaussianBlur(ocrFrame, ocrFrame, new Size(3, 3), 0.0, 0.0);
+        //Imgproc.GaussianBlur(ocrFrame, ocrFrame, new Size(3, 3), 0.0, 0.0);
 
         String fileTessName = targetDir + "/tess_" + fileName;
         Imgcodecs.imwrite(fileTessName, ocrFrame);
@@ -276,47 +281,66 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
 //        return detections;
 //    }
 
-//    private void templateMatching(Mat frame, Mat template, String fileName) {
-//        Mat grayFrame = new Mat();
-//        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
-//
-//        Imgproc.cvtColor(template, template, Imgproc.COLOR_RGB2GRAY);
-//        Imgproc.Canny(template, template, 70.0, 175.0);
-//
-//        Mat resizedFrame = new Mat();
-//        Mat mtResult = new Mat();
-//        double bestMatchRate = -1.0;
-//        Point bestMatchLocation = new Point();
-//        double bestMatchScale = -1.0;
-//        for (double imgScale = 1.0; imgScale >= 0.1; imgScale -= 0.05) {
-//            Size resize = new Size(grayFrame.width() * imgScale, grayFrame.height() * imgScale);
-//            Imgproc.resize(grayFrame, resizedFrame, resize);
-//
-//            if (resizedFrame.width() < template.width() || resizedFrame.height() < template.height())
-//                break;
-//
-//            Imgproc.Canny(resizedFrame, resizedFrame, 70.0, 175.0);
-//            Imgproc.matchTemplate(resizedFrame, template, mtResult, Imgproc.TM_CCOEFF);
-//            Core.MinMaxLocResult res = Core.minMaxLoc(mtResult);
-//            //Imgproc.rectangle(resizedFrame, res.maxLoc,
-//            //        new Point(res.maxLoc.x + CannyTemplate.width(), res.maxLoc.y + CannyTemplate.height()), new Scalar(0, 0, 255), 1);
-//            //String fileResizeName = targetDir + "/resize" + (int)(imgScale * 100) + "_" + fileName;
-//            //Imgcodecs.imwrite(fileResizeName, resizedFrame);
-//
-//            if (res.maxVal > bestMatchRate) {
-//                bestMatchRate = res.maxVal;
-//                bestMatchLocation = res.maxLoc;
-//                bestMatchScale = imgScale;
-//            }
-//        }
+    private double[] templateMatching(Mat frame, Mat template, String fileName) {
+        Mat grayFrame = new Mat();
+        Imgproc.cvtColor(frame, grayFrame, Imgproc.COLOR_RGB2GRAY);
+
+        Imgproc.Canny(template, template, 70.0, 175.0);
+
+        Mat resizedFrame = new Mat();
+        Mat mtResult = new Mat();
+        double bestMatchRate = -1.0;
+        Point bestMatchLocation = new Point();
+        double bestMatchScale = -1.0;
+        for (double imgScale = 1.0; imgScale >= 0.1; imgScale -= 0.05) {
+            Size resize = new Size(grayFrame.width() * imgScale, grayFrame.height() * imgScale);
+            Imgproc.resize(grayFrame, resizedFrame, resize);
+
+            if (resizedFrame.width() < template.width() || resizedFrame.height() < template.height())
+                break;
+
+            Imgproc.Canny(resizedFrame, resizedFrame, 70.0, 175.0);
+            Imgproc.matchTemplate(resizedFrame, template, mtResult, Imgproc.TM_CCOEFF);
+            Core.MinMaxLocResult res = Core.minMaxLoc(mtResult);
+            //Imgproc.rectangle(resizedFrame, res.maxLoc,
+            //        new Point(res.maxLoc.x + CannyTemplate.width(), res.maxLoc.y + CannyTemplate.height()), new Scalar(0, 0, 255), 1);
+            //String fileResizeName = targetDir + "/resize" + (int)(imgScale * 100) + "_" + fileName;
+            //Imgcodecs.imwrite(fileResizeName, resizedFrame);
+
+            if (res.maxVal > bestMatchRate) {
+                bestMatchRate = res.maxVal;
+                bestMatchLocation = res.maxLoc;
+                bestMatchScale = imgScale;
+            }
+        }
+        grayFrame.release();
+        resizedFrame.release();
+        mtResult.release();
+
+        // check whether matching is good or not
 //        Point resultLoc1 = new Point(bestMatchLocation.x / bestMatchScale, bestMatchLocation.y / bestMatchScale);
 //        Point resultLoc2 = new Point((bestMatchLocation.x + template.width()) / bestMatchScale, (bestMatchLocation.y + template.height()) / bestMatchScale);
 //        Imgproc.rectangle(frame, resultLoc1, resultLoc2, new Scalar(0, 255, 0, 255), 2);
 //        String fileMatchName = targetDir + "/matching_" + fileName;
 //        Imgcodecs.imwrite(fileMatchName, frame);
-//    }
 
-    private float[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName, int matchCountThreshold) {
+        if (bestMatchRate < 0.8) // not enough confidence
+            return null;
+
+        double[] resultCornersData = new double[8];
+        resultCornersData[0] = bestMatchLocation.x / bestMatchScale;
+        resultCornersData[1] = bestMatchLocation.y / bestMatchScale;
+        resultCornersData[2] = (bestMatchLocation.x + template.width()) / bestMatchScale;
+        resultCornersData[3] = bestMatchLocation.y / bestMatchScale;
+        resultCornersData[4] = (bestMatchLocation.x + template.width()) / bestMatchScale;
+        resultCornersData[5] = (bestMatchLocation.y + template.height()) / bestMatchScale;
+        resultCornersData[6] = bestMatchLocation.x / bestMatchScale;
+        resultCornersData[7] = (bestMatchLocation.y + template.height()) / bestMatchScale;
+
+        return resultCornersData;
+    }
+
+    private double[] findRegionWithKeypointMatching(Mat frame, Mat template, String fileName, int matchCountThreshold) {
         // Mainly from: docs.opencv.org/4.1.0/d7/dff/tutorial_feature_homography.html
         //int matchCountThreshold = 20;
         // 190824 - Increase Threshold to 15, 190827 - Decrease to 10 (Starry Sky, other noises)
@@ -331,8 +355,9 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         SURF detector = SURF.create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
         MatOfKeyPoint keypointsObject = new MatOfKeyPoint(), keypointsScene = new MatOfKeyPoint();
         Mat descriptorsObject = new Mat(), descriptorsScene = new Mat();
-        detector.detectAndCompute(template, new Mat(), keypointsObject, descriptorsObject);
-        detector.detectAndCompute(grayFrame, new Mat(), keypointsScene, descriptorsScene);
+        Mat maskObject = new Mat(), maskScene = new Mat();
+        detector.detectAndCompute(template, maskObject, keypointsObject, descriptorsObject);
+        detector.detectAndCompute(grayFrame, maskScene, keypointsScene, descriptorsScene);
 
         DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
         List<MatOfDMatch> knnMatches = new ArrayList<>();
@@ -352,8 +377,12 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         MatOfDMatch goodMatches = new MatOfDMatch();
         goodMatches.fromList(listOfGoodMatches);
 
+        matcher.clear();
         descriptorsObject.release();
         descriptorsScene.release();
+        maskObject.release();
+        maskScene.release();
+        knnMatches.clear();
 
         if (listOfGoodMatches.size() >= matchCountThreshold) {
             System.out.println("Enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
@@ -379,8 +408,8 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             Mat H = Calib3d.findHomography(objMat, sceneMat, Calib3d.RANSAC, ransacReprojThreshold);
 
             //-- Get the corners from the image_1 (the object to be "detected")
-            Mat objCorners = new Mat(4, 1, CvType.CV_32FC2), sceneCorners = new Mat();
-            float[] objCornersData = new float[(int) (objCorners.total() * objCorners.channels())];
+            Mat objCorners = new Mat(4, 1, CvType.CV_64FC2), sceneCorners = new Mat();
+            double[] objCornersData = new double[(int) (objCorners.total() * objCorners.channels())]; // 190903 changed to double
             objCorners.get(0, 0, objCornersData);
             objCornersData[0] = 0;
             objCornersData[1] = 0;
@@ -392,7 +421,7 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             objCornersData[7] = template.rows();
             objCorners.put(0, 0, objCornersData);
             Core.perspectiveTransform(objCorners, sceneCorners, H); // template과 닮은 부분을 못 찾을 경우 여기서 에러났었다
-            float[] sceneCornersData = new float[(int) (sceneCorners.total() * sceneCorners.channels())];
+            double[] sceneCornersData = new double[(int) (sceneCorners.total() * sceneCorners.channels())]; // 190903 changed to double
             sceneCorners.get(0, 0, sceneCornersData);
             //-- Draw lines between the corners (the mapped object in the scene - image_2 )
             Imgproc.line(imgMatches, new Point(sceneCornersData[0] + template.cols(), sceneCornersData[1]),
@@ -411,9 +440,11 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
             Imgcodecs.imwrite(fileKPMName, imgMatches);
 
             keypointsObject.release();
+            keypointsScene.release();
             goodMatches.release();
             H.release();
             objMat.release();
+            sceneMat.release();
             objCorners.release();
             imgMatches.release();
             grayFrame.release();
@@ -422,21 +453,16 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         } else {
             System.out.println("Not enough matches are found for " + fileName + " - " + listOfGoodMatches.size() + "/" + matchCountThreshold);
             keypointsObject.release();
+            keypointsScene.release();
             goodMatches.release();
             grayFrame.release();
             return null;
         }
     }
 
-    private void getScoreCrop(Mat frame, Mat result, float[] sceneCornersData, double expandRight) {
+    private void getScoreCrop(Mat frame, Mat result, double[] sceneCornersData, double expandRight) {
         // 숫자까지 포함하는 Rotatedrect 잡기
-        MatOfPoint obtainedContour = new MatOfPoint(
-                new Point(sceneCornersData[0], sceneCornersData[1]),
-                new Point(sceneCornersData[2] * (1 + expandRight) - sceneCornersData[0] * expandRight,
-                        sceneCornersData[3] * (1 + expandRight) - sceneCornersData[1] * expandRight),
-                new Point(sceneCornersData[4] * (1 + expandRight) - sceneCornersData[6] * expandRight,
-                        sceneCornersData[5] * (1 + expandRight) - sceneCornersData[7] * expandRight),
-                new Point(sceneCornersData[6], sceneCornersData[7]));
+        MatOfPoint obtainedContour = getNewPoints(sceneCornersData, expandRight);
 
         MatOfPoint2f approxCurve = new MatOfPoint2f();
         MatOfPoint2f contour2f = new MatOfPoint2f(obtainedContour.toArray());
@@ -466,6 +492,27 @@ public class ImageRecognitionServiceImpl implements ImageRecognitionService {
         ptMat.release();
 
         //return result;
+    }
+
+    private Mat getAppScoreCrop(Mat frame, double[] sceneCornersData, double expandRight) {
+        Point point1 = new Point(sceneCornersData[0], sceneCornersData[1]);
+        Point point2 = new Point(sceneCornersData[4] * (1 + expandRight) - sceneCornersData[6] * expandRight,
+                sceneCornersData[5] * (1 + expandRight) - sceneCornersData[7] * expandRight);
+
+        Rect obtainedRect = new Rect(point1, point2);
+
+        return new Mat(frame, obtainedRect);
+    }
+
+    private MatOfPoint getNewPoints(double[] pointsData, double expandRight) {
+        assert (pointsData != null && pointsData.length > 7);
+
+        return new MatOfPoint(new Point(pointsData[0], pointsData[1]),
+                new Point(pointsData[2] * (1 + expandRight) - pointsData[0] * expandRight,
+                        pointsData[3] * (1 + expandRight) - pointsData[1] * expandRight),
+                new Point(pointsData[4] * (1 + expandRight) - pointsData[6] * expandRight,
+                        pointsData[5] * (1 + expandRight) - pointsData[7] * expandRight),
+                new Point(pointsData[6], pointsData[7]));
     }
 
 //    private Rect findScreen(String imgPath) {

@@ -136,22 +136,20 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
         .then(response => {
                 if (response.ok) {
                     console.log('Yes we get response!');
-                    return response;
+                    alert('기록 제출에 성공했습니다! (Succeed to submit your records!)');
+                    dispatch(fetchContenders());
                 } else {
-                    console.log(response);
-                    let error = new Error('Error' + response.status + ': ' + response.statusText + ' - ' + response.body);
-                    error.response = response;
-                    throw error;
+                    response.json().then(message => {
+                        console.log(message);
+                        alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + message.message);
+                        dispatch(fetchContenders());
+                    })
                 }
             },
             error => {
                 let errmsg = new Error(error.message);
                 throw errmsg;
             })
-        .then(result => {
-            alert('기록 제출에 성공했습니다! (Succeed to submit your records!)');
-            dispatch(fetchContenders());
-        })
         .catch(error => {
             console.log('Failed to submit: ', error.message);
             alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + error.message);
