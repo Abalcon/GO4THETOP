@@ -8,7 +8,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'war'
 
 group = 'com.stulti'
-version = '1.6-preliminary-enable-app'
+version = '1.7-preliminary-enable-app'
 sourceCompatibility = '8'
 
 configurations {
