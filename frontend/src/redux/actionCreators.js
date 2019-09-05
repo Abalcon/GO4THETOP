@@ -61,7 +61,7 @@ export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, 
         });
 };
 
-export const fetchContenders = () => (dispatch) => {
+export const fetchContenders = (isRefresh) => (dispatch) => {
     dispatch(contendersLoading(true));
 
     return fetch(awsApiURL + 'contenders')
@@ -80,7 +80,12 @@ export const fetchContenders = () => (dispatch) => {
                 throw errmsg;
             })
         .then(response => response.json())
-        .then(contenders => dispatch(showContenders(contenders)))
+        .then(contenders => {
+            if (isRefresh)
+                dispatch(refreshContenders(contenders));
+            else
+                dispatch(showContenders(contenders));
+        })
         .catch(error => dispatch(contendersFailed(error.message)));
 };
 
@@ -95,6 +100,11 @@ export const contendersFailed = (errmsg) => ({
 
 export const showContenders = (contenders) => ({
     type: actionTypes.SHOW_CONTENDERS,
+    payload: contenders
+});
+
+export const refreshContenders = (contenders) => ({
+    type: actionTypes.REFRESH_CONTENDERS,
     payload: contenders
 });
 
@@ -137,12 +147,12 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
                 if (response.ok) {
                     //console.log('Yes we get response!');
                     alert('기록 제출에 성공했습니다! (Succeed to submit your records!)');
-                    dispatch(fetchContenders());
+                    dispatch(fetchContenders(true));
                 } else {
                     response.json().then(message => {
                         //console.log(message);
                         alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + message.message);
-                        dispatch(fetchContenders());
+                        dispatch(fetchContenders(false));
                     })
                 }
             },
@@ -153,6 +163,6 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
         .catch(error => {
             //console.log('Failed to submit: ', error.message);
             alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + error.message);
-            dispatch(fetchContenders());
+            dispatch(fetchContenders(false));
         });
 };

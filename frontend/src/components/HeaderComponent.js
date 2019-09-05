@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavItem, Jumbotron } from 'reactstrap';
+import {Alert, Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavItem, Jumbotron} from 'reactstrap';
 import { NavLink } from 'react-router-dom';
+import Countdown from 'react-countdown-now';
+
 class Header extends Component {
     constructor(props) {
         super(props);
@@ -20,6 +22,17 @@ class Header extends Component {
     render () {
         const jumbotronStyle = {
             backgroundImage: 'url(assets/images/background_example.jpeg)'
+        };
+
+        //TODO: 예선 기간 countdown
+        const TimeOver = () => <h4>예선 기간이 종료되었습니다!<br/>많은 참여 감사드립니다</h4>;
+
+        const timeLimitRenderer = ({days, hours, minutes, seconds, completed}) => {
+            if (completed) {
+                return <TimeOver/>;
+            } else {
+                return <h4 style={{fontWeight: 'bold'}}>남은 예선 기간<br/>{days}일 {hours}시간 {minutes}분 {seconds}초</h4>
+            }
         };
 
         return (
@@ -72,7 +85,7 @@ class Header extends Component {
                         </Collapse>
                     </div>
                 </Navbar>
-                <Jumbotron style={jumbotronStyle} className="mb-1">
+                <Jumbotron style={jumbotronStyle}>
                     <div className="container">
                         <div className="row row-header">
                             <div className="col-12" style={{textAlign: "right"}}>
@@ -84,6 +97,12 @@ class Header extends Component {
                         </div>
                     </div>
                 </Jumbotron>
+                <Alert color="info" style={{textAlign: 'center'}}>
+                    <Countdown
+                        date={new Date(2019, 8, 16)}
+                        renderer={timeLimitRenderer}
+                    />
+                </Alert>
             </div>
         );
     }

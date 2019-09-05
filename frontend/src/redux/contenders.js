@@ -1,9 +1,17 @@
 import * as actionTypes from './actionTypes';
 
-export const Contenders = (state = {isLoading: true, isProcessing: false, errMsg: null, contenders: []}, action) => {
+export const Contenders = (state = {
+    isLoading: true,
+    isProcessing: false,
+    isRefresh: false,
+    errMsg: null,
+    contenders: []
+}, action) => {
     switch (action.type) {
         case actionTypes.SHOW_CONTENDERS:
-            return {...state, isLoading: false, errMsg: null, contenders: action.payload};
+            return {...state, isLoading: false, errMsg: null, isRefresh: false, contenders: action.payload};
+        case actionTypes.REFRESH_CONTENDERS:
+            return {...state, isLoading: false, errMsg: null, isRefresh: true, contenders: action.payload};
         case actionTypes.CONTENDERS_LOADING:
             return {...state, isLoading: true, isProcessing: false, errMsg: null, contenders: []};
         case actionTypes.CONTENDERS_FAILED:

@@ -38,28 +38,6 @@ public class Go4thetopApplicationTests {
     @Autowired
     private ImageRecognitionService imgService;
 
-//    @TestConfiguration
-//    public class AWSRekognitionTestConfiguration {
-//        @Value("${cloud.aws.credentials.access-Key}")
-//        private String accessKey;
-//
-//        @Value("${cloud.aws.credentials.secret-key}")
-//        private String secretKey;
-//
-//        @Value("${cloud.aws.region.static}")
-//        private String region;
-//
-//        @Bean
-//        public AmazonRekognition amazonRekognition() {
-//            BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-//            return AmazonRekognitionClientBuilder
-//                    .standard()
-//                    .withRegion(region)
-//                    .withCredentials(new AWSStaticCredentialsProvider(credentials))
-//                    .build();
-//        }
-//    }
-
     //FIXME: Autowired가 되도록 Bean 설정 필요
     private DummyMailSender mailSender = new DummyMailSender();
     @Autowired

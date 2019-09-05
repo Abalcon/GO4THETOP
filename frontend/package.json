@@ -9,6 +9,7 @@
     "cross-fetch": "^3.0.4",
     "font-awesome": "^4.7.0",
     "react": "^16.8.6",
+    "react-countdown-now": "^2.1.1",
     "react-dom": "^16.8.6",
     "react-loading-overlay": "^1.0.1",
     "react-localize-redux": "^3.5.3",

@@ -11,9 +11,15 @@ class Preliminary extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            slideIndex: 0,
+            slideIndex: this.setStartIndex(this.props.isRefresh),
         };
     }
+
+    setStartIndex = (isRefresh) => {
+        if (isRefresh)
+            return 3;
+        return 0;
+    };
 
     handleChange(value) {
         this.setState({
@@ -32,12 +38,12 @@ class Preliminary extends Component {
         } else {
             return (
                 <div className="container">
-                    <Tabs onChange={this.handleChange.bind(this)} value={this.state.slideIndex}>
+                    <Tabs selectedIndex={this.state.slideIndex} onSelect={tab => this.handleChange(tab)}>
                         <TabList>
-                            <Tab value={0}>Rules</Tab>
-                            <Tab value={1}>Entry</Tab>
-                            <Tab value={2}>RecordSubmit</Tab>
-                            <Tab value={3}>Ranking</Tab>
+                            <Tab>Rules</Tab>
+                            <Tab>Entry</Tab>
+                            <Tab>RecordSubmit</Tab>
+                            <Tab>Ranking</Tab>
                         </TabList>
 
                         <TabPanel>
@@ -53,6 +59,7 @@ class Preliminary extends Component {
                         </TabPanel>
                         <TabPanel>
                             <Ranking contenders={this.props.contenders}
+                                     fetchContenders={this.props.fetchContenders}
                                      isLoading={this.props.isLoading}
                                      errMsg={this.props.errMsg}/>
                         </TabPanel>

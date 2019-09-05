@@ -25,8 +25,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = (dispatch) => ({
     postContender: (ctdID, email, fullname, nameread, cardname, lower, upper, watch, snstype, snsid, comments) =>
         dispatch(postContender(ctdID, email, fullname, nameread, cardname, lower, upper, watch, snstype, snsid, comments)),
-    fetchContenders: () => {
-        dispatch(fetchContenders())
+    fetchContenders: (isRefresh) => {
+        dispatch(fetchContenders(isRefresh))
     },
     postHeatRecord: (cardName, division, image1, image2) =>
         dispatch(postHeatRecord(cardName, division, image1, image2))
@@ -48,7 +48,7 @@ class Main extends Component {
     }
 
     componentDidMount() {
-        this.props.fetchContenders();
+        this.props.fetchContenders(false);
     }
 
     render () {
@@ -70,6 +70,8 @@ class Main extends Component {
                              contendersLoading={this.props.contenders.isLoading}
                              isProcessing={this.props.contenders.isProcessing}
                              contendersErrMsg={this.props.contenders.errMsg}
+                             isRefresh={this.props.contenders.isRefresh}
+                             fetchContenders={this.props.fetchContenders}
                              postContender={this.props.postContender}
                              postHeatRecord={this.props.postHeatRecord}/>
             );

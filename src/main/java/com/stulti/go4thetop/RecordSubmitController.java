@@ -44,21 +44,33 @@ public class RecordSubmitController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "The image you submitted is not a result screen.")
     private class InvalidImageFileException extends RuntimeException {
         // 올바른 이미지가 아닌 경우 - 기록 사진으로 분류할 수 없는 이미지
+        private InvalidImageFileException(String message) {
+            super(message);
+        }
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Invalid music for the preliminary round.")
     private class InvalidMusicNameException extends RuntimeException {
         // 예선 과제곡이 아니거나, 참가하지 않는 부문에 속한 곡(Lower/Upper 미참가자가 Lower/Upper 과제곡을 제출)인 경우
+        private InvalidMusicNameException(String message) {
+            super(message);
+        }
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Cannot check EX SCORE of your submission.")
     private class UnavailableGameScoreException extends RuntimeException {
         // EX SCORE를 인식할 수 없는 경우
+        private UnavailableGameScoreException(String message) {
+            super(message);
+        }
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Cannot check EX SCORE of your submission.")
     private class InvalidDifficultyException extends RuntimeException {
         // 예선 지정곡은 맞으나, 지정된 난이도가 아닌 경우
+        private InvalidDifficultyException(String message) {
+            super(message);
+        }
     }
 
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "An error occurred in processing your submission.")
@@ -76,10 +88,10 @@ public class RecordSubmitController {
                 throw new InvalidDivisionException();
             }
             if (result.equals("InvalidImageError")) {
-                throw new InvalidImageFileException();
+                throw new InvalidImageFileException("err");
             }
             if (result.equals("InvalidMusicError")) {
-                throw new InvalidMusicNameException();
+                throw new InvalidMusicNameException("err");
             }
         } catch (InvalidImageFileException | InvalidMusicNameException ex) {
             throw ex;
@@ -106,15 +118,20 @@ public class RecordSubmitController {
             if (filePart1 != null) {
                 String fileName1 = cardName + "_" + filePart1.getSubmittedFileName();
                 result1 = imgService.recognizeImageData(fileName1, filePart1.getInputStream(), "lower");
-                checkValidity(result1);
+                //checkValidity(result1);
             }
 
             Part filePart2 = request.getPart("lower2");
             if (filePart2 != null) {
                 String fileName2 = cardName + "_" + filePart2.getSubmittedFileName();
                 result2 = imgService.recognizeImageData(fileName2, filePart2.getInputStream(), "lower");
-                checkValidity(result2);
+                //checkValidity(result2);
             }
+            // 190905 사진 인식 실패시 절차 개선
+            if (!result1.equals(""))
+                checkValidity(result1, 1);
+            if (!result2.equals(""))
+                checkValidity(result2, 2);
 
             // 도출된 점수를 DB에 반영 - "lower1_1024"
             String[] scoreInfo = {result1, result2};
@@ -126,16 +143,20 @@ public class RecordSubmitController {
                             "(Dancer name is incorrect, or not participated in lower division)", ex);
         } catch (InvalidImageFileException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "제출한 사진이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
+                    ex.getMessage() + "이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
                             + "(Image is invalid. Please check your images)", ex);
         } catch (InvalidMusicNameException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
+                    ex.getMessage() + "의 지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
                             + "(Failed to check music information. Please check whether the image is noisy)", ex);
         } catch (UnavailableGameScoreException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
+                    ex.getMessage() + "의 점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
                             + "(Failed to check score. Please check whether the image is noisy)", ex);
+        } catch (InvalidDifficultyException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ex.getMessage() + "의 점수 인식에 실패했거나 범위를 벗어나는 점수가 인식되었습니다. 규정에 맞는 난이도인지 확인해주십시오.\n"
+                            + "(Failed to check score, or invalid score has found. Please check whether the difficulty is correct)", ex);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ImageRecognitionFailException();
@@ -159,15 +180,21 @@ public class RecordSubmitController {
             if (filePart1 != null) {
                 String fileName1 = cardName + "_" + filePart1.getSubmittedFileName();
                 result1 = imgService.recognizeImageData(fileName1, filePart1.getInputStream(), "upper");
-                checkValidity(result1);
+                //checkValidity(result1);
             }
 
             Part filePart2 = request.getPart("upper2");
             if (filePart2 != null) {
                 String fileName2 = cardName + "_" + filePart2.getSubmittedFileName();
                 result2 = imgService.recognizeImageData(fileName2, filePart2.getInputStream(), "upper");
-                checkValidity(result2);
+                //checkValidity(result2);
             }
+
+            // 190905 사진 인식 실패시 절차 개선
+            if (!result1.equals(""))
+                checkValidity(result1, 1);
+            if (!result2.equals(""))
+                checkValidity(result2, 2);
 
             // 도출된 점수를 DB에 반영 - "upper1_2048"
             String[] scoreInfo = {result1, result2};
@@ -179,16 +206,20 @@ public class RecordSubmitController {
                             "(Dancer name is incorrect, or not participated in upper division)", ex);
         } catch (InvalidImageFileException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "제출한 사진이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
+                    ex.getMessage() + "이 올바르지 않습니다. 올바른 형식의 사진인지, 또는 흐릿한 사진인지 확인해주십시오\n"
                             + "(Image is invalid. Please check your images)", ex);
         } catch (InvalidMusicNameException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
+                    ex.getMessage() + "의 지정곡 인식에 실패했습니다. 곡명이 제대로 나왔는지, 조명 등으로 가려지는 부분이 있는지 확인해주십시오.\n"
                             + "(Failed to check music information. Please check whether the image is noisy)", ex);
         } catch (UnavailableGameScoreException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
+                    ex.getMessage() + "의 점수 인식에 실패했습니다. 점수 부분이 조명 등으로 가려졌는지 확인해주십시오.\n"
                             + "(Failed to check score. Please check whether the image is noisy)", ex);
+        } catch (InvalidDifficultyException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    ex.getMessage() + "의 점수 인식에 실패했거나 범위를 벗어나는 점수가 인식되었습니다. 규정에 맞는 난이도인지 확인해주십시오.\n"
+                            + "(Failed to check score, or invalid score has found. Please check whether the difficulty is correct)", ex);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new ImageRecognitionFailException();
@@ -197,18 +228,19 @@ public class RecordSubmitController {
         //return result;
     }
 
-    private void checkValidity(String result) {
+    private void checkValidity(String result, int imgNumber) {
+        String varStr = imgNumber + "번 사진";
         if (result.equals("InvalidImageError")) {
-            throw new InvalidImageFileException();
+            throw new InvalidImageFileException(varStr);
         }
         if (result.equals("InvalidMusicError")) {
-            throw new InvalidMusicNameException();
+            throw new InvalidMusicNameException(varStr);
         }
         if (result.equals("UnavailableGameScoreError")) {
-            throw new UnavailableGameScoreException();
+            throw new UnavailableGameScoreException(varStr);
         }
         if (result.equals("InvalidDifficultyError")) {
-            throw new InvalidDifficultyException();
+            throw new InvalidDifficultyException(varStr);
         }
     }
 
