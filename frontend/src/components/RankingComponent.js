@@ -6,18 +6,36 @@ import {Tab, TabList, TabPanel, Tabs} from "react-tabs";
 
 class Ranking extends Component {
 
+    dateCompare = (a, b) => {
+        if (a == null && b == null)
+            return 0;
+        else if (a != null && b == null)
+            return 1;
+        else if (a == null && b != null)
+            return -1;
+        else {
+            var diff = 0;
+            for (var i = 0; i < 6; i++) {
+                diff = a[i] - b[i];
+                if (diff !== 0)
+                    return diff;
+            }
+            return diff;
+        }
+    };
+
     lowerScoreCompare = (a, b) => {
         if (b.lowerTotal !== a.lowerTotal)
             return b.lowerTotal - a.lowerTotal;
 
-        return new Date(b.lowerUpdateDate) - new Date(a.lowerUpdateDate);
+        return this.dateCompare(a.lowerUpdateDate, b.lowerUpdateDate);
     };
 
     upperScoreCompare = (a, b) => {
         if (b.upperTotal !== a.upperTotal)
             return b.upperTotal - a.upperTotal;
 
-        return new Date(b.upperUpdateDate) - new Date(a.upperUpdateDate);
+        return this.dateCompare(a.upperUpdateDate, b.upperUpdateDate);
     };
 
     setRowColor = (index) => {

@@ -1,34 +1,15 @@
-import React, { Component } from 'react';
-import {Card, CardBody, CardHeader, CardText, CardTitle, CardSubtitle} from "reactstrap";
+import React from 'react';
+import {Card, CardImg} from "reactstrap";
 
-class Home extends Component {
+export const Home = () => {
 
-    render () {
-        const notices = this.props.notices.map((notice) => {
-            let newText = notice.content.split('\n').map((item, i) => <span key={i}>{unescape(item)}<br/></span>);
-
-            return (
-                <div key={notice.id} className="col-12 m-1">
-                    <Card>
-                        <CardHeader tag="h3">{notice.date}</CardHeader>
-                        <CardBody>
-                            <CardTitle tag="h5">{notice.subject}</CardTitle>
-                            <CardSubtitle>{notice.images}</CardSubtitle>
-                            <CardText>{newText}</CardText>
-                        </CardBody>
-                    </Card>
-                </div>
-            );
-        });
-        return (
-            <div className="container">
-                <h4>공지사항</h4>
-                <div className="row">
-                    {notices}
-                </div>
+    return (
+        <div className="container">
+            <div className="row col-md-10">
+                <Card>
+                    <CardImg top src="assets/images/G4TT_Poster.png" alt="Main"/>
+                </Card>
             </div>
-        );
-    }
-}
-
-export default Home;
+        </div>
+    );
+};

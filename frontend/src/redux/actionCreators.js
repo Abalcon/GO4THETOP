@@ -1,6 +1,14 @@
 import * as actionTypes from './actionTypes';
 import {localURL, awsApiURL} from '../shared/urlList';
 
+const targetURL = () => {
+    let isDev = process.env.NODE_ENV !== 'production';
+    if (isDev)
+        return localURL;
+    else
+        return awsApiURL;
+};
+
 export const addContender = (contender) => ({
     type: actionTypes.ADD_CONTENDER,
     payload: contender
@@ -27,8 +35,7 @@ export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, 
         comments: comments
     };
     // newContender.date = new Date.toISOString();
-    // localURL, awsApiURL
-    return fetch(awsApiURL + 'entry', {
+    return fetch(targetURL + 'entry', {
         method: "POST",
         body: JSON.stringify(newContender),
         headers: {
@@ -134,8 +141,7 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
     if (newHeatRecord.image2 != null)
         images.append(newHeatRecord.division + "2", new Blob([newHeatRecord.image2]), newHeatRecord.image2.name);
     // newContender.date = new Date.toISOString();
-    // localURL, awsApiURL
-    return fetch(awsApiURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
+    return fetch(targetURL + 'preliminary/' + newHeatRecord.division + '?cardName=' + newHeatRecord.cardName, {
         method: "POST",
         body: images,
         // headers: {

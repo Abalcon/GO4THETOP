@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Header from './HeaderComponent';
-import Home from './HomeComponent';
+import {Home} from './HomeComponent';
+import Notice from './NoticeComponent'
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
 import MainEvent from './MainEventComponent';
@@ -58,6 +59,12 @@ class Main extends Component {
             );
         };
 
+        // const NoticePage = () => {
+        //     return (
+        //         <Notice notices={this.props.notices}/>
+        //     );
+        // };
+
         const CreditsPage = () => {
             return (
                 <Credits staffs={this.props.staffs}/>
@@ -95,6 +102,7 @@ class Main extends Component {
                 <div className="container">
                     <Switch>
                         <Route path="/home" component={HomePage} />
+                        {/*<Route path="/notices" component={NoticePage} />*/}
                         <Route path="/credits" component={CreditsPage} />
                         <Route path="/preliminary" component={PreliminaryPage} />
                         <Route path="/mainevent" component={MainEventPage} />

@@ -1,9 +1,9 @@
 {
   "rule": {
     "title": [
-      "본선 규칙",
-      "Main Event Rule",
-      "本選規則"
+      "본선 규칙 및 지정곡",
+      "Main Event Rule & Music List",
+      "本選規則と課題曲"
     ],
     "lang": [
       "언어 선택 : ",
@@ -15,15 +15,55 @@
       "Round of 16",
       "16強"
     ],
+    "round1-lower": [
+      "Lower 16강",
+      "Lower R16",
+      "Lower 16強"
+    ],
+    "round1-upper": [
+      "Upper 16강",
+      "Upper Round of 16",
+      "Upper 16強"
+    ],
     "round2": [
       "더블 엘리미네이션",
       "Double Elimination",
       "ダブル・エリミネーション"
     ],
+    "round2-lower": [
+      "Lower 8강",
+      "Lower R8",
+      "Lower 8強"
+    ],
+    "round2-upper": [
+      "Upper 8강",
+      "Upper R8",
+      "Upper 8強"
+    ],
+    "repechages-lower": [
+      "Lower 패자 4강",
+      "Lower Loser SF",
+      "Lower 패자 4強"
+    ],
+    "repechages-upper": [
+      "Upper 패자 4강",
+      "Upper Loser SF",
+      "Upper 패자 4強"
+    ],
     "final": [
       "결승 리그",
       "Final League",
       "ファイナルリーグ"
+    ],
+    "lower-music": [
+      "Lower 지정곡",
+      "Lower music list",
+      "Lower 課題曲"
+    ],
+    "upper-music": [
+      "Upper 지정곡",
+      "Upper music list",
+      "Upper 課題曲"
     ],
     "image1": [
       "assets/images/MainEvent_kr1.jpg",

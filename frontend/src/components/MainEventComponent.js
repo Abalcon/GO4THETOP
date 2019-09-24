@@ -13,29 +13,16 @@ class MainEvent extends Component {
         super(props);
 
         this.props.addTranslation(ruleTranslations);
+        this.state = {
+            slideIndex: 0
+        };
     }
 
-    // componentDidMount() {
-    //     fetch(awsApiURL + 'contenders', {method: 'GET', credentials: 'same-origin'})
-    //         .then(response => {
-    //             if (response.ok) { return response; }
-    //             else { var error = new Error('Error ' + response.status + ': ' + response.statusText)
-    //                 error.response = response;
-    //                 throw error;
-    //
-    //             }
-    //         },
-    //         error => {
-    //             var errmsg = new Error(error.message);
-    //             throw errmsg
-    //         })
-    //         .then(response => response.json())
-    //         .then(contenders => this.setState({
-    //             contenders: contenders
-    //         }))
-    //         .catch(error => console.log(error.message));
-    //
-    // }
+    handleChange(value) {
+        this.setState({
+            slideIndex: value,
+        });
+    };
 
     render () {
         const Image1 = () => (
@@ -77,61 +64,158 @@ class MainEvent extends Component {
         return (
             <div className="container">
                 <h4>
-                    <Translate id="rule.title">본선 규칙</Translate>
+                    <Translate id="rule.title">본선 규칙 및 지정곡</Translate>
                 </h4>
                 <p>
                     <Translate id="rule.lang">언어 선택 :</Translate>
                     <LanguageToggle/>
                 </p>
-                {/*<h4>본선 진출자</h4>*/}
-                {/*<p>*/}
-                {/*    예선 기간이 종료하고 나서 공개 예정입니다!<br/>*/}
-                {/*    이용에 불편을 드려 대단히 죄송합니다.*/}
-                {/*</p>*/}
-                {/*<div className="row">*/}
-                {/*    <Card>*/}
-                {/*        <CardImg top src='assets/images/G4TT_Logo.jpeg' alt='HeatRuleTest'/>*/}
-                {/*        <CardBody>*/}
-                {/*            <CardTitle>본선 진출 테스트</CardTitle>*/}
-                {/*            <CardSubtitle>테스트</CardSubtitle>*/}
-                {/*            <CardText>테스트</CardText>*/}
-                {/*        </CardBody>*/}
-                {/*    </Card>*/}
-                {/*    <Card>*/}
-                {/*        <CardImg top src='assets/images/background_example.jpeg' alt='HeatRuleTest'/>*/}
-                {/*        <CardBody>*/}
-                {/*            <CardTitle>본선 진출 테스트</CardTitle>*/}
-                {/*            <CardSubtitle>테스트</CardSubtitle>*/}
-                {/*            <CardText>테스트</CardText>*/}
-                {/*        </CardBody>*/}
-                {/*    </Card>*/}
-                {/*</div>*/}
 
-                {/*<div className="row">*/}
-                {/*    {contenders}*/}
-                {/*</div>*/}
-
-                <Tabs>
+                <Tabs selectedIndex={this.state.slideIndex} onSelect={tab => this.handleChange(tab)}>
                     <TabList>
                         <Tab>
                             <Translate id="rule.round1">16강</Translate>
                         </Tab>
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.round1-lower">Lower 16강</Translate>*/}
+                        {/*</Tab>*/}
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.round1-upper">Upper 16강</Translate>*/}
+                        {/*</Tab>*/}
                         <Tab>
                             <Translate id="rule.round2">더블 엘리미네이션</Translate>
                         </Tab>
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.round2-lower">Lower 16강</Translate>*/}
+                        {/*</Tab>*/}
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.round2-upper">Upper 16강</Translate>*/}
+                        {/*</Tab>*/}
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.repechages-lower">Lower 패자 4강</Translate>*/}
+                        {/*</Tab>*/}
+                        {/*<Tab>*/}
+                        {/*    <Translate id="rule.repechages-upper">Upper 패자 4강</Translate>*/}
+                        {/*</Tab>*/}
                         <Tab>
                             <Translate id="rule.final">결승 리그</Translate>
+                        </Tab>
+                        <Tab>
+                            <Translate id="rule.lower-music">Lower 지정곡</Translate>
+                        </Tab>
+                        <Tab>
+                            <Translate id="rule.upper-music">Upper 지정곡</Translate>
                         </Tab>
                     </TabList>
 
                     <TabPanel>
                         <Image1/>
                     </TabPanel>
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Lower_R16-1.jpg" alt="round1-lower1"/>*/}
+                    {/*        </Card>*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Lower_R16-2.jpg" alt="round1-lower2"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Upper_R16-1.jpg" alt="round1-upper1"/>*/}
+                    {/*        </Card>*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Upper_R16-2.jpg" alt="round1-upper2"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
                     <TabPanel>
                         <Image2/>
                     </TabPanel>
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Lower_R8-1.jpg" alt="round2-lower1"/>*/}
+                    {/*        </Card>*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Lower_R8-2.jpg" alt="round2-lower2"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Upper_R8-1.jpg" alt="round2-upper1"/>*/}
+                    {/*        </Card>*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Upper_R8-2.jpg" alt="round2-upper2"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Lower_Repechages.jpg" alt="repechages-lower"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
+                    {/*<TabPanel>*/}
+                    {/*    <div className="row col-md-10">*/}
+                    {/*        <Card>*/}
+                    {/*            <CardImg top src="assets/images/Upper_Repechages.jpg" alt="repechages-upper"/>*/}
+                    {/*        </Card>*/}
+                    {/*    </div>*/}
+                    {/*</TabPanel>*/}
                     <TabPanel>
                         <Image3/>
+                    </TabPanel>
+                    <TabPanel>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Lower_R16-1.jpg" alt="round1-lower1"/>
+                            </Card>
+                            <Card>
+                                <CardImg top src="assets/images/Lower_R16-2.jpg" alt="round1-lower2"/>
+                            </Card>
+                        </div>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Lower_R8-1.jpg" alt="round2-lower1"/>
+                            </Card>
+                            <Card>
+                                <CardImg top src="assets/images/Lower_R8-2.jpg" alt="round2-lower2"/>
+                            </Card>
+                        </div>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Lower_Repechages.jpg" alt="repechages-lower"/>
+                            </Card>
+                        </div>
+                    </TabPanel>
+                    <TabPanel>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Upper_R16-1.jpg" alt="round1-upper1"/>
+                            </Card>
+                            <Card>
+                                <CardImg top src="assets/images/Upper_R16-2.jpg" alt="round1-upper2"/>
+                            </Card>
+                        </div>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Upper_R8-1.jpg" alt="round2-upper1"/>
+                            </Card>
+                            <Card>
+                                <CardImg top src="assets/images/Upper_R8-2.jpg" alt="round2-upper2"/>
+                            </Card>
+                        </div>
+                        <div className="row col-md-10">
+                            <Card>
+                                <CardImg top src="assets/images/Upper_Repechages.jpg" alt="repechages-upper"/>
+                            </Card>
+                        </div>
                     </TabPanel>
                 </Tabs>
             </div>

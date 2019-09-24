@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {Alert, Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavItem, Jumbotron} from 'reactstrap';
 import { NavLink } from 'react-router-dom';
 import Countdown from 'react-countdown-now';
+import YouTubeSubscribe from './YoutubeSubscribeComponent';
 
 class Header extends Component {
     constructor(props) {
@@ -34,6 +35,8 @@ class Header extends Component {
                 return <h4 style={{fontWeight: 'bold'}}>남은 예선 기간<br/>{days}일 {hours}시간 {minutes}분 {seconds}초</h4>
             }
         };
+
+        const channelid = "UCh4Y-WGU7D5uZoJaaYYkbBQ";
 
         return (
             <div>
@@ -80,6 +83,15 @@ class Header extends Component {
 
                                         </span>Donation & Goods
                                     </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <YouTubeSubscribe
+                                        // channelName={channelName}
+                                        channelid={channelid}
+                                        theme={"default"}
+                                        layout={"full"}
+                                        count={"default"}
+                                    />
                                 </NavItem>
                             </Nav>
                         </Collapse>
