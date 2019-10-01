@@ -5,11 +5,11 @@ import Notice from './NoticeComponent'
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
 import MainEvent from './MainEventComponent';
-import {Donation} from './DonationComponent';
+import Donation from './DonationComponent';
 //import {Collapse, Jumbotron, Nav, Navbar, NavbarBrand, NavbarToggler, NavItem} from "reactstrap";
 import {Switch, Route, Redirect, withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
-import {postContender, fetchContenders, postHeatRecord} from "../redux/actionCreators";
+import {postContender, fetchContenders, postHeatRecord, postCommitment} from "../redux/actionCreators";
 import {renderToStaticMarkup} from "react-dom/server";
 import {withLocalize} from "react-localize-redux";
 import globalTranslations from "../translations/global.json";
@@ -30,7 +30,9 @@ const mapDispatchToProps = (dispatch) => ({
         dispatch(fetchContenders(isRefresh))
     },
     postHeatRecord: (cardName, division, image1, image2) =>
-        dispatch(postHeatRecord(cardName, division, image1, image2))
+        dispatch(postHeatRecord(cardName, division, image1, image2)),
+    postCommitment: (cmtID, division, name, email, address, senderName, sendType, accountNumber, getReward, rewardRequest, shirtSize, shirtAmount) =>
+        dispatch(postCommitment(cmtID, division, name, email, address, senderName, sendType, accountNumber, getReward, rewardRequest, shirtSize, shirtAmount))
 });
 
 class Main extends Component {
@@ -92,7 +94,8 @@ class Main extends Component {
 
         const DonationPage = () => {
             return (
-                <Donation/>
+                <Donation isProcessing={this.props.contenders.isProcessing}
+                          postCommitment={this.props.postCommitment}/>
             )
         };
 

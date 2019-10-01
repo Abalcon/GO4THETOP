@@ -1,13 +1,13 @@
 import * as actionTypes from './actionTypes';
 import {localURL, awsApiURL} from '../shared/urlList';
 
-const targetURL = () => {
+function targetURL() {
     let isDev = process.env.NODE_ENV !== 'production';
     if (isDev)
         return localURL;
     else
         return awsApiURL;
-};
+}
 
 export const addContender = (contender) => ({
     type: actionTypes.ADD_CONTENDER,
@@ -35,7 +35,7 @@ export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, 
         comments: comments
     };
     // newContender.date = new Date.toISOString();
-    return fetch(targetURL + 'entry', {
+    return fetch(targetURL() + 'entry', {
         method: "POST",
         body: JSON.stringify(newContender),
         headers: {
@@ -170,5 +170,65 @@ export const postHeatRecord = (cardName, division, image1, image2) => (dispatch)
             //console.log('Failed to submit: ', error.message);
             alert('기록 제출에 실패했습니다. 다시 시도하시기 바랍니다 (Failed to submit your records, please try again): ' + error.message);
             dispatch(fetchContenders(false));
+        });
+};
+
+export const addCommitment = () => ({
+    type: actionTypes.ADD_COMMITMENT
+});
+
+// 후원 및 구매
+export const postCommitment = (cmtID, division, name, email, address, senderName, sendType, accountNumber, getReward, rewardRequest, shirtSize, shirtAmount) => (dispatch) => {
+    if (getReward === undefined)
+        getReward = false;
+
+    dispatch(addCommitment(true));
+
+    const newCommitment = {
+        cmtID: cmtID,
+        division: division,
+        name: name,
+        email: email,
+        address: address,
+        senderName: senderName,
+        sendType: sendType,
+        accountNumber: accountNumber,
+        getReward: getReward,
+        rewardRequest: rewardRequest,
+        shirtSize: shirtSize,
+        shirtAmount: shirtAmount
+    };
+    // newContender.date = new Date.toISOString();
+    return fetch(targetURL() + 'commitment', {
+        method: "POST",
+        body: JSON.stringify(newCommitment),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    })
+        .then(response => {
+                if (response.ok) {
+                    if (division === "donate")
+                        alert('GO4THETOP 3회 대회 후원 신청이 완료되었습니다!');
+                    else if (division === "purchase")
+                        alert('GO4THETOP 3회 대회 티셔츠 구매 신청이 완료되었습니다!');
+
+                    dispatch(fetchContenders(true));
+                } else {
+                    let error = new Error('Error' + response.status + ': ' + response.statusText + ' - ' + response.body);
+                    error.response = response;
+                    throw error;
+                }
+            },
+            error => {
+                let errmsg = new Error(error.message);
+                throw errmsg;
+            })
+        .catch(error => {
+            if (division === "donate")
+                alert('후원 신청이 실패했습니다. 다시 시도하시기 바랍니다.');
+            else if (division === "purchase")
+                alert('티셔츠 구매 신청이 실패했습니다. 다시 시도하시기 바랍니다.');
         });
 };

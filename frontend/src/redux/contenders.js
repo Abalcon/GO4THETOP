@@ -21,6 +21,7 @@ export const Contenders = (state = {
             //console.log("Here comes a new contender: " + contender);
             return {...state, contenders: state.contenders.concat(contender)};
         case actionTypes.ADD_HEATRECORD:
+        case actionTypes.ADD_COMMITMENT:
             return {...state, isProcessing: true};
         default:
             return state;
