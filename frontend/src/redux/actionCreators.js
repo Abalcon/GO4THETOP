@@ -230,5 +230,6 @@ export const postCommitment = (cmtID, division, name, email, address, senderName
                 alert('후원 신청이 실패했습니다. 다시 시도하시기 바랍니다.');
             else if (division === "purchase")
                 alert('티셔츠 구매 신청이 실패했습니다. 다시 시도하시기 바랍니다.');
+            dispatch(fetchContenders(true));
         });
 };

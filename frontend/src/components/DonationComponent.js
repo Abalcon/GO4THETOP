@@ -3,6 +3,7 @@ import {Button, Card, CardImg, Col, Label, Row} from "reactstrap";
 import {Control, Errors, Field, LocalForm} from "react-redux-form";
 import {Tab, TabList, TabPanel, Tabs} from "react-tabs";
 import {Loading} from "./LoadingComponent";
+import CardTitle from "reactstrap/es/CardTitle";
 
 const required = (val) => val && val.length;
 const selectRequired = (val) => val && (val !== "none");
@@ -113,21 +114,24 @@ class Donation extends Component {
                 <div className="container">
                     <Tabs>
                         <TabList>
-                            <Tab>후원 안내</Tab>
                             <Tab>구매 안내</Tab>
+                            <Tab>후원 안내</Tab>
                         </TabList>
 
                         <TabPanel>
                             <div className="row col-md-10">
                                 <Card>
-                                    <CardImg top src="assets/images/DonationRevised.jpg" alt="Donate"/>
+                                    <CardImg top src="assets/images/Purchase.jpg" alt="Purchase"/>
+                                    <CardTitle tag="h4" style={{textAlign: 'center'}}>
+                                        구매 계좌: 1002-643-481308 (우리은행: 양희원)
+                                    </CardTitle>
                                 </Card>
                             </div>
                         </TabPanel>
                         <TabPanel>
                             <div className="row col-md-10">
                                 <Card>
-                                    <CardImg top src="assets/images/Purchase.jpg" alt="Purchase"/>
+                                    <CardImg top src="assets/images/DonationRevised.jpg" alt="Donate"/>
                                 </Card>
                             </div>
                         </TabPanel>
@@ -285,7 +289,7 @@ class Donation extends Component {
                         <Row className="form-group">
                             <Col md={{size: 10, offset: 2}}>
                                 <Button type="submit" color="primary" disabled={this.props.isProcessing}>
-                                    All your base are belong to us
+                                    신청/확인서 제출하기
                                 </Button>
                             </Col>
                         </Row>
