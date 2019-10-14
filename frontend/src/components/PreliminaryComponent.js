@@ -41,7 +41,7 @@ class Preliminary extends Component {
                     <Tabs selectedIndex={this.state.slideIndex} onSelect={tab => this.handleChange(tab)}>
                         <TabList>
                             <Tab>Rules</Tab>
-                            <Tab>Entry</Tab>
+                            <Tab>Entry (Watching Only)</Tab>
                             <Tab>RecordSubmit</Tab>
                             <Tab>Ranking</Tab>
                         </TabList>
@@ -51,6 +51,7 @@ class Preliminary extends Component {
                         </TabPanel>
                         <TabPanel>
                             <Entry contenders={this.props.contenders}
+                                   isProcessing={this.props.contenders.isProcessing}
                                    postContender={this.props.postContender}/>
                         </TabPanel>
                         <TabPanel>
@@ -64,9 +65,6 @@ class Preliminary extends Component {
                                      errMsg={this.props.errMsg}/>
                         </TabPanel>
                     </Tabs>
-
-                    {/*<h4>예선</h4>*/}
-                    {/*<p>Go4TheTop 3회 예선 진행 사항을 표시하는 페이지입니다</p>*/}
                 </div>
             );
         }

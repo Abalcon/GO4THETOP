@@ -19,7 +19,7 @@ export const Contenders = (state = {
         case actionTypes.ADD_CONTENDER:
             var contender = action.payload;
             //console.log("Here comes a new contender: " + contender);
-            return {...state, contenders: state.contenders.concat(contender)};
+            return {...state, contenders: state.contenders.concat(contender), isProcessing: false};
         case actionTypes.ADD_HEATRECORD:
         case actionTypes.ADD_COMMITMENT:
             return {...state, isProcessing: true};

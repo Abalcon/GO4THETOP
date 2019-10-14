@@ -131,7 +131,7 @@ class Donation extends Component {
                         <TabPanel>
                             <div className="row col-md-10">
                                 <Card>
-                                    <CardImg top src="assets/images/DonationRevised.jpg" alt="Donate"/>
+                                    <CardImg top src="assets/images/DonationWithRewards.jpg" alt="Donate"/>
                                 </Card>
                             </div>
                         </TabPanel>

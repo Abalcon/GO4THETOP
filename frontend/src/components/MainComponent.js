@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import Header from './HeaderComponent';
 import {Home} from './HomeComponent';
-import Notice from './NoticeComponent'
 import Credits from './CreditsComponent';
 import Preliminary from './PreliminaryComponent';
 import MainEvent from './MainEventComponent';

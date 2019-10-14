@@ -15,6 +15,8 @@ export const addContender = (contender) => ({
 });
 
 export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, upper, watch, snstype, snsid, comments) => (dispatch) => {
+    dispatch(addHeatRecord(true));
+
     const makeSNS = (snstype, snsid) => {
         if (snstype && snstype !== "" && snstype !== "None") {
             return snstype + ": " + snsid;
@@ -60,11 +62,12 @@ export const postContender = (ctdID, mail, fullName, nameread, cardName, lower, 
         .then(response => response.json())
         .then(result => {
             dispatch(addContender(result));
-            alert('GO4THETOP 3회 대회에 참가해주셔서 감사합니다! (Thank you for participating GO4THETOP 3rd Season!)')
+            alert('GO4THETOP 3rd Season 관람을 신청해주셔서 감사합니다! (Thank you for participating GO4THETOP 3rd Season!)')
         })
         .catch(error => {
             //console.log('Failed to entry: ', error.message);
-            alert('참가 신청에 실패했습니다 (Failed to register your entry)')
+            dispatch(fetchContenders(false));
+            alert('관람 신청에 실패했습니다 (Failed to register your entry)')
         });
 };
 
