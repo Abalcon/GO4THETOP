@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Label, Row, Col, Card, CardImg} from 'reactstrap';
+import {Button, Label, Row, Col/*, Card, CardImg*/} from 'reactstrap';
 import {Control, LocalForm, Errors, Field} from 'react-redux-form';
 
 const required = (val) => val && val.length;
