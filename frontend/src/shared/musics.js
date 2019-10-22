@@ -1,32 +1,41 @@
 export const G4TTMusics = {
+    // ORCA.png는 아직 자켓을 못 찾아서 임시로 넣는 이미지
     Lower_R16: [
         {
             name: "A",
+            image: "A_Amuro.png",
             difficulty: "challenge",
             level: 12
         },
         {
             name: "CG Project",
+            image: "CG_Project.png",
             difficulty: "expert",
             level: 12
         },
         {
-            name: "BREAK DOWN!",
+            name: "BRE∀K DOWN!",
+            read: "BREAK DOWN!",
+            image: "BREAK_DOWN.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "LEVEL UP",
+            image: "ORCA.png",
             difficulty: "expert",
             level: 13
         },
         {
             name: "WILD SIDE",
+            image: "WILD_SIDE.png",
             difficulty: "challenge",
             level: 12
         },
         {
-            name: "爆なな☆ですとロイヤ",
+            name: "爆なな☆てすとロイヤ",
+            read: "Bakunana Testroyer",
+            image: "Bakunana_testroyer_HARD.png",
             difficulty: "expert",
             level: 13
         }
@@ -34,31 +43,39 @@ export const G4TTMusics = {
     Lower_R8: [
         {
             name: "革命",
+            read: "Kakumei",
+            image: "Kakumei.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "雫",
+            read: "Shizuku",
+            image: "Shizuku_DDR.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "50th Memorial Songs -Flagship medley-",
+            image: "50th_Memorial_Songs_-Flagship_medley-.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "ORION.78 ~civilization mix~",
+            image: "ORION.78__civilization_mix_.png",
             difficulty: "expert",
             level: 13
         },
         {
-            name: "GRADIUSIC CYBER ~AMD 65 MIX~",
+            name: "GRADIUSIC CYBER ~AMD G5 MIX~",
+            image: "GRADIUSIC_CYBER_AMD_G5_MIX.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "CROSS",
+            image: "ORCA.png",
             difficulty: "expert",
             level: 13
         }

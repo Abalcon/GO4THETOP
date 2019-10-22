@@ -42,20 +42,21 @@ export const Qualifiers = () => {
                 <Col md={3}>EPOS</Col>
                 <Col md={3}>UNKNOWN</Col>
                 <Col md={3}>FILITE</Col>
-                <Col md={3}>NAMUWIKI</Col>
+                <Col md={3}>ANTITEZE</Col>
             </Row>
             <Row tag="h5" style={{textAlign: 'center'}}>
-                <Col md={3}>ANTITEZE</Col>
                 <Col md={3}>SETH</Col>
                 <Col md={3}>RAHWA</Col>
                 <Col md={3}>LEESEULB</Col>
+                <Col md={3}>ZAYUEX1A</Col>
             </Row>
             <Row tag="h5" style={{textAlign: 'center'}}>
-                <Col md={3}>ZAYUEX1A</Col>
                 <Col md={3}>CONFUZE</Col>
                 <Col md={3}>NINEMYUZ</Col>
                 <Col md={3}>MEIER</Col>
+                <Col md={3}>YUKARI-.</Col>
             </Row>
+            <h4>(10.20) Upper 기권자에 따른 진출자 변경</h4>
         </div>
     );
 };

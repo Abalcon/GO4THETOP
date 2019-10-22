@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, CardTitle, CardSubtitle, Button} from "reactstrap";
+import {Card, CardImg, CardTitle, CardSubtitle, Button} from "reactstrap";
 import {G4TTMusics} from "../shared/musics";
 import RoundSelect from "./RoundSelectComponent";
 
@@ -75,6 +75,19 @@ class MusicSelect extends Component {
     }
 
     render() {
+        const borderColor = (diff) => {
+            switch (diff) {
+                case "challenge":
+                    return {border: '5px solid BlueViolet'};
+                case "expert":
+                    return {border: '5px solid Chartreuse'};
+                case "difficult":
+                    return {border: '5px solid Coral'};
+                default:
+                    return;
+            }
+        };
+
         return (
             <div className="container">
                 <h3>라운드 선택 - 지정곡 불러오기</h3>
@@ -114,10 +127,14 @@ class MusicSelect extends Component {
                     {this.state.musicSelectLog.slice(Math.max(this.state.musicSelectLog.length - 2, 0))
                         .map((idx) => (
                             <Card key={idx} className="m-1">
-                                <CardTitle>{this.state.musicList[idx].name}</CardTitle>
-                                <CardSubtitle>{this.state.musicList[idx].difficulty}</CardSubtitle>
+                                <CardImg top src={"assets/images/" + this.state.musicList[idx].image}
+                                         style={borderColor(this.state.musicList[idx].difficulty)} alt="RandomMusic"/>
+                                <CardTitle tag="h4">{this.state.musicList[idx].name}</CardTitle>
+                                <CardSubtitle tag="h4">{this.state.musicList[idx].difficulty}{' '}
+                                    {this.state.musicList[idx].level}</CardSubtitle>
                             </Card>
-                        ))}
+                        ))
+                    }
                 </div>
             </div>
         );
