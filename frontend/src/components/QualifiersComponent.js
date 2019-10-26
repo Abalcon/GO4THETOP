@@ -9,7 +9,7 @@ export const Qualifiers = () => {
             <Row tag="h5" style={{textAlign: 'center'}}>
                 <Col md={3} style={{backgroundColor: 'Gold'}}>RETOREE</Col>
                 <Col md={3} style={{backgroundColor: 'Silver'}}>JUPITER</Col>
-                <Col md={3}>DANOBAK</Col>
+                <Col md={3}>HANXYASU</Col>
                 <Col md={3}>COCOA</Col>
             </Row>
             <Row tag="h5" style={{textAlign: 'center'}}>
@@ -46,7 +46,7 @@ export const Qualifiers = () => {
             </Row>
             <Row tag="h5" style={{textAlign: 'center'}}>
                 <Col md={3}>SETH</Col>
-                <Col md={3}>RAHWA</Col>
+                <Col md={3}>RAWHA</Col>
                 <Col md={3}>LEESEULB</Col>
                 <Col md={3}>ZAYUEX1A</Col>
             </Row>

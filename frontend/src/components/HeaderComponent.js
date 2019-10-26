@@ -25,14 +25,13 @@ class Header extends Component {
             backgroundImage: 'url(assets/images/background_example.jpeg)'
         };
 
-        //TODO: 예선 기간 countdown
-        const TimeOver = () => <h4>예선 기간이 종료되었습니다!<br/>많은 참여 감사드립니다</h4>;
+        const TimeOver = () => <h4>본선 진행중입니다!</h4>;
 
         const timeLimitRenderer = ({days, hours, minutes, seconds, completed}) => {
             if (completed) {
                 return <TimeOver/>;
             } else {
-                return <h4 style={{fontWeight: 'bold'}}>남은 예선 기간<br/>{days}일 {hours}시간 {minutes}분 {seconds}초</h4>
+                return <h4 style={{fontWeight: 'bold'}}>본선 개최까지 남은 시간:<br/>{days}일 {hours}시간 {minutes}분 {seconds}초</h4>
             }
         };
 
@@ -111,7 +110,7 @@ class Header extends Component {
                 </Jumbotron>
                 <Alert color="info" style={{textAlign: 'center'}}>
                     <Countdown
-                        date={new Date(2019, 8, 16)}
+                        date={new Date(2019, 10, 2, 10, 30)}
                         renderer={timeLimitRenderer}
                     />
                 </Alert>

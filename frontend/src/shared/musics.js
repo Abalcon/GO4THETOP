@@ -22,7 +22,7 @@ export const G4TTMusics = {
         },
         {
             name: "LEVEL UP",
-            image: "ORCA.png",
+            image: "LEVEL_UP.png",
             difficulty: "expert",
             level: 13
         },
@@ -75,7 +75,7 @@ export const G4TTMusics = {
         },
         {
             name: "CROSS",
-            image: "ORCA.png",
+            image: "CROSS.png",
             difficulty: "expert",
             level: 13
         }
@@ -83,16 +83,19 @@ export const G4TTMusics = {
     Lower_Rep: [
         {
             name: "REJOIN",
+            image: "Rejoin.png",
             difficulty: "expert",
             level: 13
         },
         {
             name: "ALGORITHM",
+            image: "ALGORITHM.png",
             difficulty: "expert",
             level: 12
         },
         {
             name: "Dead Heat",
+            image: "Dead_Heat.png",
             difficulty: "expert",
             level: 13
         }
@@ -100,31 +103,38 @@ export const G4TTMusics = {
     Upper_R16: [
         {
             name: "The legend of MAX",
+            image: "The_legend_of_MAX.png",
             difficulty: "expert",
             level: 15
         },
         {
             name: "エンドルフィン",
+            read: "Endorphin",
+            image: "Endorphin.png",
             difficulty: "expert",
             level: 15
         },
         {
             name: "Straight Oath",
+            image: "Straight_Oath.png",
             difficulty: "challenge",
             level: 15
         },
         {
             name: "District of the Shadows",
+            image: "District_of_the_Shadows.png",
             difficulty: "expert",
             level: 16
         },
         {
             name: "BLSTR",
+            image: "BLSTR.png",
             difficulty: "expert",
             level: 16
         },
         {
             name: "GAIA",
+            image: "GAIA.png",
             difficulty: "expert",
             level: 16
         }
@@ -132,31 +142,39 @@ export const G4TTMusics = {
     Upper_R8: [
         {
             name: "New York EVOLVED Ver. C",
+            image: "New_York_EVOLVED.png",
             difficulty: "expert",
             level: 16
         },
         {
             name: "BOSS RUSH",
+            image: "Boss_Rush.png",
             difficulty: "expert",
             level: 16
         },
         {
             name: "Illegal Function Call",
+            image: "Illegal_Function_Call.png",
             difficulty: "expert",
             level: 16
         },
         {
             name: "RËVOLUTI⏀N",
+            read: "REVOLUTION",
+            image: "REVOLUTION.png",
             difficulty: "challenge",
             level: 17
         },
         {
             name: "London EVOLVED Ver. A",
+            image: "London_EVOLVED_Ver.A.png",
             difficulty: "challenge",
             level: 17
         },
         {
             name: "恋する☆宇宙戦争っ!!",
+            read: "Koisuru uchuu sensou",
+            image: "Koisuru_uchuu_sensou!!.png",
             difficulty: "challenge",
             level: 17
         }
@@ -164,16 +182,21 @@ export const G4TTMusics = {
     Upper_Rep: [
         {
             name: "Idola",
+            image: "Idola.png",
             difficulty: "challenge",
             level: 17
         },
         {
             name: "IX",
+            read: "Nine",
+            image: "IX.png",
             difficulty: "expert",
             level: 17
         },
         {
             name: "嘆きの樹",
+            read: "Nageki no ki",
+            image: "Nageki_no_ki.png",
             difficulty: "challenge",
             level: 18
         }

@@ -1,18 +1,15 @@
-export const CONTENDERS =
-    [
-        {
-            id: 1,
-            mail: "extinbase@naver.com",
-            fullName: "DJ 아발컨",
-            cardName: "Abalcon",
-            upper: false,
-            lower: false,
-            upperTrack1: 0,
-            upperTrack2: 0,
-            upperTotal: 0,
-            lowerTrack1: 0,
-            lowerTrack2: 0,
-            lowerTotal: 0,
-            sns: "AutomationCreator"
-        }
-    ];
+export const MainContenders =
+    {
+        Lower: [
+            "RETOREE", "JUPITER", "HANXYASU", "COCOA",
+            "ZAYUEX1A", "WUTOT", "BRDCASE", "FEFEMZ",
+            "5T0HA", "HIKARI", "NINEMYUZ", "CONFUZE",
+            "YUKARI-.", "N00B", "LJW-LUNA", "KIM-DH--"
+        ],
+        Upper: [
+            "FEFEMZ", "RETOREE", "RSS", "COCOA",
+            "EPOS", "UNKNOWN", "CLEANER", "ANTITEZE",
+            "SETH", "KYOUKA", "LEESEULB", "ZAYUEX1A",
+            "CONFUZE", "NINEMYUZ", "MEIER", "YUKARI-."
+        ]
+    };
