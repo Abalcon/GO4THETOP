@@ -1,5 +1,4 @@
 export const G4TTMusics = {
-    // ORCA.png는 아직 자켓을 못 찾아서 임시로 넣는 이미지
     Lower_R16: [
         {
             name: "A",
@@ -91,13 +90,13 @@ export const G4TTMusics = {
             name: "ALGORITHM",
             image: "ALGORITHM.png",
             difficulty: "expert",
-            level: 12
+          level: 13
         },
         {
             name: "Dead Heat",
             image: "Dead_Heat.png",
             difficulty: "expert",
-            level: 13
+          level: 14
         }
     ],
     Upper_R16: [
@@ -181,26 +180,877 @@ export const G4TTMusics = {
     ],
     Upper_Rep: [
         {
-            name: "Idola",
-            image: "Idola.png",
-            difficulty: "challenge",
-            level: 17
+          name: "Idola",
+          image: "Idola.png",
+          difficulty: "challenge",
+          level: 17
         },
-        {
-            name: "IX",
-            read: "Nine",
-            image: "IX.png",
-            difficulty: "expert",
-            level: 17
-        },
-        {
-            name: "嘆きの樹",
-            read: "Nageki no ki",
-            image: "Nageki_no_ki.png",
-            difficulty: "challenge",
-            level: 18
-        }
-    ]
+      {
+        name: "IX",
+        read: "Nine",
+        image: "IX.png",
+        difficulty: "expert",
+        level: 17
+      },
+      {
+        name: "嘆きの樹",
+        read: "Nageki no ki",
+        image: "Nageki_no_ki.png",
+        difficulty: "challenge",
+        level: 18
+      }
+    ],
+  Lower_WSF: [
+    {
+      name: "朝色の紙飛行機",
+      read: "Asairo no kamihikouki",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "天ノ弱",
+      read: "Amanojyaku",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "アルストロメリア (walk with you remix)",
+      read: "Alstromeria walk with you remix",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "challenge",
+      level: 13
+    },
+    {
+      name: "エキサイティング!!も・ちゃ・ちゃ☆",
+      read: "Exciting mochacha",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "乙女繚乱 舞い咲き誇れ",
+      read: "Otomeryouran maisakihokore",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "朧",
+      read: "Oboro",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "challenge",
+      level: 13
+    },
+    {
+      name: "女言葉の消失",
+      read: "Onnakotoba no shoushitsu",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "革命パッショネイト",
+      read: "Kakumei Passionate",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "キケンな果実",
+      read: "Kikenna",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "クリムゾンゲイト",
+      read: "Crimson Gate",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "激アツ☆マジヤバ☆チアガール",
+      read: "Gekiatsu majiyaba cheergirl",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "桜",
+      read: "Sakura",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "幸せになれる隠しコマンドがあるらしい",
+      read: "Siawaseninareru",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "漆黒のスペシャルプリンセスサンデー",
+      read: "special princess sunday",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "十二星座の聖域",
+      read: "Sanctuary of zodiac",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "スイーツはとまらない♪",
+      read: "Sweets wa tomaranai",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "すきなことだけでいいです",
+      read: "Sukinakotodakedeiidesu",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "創世ノート",
+      read: "Sousei Note",
+      image: "G4TT_Logo.jpeg",
+      difficulty: "expert",
+      level: 13
+    },
+  ],
+  // 宇宙(ソラ)への片道切符expert	A	88-175	317/21
+  // タイガーランペイジexpert	A20	150	350/35
+  // 大見解challenge	EXT	143-172	433/16
+  // 闘え！ダダンダーンVexpert	A	176	436/19
+  // 打打打打打打打打打打expert	A	156	448/25
+  // 地方創生☆チクワクティクスexpert	2014	170	404/4
+  // ちゅ～いん☆バニーchallenge	2014	180	323/19(52)
+  // チルノのパーフェクトさんすう教室expert	A	175	409/30
+  // チルノのパーフェクトさんすう教室(EDM REMIX)expert	A	130(-175)	513/7
+  // デッドボヲルdeホームランexpert	2014	145	424/17
+  // 虹色challenge	SN	160	427/6
+  // 熱情のサパデアードexpert	A20	136	400/40
+  // 爆なな☆てすとロイヤーexpert	2014	200	520/11
+  // 初音ミクの消失expert	A	240	533/10
+  // ハッピーシンセサイザexpert	A	127	344/4
+  // パ→ピ→プ→Yeah!expert	2014	160	358/11
+  // *ハロー、プラネット。expert	A	150	435/46
+  // ビビットストリームexpert	2014	184	464/18
+  // 向日葵サンセットexpert	A	135	339/18
+  // ビューティフル レシートexpert	X3	196	362/50
+  // 無頼ック自己ライザーexpert	A	150	475/17
+  // プレインエイジア -PHQ remix-expert	A	182	482/9
+  // ベィスドロップ・フリークスexpert	A	179	455/20
+  // ホメ猫☆センセーションexpert	2014	200	536/7
+  // 回レ！雪月花challenge	2014	160	351/19
+  // ライアーダンスexpert	A20	200	431/21
+  // ラキラキexpert	2013	165	422/26
+  // ラクガキストexpert	2014	199	562/2
+  // 繚乱ヒットチャートexpert	X3	192	444/19
+  // 輪廻転生expert	A	196	612/18
+  // AAexpert	SN	154	386/2
+  // Across the nightmarechallenge	EXT	300	372/0
+  // AFRONOVAexpert	3rd	200	370/0
+  // AFRONOVA (X-Special)challenge	X	200	394/30
+  // aftershock!!expert	X2	157(-628)	447/14
+  // ALL MY HEART -この恋に、わたしの全てを賭ける-expert	A	160	391/6
+  // ALGORITHMexpert	A	130	423/16
+  // Amalgamationexpert	X3	166	436/9
+  // Angelic Jellyexpert	A	100-200	531/2
+  // AWAKEexpert	2014	180	444/33
+  // bagexpert	EXT	65	382/0
+  // bagchallenge	EXT	65	382/0
+  // BRILLIANT 2U -"STREAM" Special-challenge	SN2	150	340/6
+  // Burning Heat! (3 Option Mix)expert	MAX2	166	413/5
+  // CaptivAte ~誓い~expert	SN2	160	420/15
+  // Colors (for EXTREME)challenge	EXT	150	430/7
+  // Condorexpert	2013	142	363/14
+  // Cosmic Hurricaneexpert	X3	188	483/18
+  // Crazy Shuffleexpert	A20	128	417/23
+  // CROSSexpert	A20	150	447/23
+  // Dance Celebration (System 7 Remix)expert	X	132	314/31
+  // Dance Dance Revolution (X-Special)challenge	X	150	353/36
+  // Dance Partaychallenge	2014	135	378/5
+  // Dancer in the flareexpert	A	132	358/3
+  // Destiny Loversexpert	EXT	170	358/14
+  // Diamond Dustchallenge	X3	148	274/18(39)
+  // dirty digitalchallenge	X2	140	306/2
+  // Dispersion Starexpert	2014	180	340/23
+  // DoLLchallenge	SN	170	431/51
+  // DOWNER & UPPERexpert	A20	140	381/36
+  // DROP OUTexpert	4th	260	397/0
+  // Elysiumchallenge	2014	145	403/30
+  // escapechallenge	2013	140	352/10(35)
+  // esrev:eRexpert	2014	155	408/26
+  // Eternal Summerexpert	A	145	476/21
+  // exotic ethnicexpert	MAX	190	431/21
+  // Far east nightbird kors k Remix -DDR edit ver-expert	A	175	393/11
+  // FLOWERexpert	X3	173	442/11
+  // Flow (Jammin' Ragga Mix)expert	SN2	70-140	309/25
+  // Flow (True style)challenge	SN	140-280	364/1
+  // Fly away -mix del matador-expert	SN2	130	372/15
+  // Fly far bounceexpert	A	(91-)163	385/6
+  // Freezechallenge	X2	140	268/54(23)
+  // GRADIUSIC CYBER (AMD G5 Mix)expert	3rd	160	370/0
+  // Grand Chariotexpert	A	191	518/13
+  // Habibe (Antuh muhleke)expert	2014	144	389/0
+  // HANDS UP IN THE AIRexpert	A	128	360/2
+  // Haunted Rhapsodyexpert	X3	155	363/16
+  // Healing Vision (Angelic mix)expert	MAX	49-196	479/0
+  // HEART BEAT FORMULAexpert	X3	230	457/10
+  // HEART BEAT FORMULA (Vinyl Mix)expert	2014	115	387/8
+  // heronchallenge	2013	182	301/14(35)
+  // High School Loveexpert	A	180	470/21
+  // Hillbilly Shoesexpert	A	116	376/7
+  // Hopefulexpert	A	146	354/14
+  // iFUTURELIST (DDR VERSION)challenge	SN	150	355/6
+  // INSERTiONexpert	5th	110-225	374/0
+  // La recetachallenge	X2	130	361/19
+  // LEADING CYBERexpert	4th	150	359/0
+  // Leaving...challenge	X2	145	384/16
+  // LEVEL UPexpert	A20	180	394/16
+  // Malaccachallenge	X	140	385/18
+  // M.A.Y.U.expert	2014	128	420/8
+  // MAX LOVEchallenge	X2	180	547/3
+  // Mind Parasiteexpert	SN	145	330/26
+  // MITOれて！いばらきっしゅだ～りんexpert	2014	173	423/13
+  // Monkey Businessexpert	2013	80-160	445/17
+  // No.13expert	SN	172	420/9
+  // On The Breakexpert	X	85-170	370/18
+  // ORION.78 (civilization mix)expert	MAX	200	398/0
+  // PARANOiA ETERNALexpert	5th	200	381/5
+  // PARANOiA ETERNAL (X-Special)challenge	X	200	452/30
+  // PARANOiA MAX ~DIRTY MIX~ (X-Special)challenge	X	190	420/4
+  // PARANOiA Rebirthexpert	3rd	190	433/0
+  // PARANOiA (X-Special)challenge	X	180	371/12
+  // printempsexpert	2013	168	396/6
+  // PUT YOUR FAITH IN ME (DA's Twinkly Disco Remix)expert	X3	115	372/22
+  // Rejoinexpert	A	135	434/30
+  // REVOLUTIONARY ADDICTexpert	X3	174(-696)	449/25
+  // Right on time (Ryu☆Remix)challenge	2013	149	217/6(63)
+  // SABER WINGexpert	X	74-222(-444)	442/24
+  // SABER WINGchallenge	X	74-222(-444)	389/18(59)
+  // S・A・G・Aexpert	X	200-244	317/17
+  // sakura stormchallenge	X2	184	388/8
+  // Saturnexpert	SN2	78-155	337/27
+  // Seta Para Cima↑↑expert	A20	140	420/6
+  // SHIONexpert	A	179	507/8
+  // siberiteexpert	A	128	463/4
+  // Somehow You Found Meexpert	2013	180	406/0
+  // SOUL CRASHexpert	SN2	142	390/9
+  // Starry HEAVENchallenge	2013	190	336/16
+  // Star Trailexpert	A	74-148	462/19
+  // STERLING SILVERexpert	A	175	486/6
+  // stoic (EXTREME version)expert	EXT	155	342/3
+  // Straight Oathexpert	2013	182	460/10
+  // Strawberry Chu♡Chu♡expert	A	137	405/13
+  // StrayedCatzexpert	A	114-152	451/12
+  // Struggleexpert	2014	180	510/4
+  // Summer fantasy (Darwin remix)expert	2014	178	348/21
+  // Sweet Sweet ♥ Magicexpert	MAX2	180	372/33
+  // The Island Songchallenge	2013	85	350/19
+  // The Lightexpert	A20	160	335/28
+  // Tribechallenge	X3	139	441/46
+  // TRIP MACHINE survivorexpert	EXT	(43-)170	347/2
+  // TSUBASAexpert	2014	151	454/10
+  // Ubertreffenexpert	X	174	405/9
+  // Une mage blancheexpert	A20	193	468/48
+  // Uranuschallenge	SN2	81-162	402/0
+  // Venuschallenge	SN2	195	436/20
+  // V (for EXTREME)challenge	EXT	150	448/4
+  // volcanoexpert	SN2	240	436/18
+  // Waitingexpert	A20	160	401/5
+  // WH1TE RO5Eexpert	X2	85-170	368/9
+  // What Will Come of Meexpert	X2	140	371/9
+  // Wicked Plastikexpert	X3	145	373/8
+  // WILD SIDEchallenge	2013	165	420/39
+  // xenonexpert	EXT	158	375/11
+  // Xepherexpert	SN	170	442/14
+  // You are a Starchallenge	X2	155	391/32
+  // 50th Memorial Songs -The BEMANI History-expert	A20	136	368/20
+  Upper_WSF: [
+    {
+      name: "A",
+      image: "A_Amuro.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "CG Project",
+      image: "CG_Project.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "BRE∀K DOWN!",
+      read: "BREAK DOWN!",
+      image: "BREAK_DOWN.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "LEVEL UP",
+      image: "LEVEL_UP.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "WILD SIDE",
+      image: "WILD_SIDE.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "爆なな☆てすとロイヤ",
+      read: "Bakunana Testroyer",
+      image: "Bakunana_testroyer_HARD.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "革命",
+      read: "Kakumei",
+      image: "Kakumei.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "雫",
+      read: "Shizuku",
+      image: "Shizuku_DDR.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "50th Memorial Songs -Flagship medley-",
+      image: "50th_Memorial_Songs_-Flagship_medley-.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "ORION.78 ~civilization mix~",
+      image: "ORION.78__civilization_mix_.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "GRADIUSIC CYBER ~AMD G5 MIX~",
+      image: "GRADIUSIC_CYBER_AMD_G5_MIX.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "CROSS",
+      image: "CROSS.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "REJOIN",
+      image: "Rejoin.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "ALGORITHM",
+      image: "ALGORITHM.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "Dead Heat",
+      image: "Dead_Heat.png",
+      difficulty: "expert",
+      level: 14
+    },
+    {
+      name: "The legend of MAX",
+      image: "The_legend_of_MAX.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "エンドルフィン",
+      read: "Endorphin",
+      image: "Endorphin.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "Straight Oath",
+      image: "Straight_Oath.png",
+      difficulty: "challenge",
+      level: 15
+    },
+    {
+      name: "District of the Shadows",
+      image: "District_of_the_Shadows.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BLSTR",
+      image: "BLSTR.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "GAIA",
+      image: "GAIA.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "New York EVOLVED Ver. C",
+      image: "New_York_EVOLVED.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BOSS RUSH",
+      image: "Boss_Rush.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "Illegal Function Call",
+      image: "Illegal_Function_Call.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "RËVOLUTI⏀N",
+      read: "REVOLUTION",
+      image: "REVOLUTION.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "London EVOLVED Ver. A",
+      image: "London_EVOLVED_Ver.A.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "恋する☆宇宙戦争っ!!",
+      read: "Koisuru uchuu sensou",
+      image: "Koisuru_uchuu_sensou!!.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "Idola",
+      image: "Idola.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "IX",
+      read: "Nine",
+      image: "IX.png",
+      difficulty: "expert",
+      level: 17
+    },
+    {
+      name: "嘆きの樹",
+      read: "Nageki no ki",
+      image: "Nageki_no_ki.png",
+      difficulty: "challenge",
+      level: 18
+    }
+  ],
+  Lower_F: [
+    {
+      name: "A",
+      image: "A_Amuro.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "CG Project",
+      image: "CG_Project.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "BRE∀K DOWN!",
+      read: "BREAK DOWN!",
+      image: "BREAK_DOWN.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "LEVEL UP",
+      image: "LEVEL_UP.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "WILD SIDE",
+      image: "WILD_SIDE.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "爆なな☆てすとロイヤ",
+      read: "Bakunana Testroyer",
+      image: "Bakunana_testroyer_HARD.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "革命",
+      read: "Kakumei",
+      image: "Kakumei.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "雫",
+      read: "Shizuku",
+      image: "Shizuku_DDR.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "50th Memorial Songs -Flagship medley-",
+      image: "50th_Memorial_Songs_-Flagship_medley-.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "ORION.78 ~civilization mix~",
+      image: "ORION.78__civilization_mix_.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "GRADIUSIC CYBER ~AMD G5 MIX~",
+      image: "GRADIUSIC_CYBER_AMD_G5_MIX.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "CROSS",
+      image: "CROSS.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "REJOIN",
+      image: "Rejoin.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "ALGORITHM",
+      image: "ALGORITHM.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "Dead Heat",
+      image: "Dead_Heat.png",
+      difficulty: "expert",
+      level: 14
+    },
+    {
+      name: "The legend of MAX",
+      image: "The_legend_of_MAX.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "エンドルフィン",
+      read: "Endorphin",
+      image: "Endorphin.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "Straight Oath",
+      image: "Straight_Oath.png",
+      difficulty: "challenge",
+      level: 15
+    },
+    {
+      name: "District of the Shadows",
+      image: "District_of_the_Shadows.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BLSTR",
+      image: "BLSTR.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "GAIA",
+      image: "GAIA.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "New York EVOLVED Ver. C",
+      image: "New_York_EVOLVED.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BOSS RUSH",
+      image: "Boss_Rush.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "Illegal Function Call",
+      image: "Illegal_Function_Call.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "RËVOLUTI⏀N",
+      read: "REVOLUTION",
+      image: "REVOLUTION.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "London EVOLVED Ver. A",
+      image: "London_EVOLVED_Ver.A.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "恋する☆宇宙戦争っ!!",
+      read: "Koisuru uchuu sensou",
+      image: "Koisuru_uchuu_sensou!!.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "Idola",
+      image: "Idola.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "IX",
+      read: "Nine",
+      image: "IX.png",
+      difficulty: "expert",
+      level: 17
+    },
+    {
+      name: "嘆きの樹",
+      read: "Nageki no ki",
+      image: "Nageki_no_ki.png",
+      difficulty: "challenge",
+      level: 18
+    }
+  ],
+  Upper_F: [
+    {
+      name: "A",
+      image: "A_Amuro.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "CG Project",
+      image: "CG_Project.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "BRE∀K DOWN!",
+      read: "BREAK DOWN!",
+      image: "BREAK_DOWN.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "LEVEL UP",
+      image: "LEVEL_UP.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "WILD SIDE",
+      image: "WILD_SIDE.png",
+      difficulty: "challenge",
+      level: 12
+    },
+    {
+      name: "爆なな☆てすとロイヤ",
+      read: "Bakunana Testroyer",
+      image: "Bakunana_testroyer_HARD.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "革命",
+      read: "Kakumei",
+      image: "Kakumei.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "雫",
+      read: "Shizuku",
+      image: "Shizuku_DDR.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "50th Memorial Songs -Flagship medley-",
+      image: "50th_Memorial_Songs_-Flagship_medley-.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "ORION.78 ~civilization mix~",
+      image: "ORION.78__civilization_mix_.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "GRADIUSIC CYBER ~AMD G5 MIX~",
+      image: "GRADIUSIC_CYBER_AMD_G5_MIX.png",
+      difficulty: "expert",
+      level: 12
+    },
+    {
+      name: "CROSS",
+      image: "CROSS.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "REJOIN",
+      image: "Rejoin.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "ALGORITHM",
+      image: "ALGORITHM.png",
+      difficulty: "expert",
+      level: 13
+    },
+    {
+      name: "Dead Heat",
+      image: "Dead_Heat.png",
+      difficulty: "expert",
+      level: 14
+    },
+    {
+      name: "The legend of MAX",
+      image: "The_legend_of_MAX.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "エンドルフィン",
+      read: "Endorphin",
+      image: "Endorphin.png",
+      difficulty: "expert",
+      level: 15
+    },
+    {
+      name: "Straight Oath",
+      image: "Straight_Oath.png",
+      difficulty: "challenge",
+      level: 15
+    },
+    {
+      name: "District of the Shadows",
+      image: "District_of_the_Shadows.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BLSTR",
+      image: "BLSTR.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "GAIA",
+      image: "GAIA.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "New York EVOLVED Ver. C",
+      image: "New_York_EVOLVED.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "BOSS RUSH",
+      image: "Boss_Rush.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "Illegal Function Call",
+      image: "Illegal_Function_Call.png",
+      difficulty: "expert",
+      level: 16
+    },
+    {
+      name: "RËVOLUTI⏀N",
+      read: "REVOLUTION",
+      image: "REVOLUTION.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "London EVOLVED Ver. A",
+      image: "London_EVOLVED_Ver.A.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "恋する☆宇宙戦争っ!!",
+      read: "Koisuru uchuu sensou",
+      image: "Koisuru_uchuu_sensou!!.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "Idola",
+      image: "Idola.png",
+      difficulty: "challenge",
+      level: 17
+    },
+    {
+      name: "IX",
+      read: "Nine",
+      image: "IX.png",
+      difficulty: "expert",
+      level: 17
+    },
+    {
+      name: "嘆きの樹",
+      read: "Nageki no ki",
+      image: "Nageki_no_ki.png",
+      difficulty: "challenge",
+      level: 18
+    }
+  ]
 };
 
 export const AllMusics =

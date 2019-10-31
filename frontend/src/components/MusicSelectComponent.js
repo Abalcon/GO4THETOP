@@ -1,5 +1,8 @@
 import React, {Component} from 'react';
-import {Card, CardImg, CardTitle, CardSubtitle, Button} from "reactstrap";
+import {
+  Card, CardImg, CardTitle, CardSubtitle, Col, Row,
+  Button, Input, ListGroup, ListGroupItem
+} from "reactstrap";
 import {G4TTMusics} from "../shared/musics";
 import RoundSelect from "./RoundSelectComponent";
 
@@ -10,23 +13,25 @@ class MusicSelect extends Component {
 
         this.loadMusic = this.loadMusic.bind(this);
         this.clearMusic = this.clearMusic.bind(this);
-        this.makeRandomPair = this.makeRandomPair.bind(this);
+      this.handleChange = this.handleChange.bind(this);
+      this.myRef = React.createRef();
 
         this.state = {
             musicNumber: 0,
             musicList: [],
-            musicSelectLog: []
+          filteredList: [],
+          musicSelectLog: [],
+          selectedMusic: null,
+          decidedMusic: null
         };
     }
 
     loadMusic(round) {
-        //console.log(round);
         this.setState({
             musicList: G4TTMusics[round],
             musicNumber: G4TTMusics[round].length,
             musicSelectLog: [] // clear random selection record
         });
-        //console.log(this.state.musicList);
     }
 
     clearMusic() {
@@ -38,40 +43,44 @@ class MusicSelect extends Component {
         });
     }
 
-    /* 순서쌍 랜덤 선택
-    * 1회 시행에 random을 두번 돌려서 값이 서로 다른 순서쌍을 만들어야 한다.
-    * 또한 같은 곡은 최대 2번까지만 나오도록 (필요하면 3번까지)
-    */
-    makeRandomPair() {
-        const isSelectedTwice = (idx) => {
-            console.log(this.state.musicSelectLog.filter((j) => j === idx).length);
-            return this.state.musicSelectLog.filter((j) => j === idx).length >= 2
-        };
-
-        if (this.state.musicNumber === 0) {
-            alert("먼저 지정곡을 불러와야합니다!");
-        } else if (this.state.musicSelectLog.length >= 2 * this.state.musicNumber) { // 왜 여기로 못 들어가지
-            alert("모든 지정곡이 2번씩 나왔습니다! 지정곡을 새로 불러오시기 바랍니다");
+  handleChange(event) {
+    // TODO: 입력 값에 따라 filteredList를 결정
+    if (event.target.value !== '') {
+      let updatedList = this.state.musicList;
+      updatedList = updatedList.filter((item) =>
+        item.name.toLowerCase().search(event.target.value.toLowerCase()) !== -1 ||
+        (item.read !== undefined && item.read.toLowerCase().search(event.target.value.toLowerCase()) !== -1)
+      );
+      this.setState({
+        filteredList: updatedList
+      });
         }
-        // else if ([...Array(this.state.musicNumber).keys()]
-        //     .every((i) => isSelectedTwice(i))) {
-        //     alert("모든 지정곡이 2번씩 나왔습니다! 지정곡을 새로 불러오시기 바랍니다");
-        // }
         else {
-            let first = Math.floor(Math.random() * this.state.musicNumber);
-            while (isSelectedTwice(first))
-                first = Math.floor(Math.random() * this.state.musicNumber);
-
-            let second = Math.floor(Math.random() * this.state.musicNumber);
-            while (second === first || isSelectedTwice(second))
-                second = Math.floor(Math.random() * this.state.musicNumber);
-
             this.setState({
-                musicSelectLog: [...this.state.musicSelectLog, first, second]
+              filteredList: []
             });
-            console.log(this.state.musicList[first], this.state.musicList[second], this.state.musicSelectLog);
-            console.log([...Array(this.state.musicNumber).keys()]);
-        }
+    }
+  }
+
+  handleSelect(event) {
+    //console.log(event.target.value);
+    this.setState({
+      selectedMusic: this.state.musicList.find((music) =>
+        music.name === event.target.value)
+    });
+  }
+
+  decision = null;
+
+  makeDecision() {
+    if (this.state.selectedMusic !== null) {
+      this.setState({
+        decidedMusic: this.state.selectedMusic
+      });
+      console.log("Now Scrolling to: " + this.myRef.current.offsetTop)
+      window.scrollTo(0, this.myRef.current.offsetTop)
+    } else
+      alert('곡을 먼저 선택하고 결정하세요');
     }
 
     render() {
@@ -88,22 +97,66 @@ class MusicSelect extends Component {
             }
         };
 
+      const showSelection = () => {
+        if (this.state.selectedMusic !== null) {
+          return (
+            <Card className="m-1">
+              <CardImg top src={"assets/images/" + this.state.selectedMusic.image}
+                       style={borderColor(this.state.selectedMusic.difficulty)} alt="SelectedMusic"/>
+              <CardTitle tag="h4">{this.state.selectedMusic.name}</CardTitle>
+              <CardSubtitle tag="h4">{this.state.selectedMusic.difficulty}{' '}
+                {this.state.selectedMusic.level}</CardSubtitle>
+            </Card>
+          );
+        } else {
+          return (
+            <Card className="m-1">
+              <CardImg top src="assets/images/G4TT_Logo.jpeg" alt="SelectMusic"/>
+              <CardTitle tag="h4">곡을 선택하세요</CardTitle>
+              <CardSubtitle tag="h4">검색 문자열을 입력하여 클릭</CardSubtitle>
+            </Card>
+          );
+        }
+      };
+
+      const showDecision = () => {
+        if (this.state.decidedMusic !== null) {
+          return (
+            <Card className="m-1">
+              <CardImg top src={"assets/images/" + this.state.decidedMusic.image}
+                       style={borderColor(this.state.decidedMusic.difficulty)} alt="SelectedMusic"/>
+              <CardTitle tag="h4">{this.state.decidedMusic.name}</CardTitle>
+              <CardSubtitle tag="h4">{this.state.decidedMusic.difficulty}{' '}
+                {this.state.decidedMusic.level}</CardSubtitle>
+            </Card>
+          );
+        } else {
+          return (
+            <Card className="m-1">
+              <CardImg top src="assets/images/G4TT_Logo.jpeg" alt="SelectMusic"/>
+              <CardTitle tag="h4">곡을 선택하세요</CardTitle>
+              <CardSubtitle tag="h4">검색 문자열을 입력하여 클릭</CardSubtitle>
+            </Card>
+          );
+        }
+      };
+
         return (
             <div className="container">
                 <h3>라운드 선택 - 지정곡 불러오기</h3>
                 <div className="row ml-auto">
-                    <RoundSelect value="Lower_R16" description="Lower 16강"
-                                 onSelect={(value) => this.loadMusic(value)}/>
-                    <RoundSelect value="Lower_R8" description="Lower 8강"
-                                 onSelect={(value) => this.loadMusic(value)}/>
-                    <RoundSelect value="Lower_Rep" description="Lower 패자 1차"
-                                 onSelect={(value) => this.loadMusic(value)}/>
-                    <RoundSelect value="Upper_R16" description="Upper 16강"
-                                 onSelect={(value) => this.loadMusic(value)}/>
-                    <RoundSelect value="Upper_R8" description="Upper 8강"
-                                 onSelect={(value) => this.loadMusic(value)}/>
-                    <RoundSelect value="Upper_Rep" description="Upper 패자 1차"
-                                 onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Lower_WSF" description="Lower 승자전"
+                               onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Lower_WSF" description="Lower 패자 2차"
+                               onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Lower_F" description="Lower 결승"
+                               onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Upper_WSF" description="Upper 승자전"
+                               onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Upper_WSF" description="Upper 패자 2차"
+                               onSelect={(value) => this.loadMusic(value)}/>
+                  <RoundSelect value="Upper_F" description="Upper 결승"
+                               onSelect={(value) => this.loadMusic(value)}/>
                 </div>
                 <h3>지정곡 불러오기 테스트</h3>
                 <div className="row ml-auto">
@@ -114,27 +167,45 @@ class MusicSelect extends Component {
                         </Card>
                     ))}
                 </div>
-                <h3>순서쌍 랜덤 선택</h3>
+              <h3>검색</h3>
                 <div className="m-1">
-                    <Button color="primary" value="getRandomPair"
-                            disabled={this.state.musicNumber === 0 || this.state.musicSelectLog.length >= 2 * this.state.musicNumber}
-                            onClick={() => this.makeRandomPair()}>
-                        Get a Random Pair!
-                    </Button>
+                  <Row>
+                    <Col md={6}>
+                      <Input name="searchMusic"
+                             onChange={(value) => this.handleChange(value)}
+                             placeholder="원하는 곡을 검색하세요. 읽는 방법으로도 검색됩니다"/>
+                    </Col>
+                    <Col md={6}>
+                      <Button color="primary" value="makeDecision"
+                              disabled={this.state.selectedMusic === null}
+                              onClick={() => this.makeDecision()}>
+                        Let's Heat it up with this Number!
+                      </Button>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md={6}>
+                      <ListGroup>
+                        {this.state.filteredList.slice(0, Math.min(8, this.state.filteredList.length))
+                          .map((music, idx) => (
+                              <ListGroupItem key={idx} tag="button" value={music.name}
+                                             action onClick={(e) => this.handleSelect(e)}>
+                                {music.name}<br/>{music.difficulty}{' '}{music.level}
+                              </ListGroupItem>
+                            )
+                          )}
+                      </ListGroup>
+                    </Col>
+                    <Col md={6}>
+                      <div className="row ml-auto">
+                        {showSelection()}
+                      </div>
+                    </Col>
+                  </Row>
                 </div>
-                <h3>랜덤 선택 결과</h3>
-                <div className="row ml-auto">
-                    {this.state.musicSelectLog.slice(Math.max(this.state.musicSelectLog.length - 2, 0))
-                        .map((idx) => (
-                            <Card key={idx} className="m-1">
-                                <CardImg top src={"assets/images/" + this.state.musicList[idx].image}
-                                         style={borderColor(this.state.musicList[idx].difficulty)} alt="RandomMusic"/>
-                                <CardTitle tag="h4">{this.state.musicList[idx].name}</CardTitle>
-                                <CardSubtitle tag="h4">{this.state.musicList[idx].difficulty}{' '}
-                                    {this.state.musicList[idx].level}</CardSubtitle>
-                            </Card>
-                        ))
-                    }
+              <h3>선곡 결과</h3>
+              <div className="row ml-auto" ref={this.myRef}>
+                {showDecision()}
                 </div>
             </div>
         );

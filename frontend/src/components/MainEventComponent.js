@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import {Tab, TabList, TabPanel, Tabs} from "react-tabs";
 import MainRule from './MainRuleComponent';
 import {Qualifiers} from "./QualifiersComponent";
-import MusicSelect from './MusicSelectComponent';
+import MusicRandom from './MusicRandomComponent';
 import MakeDraw from './MakeDrawComponent';
+import MusicSelect from './MusicSelectComponent'
+import {ShowDraw} from "./ShowDrawComponent";
 
 class MainEvent extends Component {
 
@@ -16,6 +18,8 @@ class MainEvent extends Component {
                         <Tab>본선 진출자</Tab>
                         <Tab>랜덤 선곡</Tab>
                         <Tab>그룹 추첨</Tab>
+                      <Tab>지정 선곡 (검색)</Tab>
+                      <Tab>대진표</Tab>
                     </TabList>
 
                     <TabPanel>
@@ -24,11 +28,17 @@ class MainEvent extends Component {
                     <TabPanel>
                         <Qualifiers/>
                     </TabPanel>
+                  <TabPanel>
+                    <MusicRandom/>
+                  </TabPanel>
+                  <TabPanel>
+                    <MakeDraw/>
+                  </TabPanel>
                     <TabPanel>
                         <MusicSelect/>
                     </TabPanel>
                     <TabPanel>
-                        <MakeDraw/>
+                      <ShowDraw/>
                     </TabPanel>
                 </Tabs>
             </div>
